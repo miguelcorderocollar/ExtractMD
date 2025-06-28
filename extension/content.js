@@ -1,6 +1,195 @@
 // Content script for YouTube Transcript Copier
 console.log('YouTube Transcript Copier content script loaded');
 
+// Global state for the floating button
+let floatingButton = null;
+let isProcessing = false;
+
+// Initialize floating button when page loads
+function initializeFloatingButton() {
+  // Only show on video pages
+  if (!window.location.pathname.includes('/watch')) {
+    return;
+  }
+  
+  // Create floating button
+  floatingButton = document.createElement('div');
+  floatingButton.id = 'yt-transcript-floating-button';
+  floatingButton.innerHTML = `
+    <div class="button-emoji">📝</div>
+  `;
+  
+  // Add styles
+  floatingButton.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    cursor: pointer;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    user-select: none;
+    opacity: 0.7;
+  `;
+  
+  // Hover effects
+  floatingButton.addEventListener('mouseenter', () => {
+    if (!isProcessing) {
+      floatingButton.style.transform = 'translateY(-2px) scale(1.1)';
+      floatingButton.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
+      floatingButton.style.opacity = '1';
+      floatingButton.style.background = 'rgba(255, 255, 255, 0.25)';
+    }
+  });
+  
+  floatingButton.addEventListener('mouseleave', () => {
+    if (!isProcessing) {
+      floatingButton.style.transform = 'translateY(0) scale(1)';
+      floatingButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+      floatingButton.style.opacity = '0.7';
+      floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
+    }
+  });
+  
+  // Click handler
+  floatingButton.addEventListener('click', async () => {
+    if (isProcessing) return;
+    
+    await handleFloatingButtonClick();
+  });
+  
+  // Add to page
+  document.body.appendChild(floatingButton);
+}
+
+// Handle floating button click
+async function handleFloatingButtonClick() {
+  try {
+    isProcessing = true;
+    setButtonLoading();
+    
+    // Call the existing transcript copy function
+    await window.copyYouTubeTranscript();
+    
+    // Show success state
+    setButtonSuccess();
+    
+    // Reset to normal state after 2 seconds
+    setTimeout(() => {
+      setButtonNormal();
+      isProcessing = false;
+    }, 2000);
+    
+  } catch (error) {
+    console.error('Error in floating button handler:', error);
+    setButtonError();
+    
+    // Reset to normal state after 3 seconds
+    setTimeout(() => {
+      setButtonNormal();
+      isProcessing = false;
+    }, 3000);
+  }
+}
+
+// Set button to loading state
+function setButtonLoading() {
+  if (!floatingButton) return;
+  
+  floatingButton.innerHTML = `
+    <div class="button-emoji">⏳</div>
+  `;
+  
+  floatingButton.style.background = 'rgba(255, 193, 7, 0.8)';
+  floatingButton.style.border = '1px solid rgba(255, 193, 7, 0.3)';
+  floatingButton.style.cursor = 'not-allowed';
+  floatingButton.style.fontSize = '20px';
+  floatingButton.style.opacity = '1';
+}
+
+// Set button to success state
+function setButtonSuccess() {
+  if (!floatingButton) return;
+  
+  floatingButton.innerHTML = `
+    <div class="button-emoji">✅</div>
+  `;
+  
+  floatingButton.style.background = 'rgba(76, 175, 80, 0.8)';
+  floatingButton.style.border = '1px solid rgba(76, 175, 80, 0.3)';
+  floatingButton.style.fontSize = '24px';
+  floatingButton.style.opacity = '1';
+}
+
+// Set button to error state
+function setButtonError() {
+  if (!floatingButton) return;
+  
+  floatingButton.innerHTML = `
+    <div class="button-emoji">❌</div>
+  `;
+  
+  floatingButton.style.background = 'rgba(244, 67, 54, 0.8)';
+  floatingButton.style.border = '1px solid rgba(244, 67, 54, 0.3)';
+  floatingButton.style.fontSize = '24px';
+  floatingButton.style.opacity = '1';
+}
+
+// Set button back to normal state
+function setButtonNormal() {
+  if (!floatingButton) return;
+  
+  floatingButton.innerHTML = `
+    <div class="button-emoji">📝</div>
+  `;
+  
+  floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
+  floatingButton.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+  floatingButton.style.cursor = 'pointer';
+  floatingButton.style.fontSize = '24px';
+  floatingButton.style.opacity = '0.7';
+}
+
+// Initialize floating button when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeFloatingButton);
+} else {
+  initializeFloatingButton();
+}
+
+// Also initialize on YouTube navigation (SPA behavior)
+let currentUrl = window.location.href;
+const observer = new MutationObserver(() => {
+  if (window.location.href !== currentUrl) {
+    currentUrl = window.location.href;
+    
+    // Remove existing button if it exists
+    if (floatingButton && floatingButton.parentNode) {
+      floatingButton.parentNode.removeChild(floatingButton);
+      floatingButton = null;
+    }
+    
+    // Initialize new button after a short delay
+    setTimeout(initializeFloatingButton, 1000);
+  }
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+
 // Global function that can be called from background script
 window.copyYouTubeTranscript = async function() {
   try {
@@ -18,6 +207,7 @@ window.copyYouTubeTranscript = async function() {
   } catch (error) {
     console.error('Error copying transcript:', error);
     showNotification('Error: ' + error.message, 'error');
+    throw error; // Re-throw to handle in floating button
   }
 };
 
