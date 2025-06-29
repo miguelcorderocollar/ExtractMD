@@ -170,11 +170,39 @@
                 <span class="slider"></span>
             </label>
         </div>
+        <div class="setting-item">
+            <span class="setting-label">Add video title to transcript</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="addTitleToTranscript" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Add channel name to transcript</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="addChannelToTranscript" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Add video URL to transcript</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="addUrlToTranscript" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Jump to domain after copy</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="jumpToDomain">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item" style="flex-direction:column;align-items:flex-start;gap:4px;">
+            <span class="setting-label" style="font-size:12px;">Target domain/URL</span>
+            <input type="text" id="jumpToDomainUrl" placeholder="https://chat.openai.com/" style="width:100%;padding:4px 8px;border-radius:4px;border:none;font-size:12px;">
+        </div>
     </div>
-    
-    <button class="action-button" id="copyButton">
-        Copy Transcript
-    </button>
     
     <div class="shortcut-info">
         Keyboard shortcut: Ctrl+Shift+Y (or Cmd+Shift+Y on Mac)

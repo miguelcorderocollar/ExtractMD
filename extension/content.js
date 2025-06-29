@@ -5,6 +5,42 @@ console.log('YouTube Transcript Copier content script loaded');
 let floatingButton = null;
 let isProcessing = false;
 
+// Check if video is in fullscreen mode
+function isVideoFullscreen() {
+  // Check for browser fullscreen API
+  if (document.fullscreenElement || 
+      document.webkitFullscreenElement || 
+      document.mozFullScreenElement || 
+      document.msFullscreenElement) {
+    return true;
+  }
+  
+  // Check for YouTube's theater mode (which is like fullscreen)
+  const theaterModeButton = document.querySelector('button[aria-label="Theater mode (t)"]');
+  if (theaterModeButton && theaterModeButton.getAttribute('aria-pressed') === 'true') {
+    return true;
+  }
+  
+  // Check for YouTube's fullscreen button state
+  const fullscreenButton = document.querySelector('button[aria-label="Full screen (f)"]');
+  if (fullscreenButton && fullscreenButton.getAttribute('aria-pressed') === 'true') {
+    return true;
+  }
+  
+  return false;
+}
+
+// Update button visibility based on fullscreen state
+function updateButtonVisibility() {
+  if (!floatingButton) return;
+  
+  if (isVideoFullscreen()) {
+    floatingButton.style.display = 'none';
+  } else {
+    floatingButton.style.display = 'flex';
+  }
+}
+
 // Initialize floating button when page loads
 function initializeFloatingButton() {
   // Only show on video pages
@@ -71,6 +107,9 @@ function initializeFloatingButton() {
   
   // Add to page
   document.body.appendChild(floatingButton);
+  
+  // Set initial visibility
+  updateButtonVisibility();
 }
 
 // Handle floating button click
@@ -190,20 +229,77 @@ observer.observe(document.body, {
   subtree: true
 });
 
+// Monitor for fullscreen changes
+document.addEventListener('fullscreenchange', updateButtonVisibility);
+document.addEventListener('webkitfullscreenchange', updateButtonVisibility);
+document.addEventListener('mozfullscreenchange', updateButtonVisibility);
+document.addEventListener('MSFullscreenChange', updateButtonVisibility);
+
+// Monitor for YouTube player state changes (theater mode, fullscreen buttons)
+const playerObserver = new MutationObserver(() => {
+  updateButtonVisibility();
+});
+
+// Start observing player controls for changes
+function startPlayerObserver() {
+  const playerControls = document.querySelector('#movie_player');
+  if (playerControls) {
+    playerObserver.observe(playerControls, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ['aria-pressed']
+    });
+  }
+}
+
+// Initialize player observer when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startPlayerObserver);
+} else {
+  startPlayerObserver();
+}
+
+// Also start player observer on YouTube navigation
+const urlObserver = new MutationObserver(() => {
+  if (window.location.href !== currentUrl) {
+    currentUrl = window.location.href;
+    setTimeout(startPlayerObserver, 1000);
+  }
+});
+
+urlObserver.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+
 // Global function that can be called from background script
-window.copyYouTubeTranscript = async function() {
+window.copyYouTubeTranscript = async function(settings = null) {
   try {
-    console.log('Starting transcript copy process...');
-    
+    // Always get latest settings if not provided
+    let mergedSettings = settings;
+    if (!settings) {
+      mergedSettings = await new Promise(resolve => {
+        chrome.storage.sync.get({
+          includeTimestamps: true,
+          addTitleToTranscript: true,
+          addChannelToTranscript: true,
+          addUrlToTranscript: true,
+          jumpToDomain: false,
+          jumpToDomainUrl: 'https://chat.openai.com/'
+        }, resolve);
+      });
+    }
+    console.log('Starting transcript copy process with settings:', mergedSettings);
     // Step 1: Click the "Show more" button to expand description
     await expandDescription();
-    
     // Step 2: Wait and click "Show transcript" button
     await clickShowTranscript();
-    
     // Step 3: Wait for transcript to load and copy it
-    await waitForTranscriptAndCopy();
-    
+    await waitForTranscriptAndCopy(mergedSettings);
+    // Step 4: Jump to domain if enabled
+    if (mergedSettings.jumpToDomain && mergedSettings.jumpToDomainUrl) {
+      chrome.runtime.sendMessage({ action: 'openNewTab', url: mergedSettings.jumpToDomainUrl });
+    }
   } catch (error) {
     console.error('Error copying transcript:', error);
     showNotification('Error: ' + error.message, 'error');
@@ -249,7 +345,7 @@ async function clickShowTranscript() {
   }
 }
 
-async function waitForTranscriptAndCopy() {
+async function waitForTranscriptAndCopy(settings = {}) {
   console.log('Waiting for transcript to load...');
   
   // Wait for transcript segments to appear
@@ -266,19 +362,42 @@ async function waitForTranscriptAndCopy() {
   }
   
   if (!transcriptContainer) {
+    showNotification('❌ Transcript not found or not available for this video. Please check if the video has a transcript. If this persists, contact the developer.', 'error', true);
     throw new Error('Transcript failed to load within timeout period.');
   }
   
   console.log('Transcript loaded, extracting content...');
   
   // Extract transcript text
-  const transcriptText = extractTranscriptText();
+  let transcriptText = extractTranscriptText();
+  
+  // Prepend metadata if requested
+  let metaMd = '';
+  if (settings.addTitleToTranscript || settings.addChannelToTranscript || settings.addUrlToTranscript) {
+    // Get video info
+    let title = '';
+    let channelName = '';
+    let channelUrl = '';
+    let videoUrl = window.location.href;
+    const titleElem = document.querySelector('div#title h1 yt-formatted-string');
+    if (titleElem) title = titleElem.textContent.trim();
+    const channelElem = document.querySelector('ytd-channel-name#channel-name a');
+    if (channelElem) {
+      channelName = channelElem.textContent.trim();
+      channelUrl = channelElem.href.startsWith('http') ? channelElem.href : (window.location.origin + channelElem.getAttribute('href'));
+    }
+    if (settings.addTitleToTranscript && title) metaMd += `# ${title}\n`;
+    if (settings.addChannelToTranscript && channelName) metaMd += `**Channel:** [${channelName}](${channelUrl})\n`;
+    if (settings.addUrlToTranscript && videoUrl) metaMd += `**Video URL:** ${videoUrl}\n`;
+    if (metaMd) metaMd += '\n';
+  }
+  transcriptText = metaMd + transcriptText;
   
   // Get settings
-  const settings = await getSettings();
+  const userSettings = await getSettings();
   
   // Copy to clipboard
-  await copyToClipboard(transcriptText, settings.includeTimestamps);
+  await copyToClipboard(transcriptText, userSettings.includeTimestamps);
   
   showNotification('Transcript copied to clipboard!', 'success');
 }
@@ -350,24 +469,25 @@ async function copyToClipboard(text, includeTimestamps) {
   }
 }
 
-function showNotification(message, type = 'info') {
+function showNotification(message, type = 'info', prominent = false) {
   // Create a notification element
   const notification = document.createElement('div');
   notification.style.cssText = `
     position: fixed;
     top: 20px;
     right: 20px;
-    padding: 12px 20px;
+    padding: ${prominent ? '20px 28px' : '12px 20px'};
     border-radius: 8px;
     color: white;
     font-family: Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: ${prominent ? '18px' : '14px'};
+    font-weight: 600;
     z-index: 10000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
     transition: opacity 0.3s ease;
-    max-width: 300px;
+    max-width: 350px;
     word-wrap: break-word;
+    text-align: center;
   `;
   
   // Set background color based on type
@@ -385,7 +505,7 @@ function showNotification(message, type = 'info') {
   notification.textContent = message;
   document.body.appendChild(notification);
   
-  // Remove after 3 seconds
+  // Remove after 3 seconds (or 5s if prominent)
   setTimeout(() => {
     notification.style.opacity = '0';
     setTimeout(() => {
@@ -393,7 +513,7 @@ function showNotification(message, type = 'info') {
         notification.parentNode.removeChild(notification);
       }
     }, 300);
-  }, 3000);
+  }, prominent ? 5000 : 3000);
 }
 
 function sleep(ms) {
@@ -403,7 +523,42 @@ function sleep(ms) {
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'copyTranscript') {
-    window.copyYouTubeTranscript();
-    sendResponse({success: true});
+    // Accept settings from popup
+    window.copyYouTubeTranscript(request.settings).then(() => {
+      sendResponse({success: true});
+    }).catch(() => {
+      sendResponse({success: false});
+    });
+    return true;
+  } else if (request.action === 'getVideoInfo') {
+    try {
+      // Title
+      let title = '';
+      const titleElem = document.querySelector('div#title h1 yt-formatted-string');
+      if (titleElem) {
+        title = titleElem.textContent.trim();
+      }
+      // Channel name and URL
+      let channelName = '';
+      let channelUrl = '';
+      const channelElem = document.querySelector('ytd-channel-name#channel-name a');
+      if (channelElem) {
+        channelName = channelElem.textContent.trim();
+        channelUrl = channelElem.href.startsWith('http') ? channelElem.href : (window.location.origin + channelElem.getAttribute('href'));
+      }
+      // Video URL
+      const videoUrl = window.location.href;
+      sendResponse({
+        success: true,
+        title,
+        channelName,
+        channelUrl,
+        videoUrl
+      });
+    } catch (e) {
+      sendResponse({success: false, error: e.message});
+    }
+    // Indicate async response
+    return true;
   }
 }); 

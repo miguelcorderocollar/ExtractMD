@@ -30,4 +30,11 @@ function copyTranscript() {
   if (window.copyYouTubeTranscript) {
     window.copyYouTubeTranscript();
   }
-} 
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'openNewTab' && message.url) {
+    chrome.tabs.create({ url: message.url });
+    sendResponse({ success: true });
+  }
+}); 
