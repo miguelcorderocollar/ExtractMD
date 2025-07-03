@@ -43,8 +43,19 @@ function updateButtonVisibility() {
 
 // Initialize floating button when page loads
 function initializeFloatingButton() {
-  // Only show on video pages
-  if (!window.location.pathname.includes('/watch')) {
+  // Show on YouTube video, HN item, or HN news pages
+  const isYouTube = window.location.hostname.includes('youtube.com') && window.location.pathname.includes('/watch');
+  const isHNItem = window.location.hostname.includes('ycombinator.com') && window.location.pathname === '/item';
+  const isHNNews = window.location.hostname.includes('ycombinator.com') && (
+    window.location.pathname === '/news' ||
+    window.location.pathname === '/newest' ||
+    window.location.pathname === '/front' ||
+    window.location.pathname === '/best' ||
+    window.location.pathname === '/ask' ||
+    window.location.pathname === '/show' ||
+    window.location.pathname === '/jobs'
+  );
+  if (!isYouTube && !isHNItem && !isHNNews) {
     return;
   }
   
@@ -101,8 +112,13 @@ function initializeFloatingButton() {
   // Click handler
   floatingButton.addEventListener('click', async () => {
     if (isProcessing) return;
-    
-    await handleFloatingButtonClick();
+    if (isYouTube) {
+      await handleFloatingButtonClick();
+    } else if (isHNItem) {
+      await handleHNFloatingButtonClick();
+    } else if (isHNNews) {
+      await handleHNNewsFloatingButtonClick();
+    }
   });
   
   // Add to page
@@ -135,6 +151,72 @@ async function handleFloatingButtonClick() {
     setButtonError();
     
     // Reset to normal state after 3 seconds
+    setTimeout(() => {
+      setButtonNormal();
+      isProcessing = false;
+    }, 3000);
+  }
+}
+
+async function handleHNFloatingButtonClick() {
+  try {
+    isProcessing = true;
+    setButtonLoading();
+    // Get HN settings
+    const settings = await new Promise(resolve => {
+      chrome.storage.sync.get({
+        hnIncludeAuthor: true,
+        hnIncludeTime: true,
+        hnIncludeReplies: true
+      }, resolve);
+    });
+    // Extract and copy comments
+    const md = extractHNCommentsMarkdown(settings);
+    await copyToClipboard(md, true);
+    setButtonSuccess();
+    showNotification('HN comments copied to clipboard!', 'success');
+    setTimeout(() => {
+      setButtonNormal();
+      isProcessing = false;
+    }, 2000);
+  } catch (error) {
+    setButtonError();
+    showNotification('Failed to copy HN comments.', 'error');
+    setTimeout(() => {
+      setButtonNormal();
+      isProcessing = false;
+    }, 3000);
+  }
+}
+
+async function handleHNNewsFloatingButtonClick() {
+  try {
+    isProcessing = true;
+    setButtonLoading();
+    // Get HN news settings
+    const settings = await new Promise(resolve => {
+      chrome.storage.sync.get({
+        hnNewsIncludeTitle: true,
+        hnNewsIncludeUrl: true,
+        hnNewsIncludeSite: true,
+        hnNewsIncludePoints: true,
+        hnNewsIncludeAuthor: true,
+        hnNewsIncludeTime: true,
+        hnNewsIncludeComments: true
+      }, resolve);
+    });
+    // Extract and copy news
+    const md = extractHNNewsMarkdown(settings);
+    await copyToClipboard(md, true);
+    setButtonSuccess();
+    showNotification('HN news copied to clipboard!', 'success');
+    setTimeout(() => {
+      setButtonNormal();
+      isProcessing = false;
+    }, 2000);
+  } catch (error) {
+    setButtonError();
+    showNotification('Failed to copy HN news.', 'error');
     setTimeout(() => {
       setButtonNormal();
       isProcessing = false;
@@ -560,5 +642,168 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     // Indicate async response
     return true;
+  } else if (request.action === 'copyHNComments') {
+    // HN comments extraction logic
+    try {
+      const md = extractHNCommentsMarkdown(request.settings);
+      copyToClipboard(md, true).then(() => {
+        showNotification('HN comments copied to clipboard!', 'success');
+        sendResponse({ success: true });
+      }).catch(() => {
+        showNotification('Failed to copy HN comments.', 'error');
+        sendResponse({ success: false });
+      });
+    } catch (e) {
+      showNotification('Failed to extract HN comments.', 'error');
+      sendResponse({ success: false });
+    }
+    return true;
+  } else if (request.action === 'copyHNNews') {
+    try {
+      const md = extractHNNewsMarkdown(request.settings);
+      copyToClipboard(md, true).then(() => {
+        showNotification('HN news copied to clipboard!', 'success');
+        sendResponse({ success: true });
+      }).catch(() => {
+        showNotification('Failed to copy HN news.', 'error');
+        sendResponse({ success: false });
+      });
+    } catch (e) {
+      showNotification('Failed to extract HN news.', 'error');
+      sendResponse({ success: false });
+    }
+    return true;
   }
-}); 
+});
+
+function extractHNCommentsMarkdown(settings) {
+  // Only run on HN item pages
+  if (!window.location.hostname.includes('ycombinator.com') || !window.location.pathname.startsWith('/item')) {
+    throw new Error('Not on a Hacker News item page.');
+  }
+  // Parse all comment rows
+  const rows = Array.from(document.querySelectorAll('tr.athing.comtr'));
+  // Build a tree of comments
+  const comments = [];
+  const stack = [];
+  rows.forEach(row => {
+    const indentImg = row.querySelector('td.ind img');
+    const indent = indentImg ? parseInt(indentImg.getAttribute('width') || '0', 10) / 40 : 0;
+    const author = row.querySelector('.hnuser')?.textContent || '';
+    const time = row.querySelector('.age a')?.textContent || '';
+    const commentHtml = row.querySelector('.commtext')?.innerHTML || '';
+    const commentText = htmlToMarkdown(commentHtml);
+    const id = row.id;
+    const comment = { id, author, time, commentText, indent, children: [] };
+    // Place in tree
+    while (stack.length && stack[stack.length - 1].indent >= indent) stack.pop();
+    if (stack.length) {
+      stack[stack.length - 1].children.push(comment);
+    } else {
+      comments.push(comment);
+    }
+    stack.push(comment);
+  });
+  // Build Markdown
+  function renderComment(c, depth) {
+    let md = '';
+    if (settings.hnIncludeAuthor) md += `**${c.author}**`;
+    if (settings.hnIncludeTime) md += (md ? ' · ' : '') + `_${c.time}_`;
+    if (md) md += '\n';
+    md += c.commentText + '\n';
+    if (settings.hnIncludeReplies && c.children.length) {
+      md += c.children.map(child => renderComment(child, depth + 1)).join('');
+    }
+    return md.split('\n').map(line => (depth > 0 ? '>'.repeat(depth) + ' ' + line : line)).join('\n') + '\n';
+  }
+  let result = comments.map(c => renderComment(c, 0)).join('\n');
+  // Add title and URL
+  const title = document.querySelector('title')?.textContent || '';
+  const url = window.location.href;
+  result = `# ${title}\n\n**URL:** ${url}\n\n` + result;
+  return result.trim();
+}
+
+function htmlToMarkdown(html) {
+  let text = html
+    .replace(/<p>/gi, '\n\n')
+    .replace(/<a [^>]*href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)')
+    .replace(/<i>(.*?)<\/i>/gi, '*$1*')
+    .replace(/<b>(.*?)<\/b>/gi, '**$1**')
+    .replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/gi, function(_, code) { return `\n\n\n${code}\n\n`; })
+    .replace(/<[^>]+>/g, '') // Remove any other tags
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&#x2F;/g, '/')
+    .replace(/&gt;/g, '>')
+    .replace(/&lt;/g, '<')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\n{3,}/g, '\n\n');
+  // Replace placeholder with triple backticks
+  text = text.replace(/\u007F\u007F\u007F/g, '```');
+  return text.trim();
+}
+
+function extractHNNewsMarkdown(settings) {
+  // Only run on HN main/news pages
+  if (!window.location.hostname.includes('ycombinator.com')) throw new Error('Not on HN');
+  const validPaths = ['/news','/newest','/front','/best','/ask','/show','/jobs'];
+  if (!validPaths.includes(window.location.pathname)) throw new Error('Not on HN news page');
+  // Find all news items
+  const tbodies = Array.from(document.querySelectorAll('tbody'));
+  let newsRows = [];
+  tbodies.forEach(tbody => {
+    const rows = Array.from(tbody.querySelectorAll('tr.athing.submission'));
+    if (rows.length) newsRows = newsRows.concat(rows);
+  });
+  // If not found, fallback to tr.athing
+  if (newsRows.length === 0) {
+    newsRows = Array.from(document.querySelectorAll('tr.athing'));
+  }
+  let md = '';
+  newsRows.forEach(row => {
+    let line = '';
+    // Title
+    if (settings.hnNewsIncludeTitle) {
+      const title = row.querySelector('.titleline a')?.textContent?.trim() || '';
+      line += `### ${title}\n`;
+    }
+    // URL
+    if (settings.hnNewsIncludeUrl) {
+      const url = row.querySelector('.titleline a')?.href || '';
+      if (url) line += `[Link](${url})\n`;
+    }
+    // Site
+    if (settings.hnNewsIncludeSite) {
+      const site = row.querySelector('.sitestr')?.textContent?.trim() || '';
+      if (site) line += `*Site:* ${site}\n`;
+    }
+    // Points, Author, Time, Comments
+    const subtextRow = row.nextElementSibling;
+    if (subtextRow && subtextRow.querySelector('.subtext')) {
+      const subtext = subtextRow.querySelector('.subtext');
+      // Points
+      if (settings.hnNewsIncludePoints) {
+        const points = subtext.querySelector('.score')?.textContent?.trim() || '';
+        if (points) line += `*Points:* ${points}\n`;
+      }
+      // Author
+      if (settings.hnNewsIncludeAuthor) {
+        const author = subtext.querySelector('.hnuser')?.textContent?.trim() || '';
+        if (author) line += `*By:* ${author}\n`;
+      }
+      // Time
+      if (settings.hnNewsIncludeTime) {
+        const time = subtext.querySelector('.age a')?.textContent?.trim() || '';
+        if (time) line += `*Time:* ${time}\n`;
+      }
+      // Comments
+      if (settings.hnNewsIncludeComments) {
+        const comments = Array.from(subtext.querySelectorAll('a')).find(a => a.textContent.includes('comment'))?.textContent?.trim() || '';
+        if (comments) line += `*Comments:* ${comments}\n`;
+      }
+    }
+    md += line + '\n';
+  });
+  return md.trim();
+} 

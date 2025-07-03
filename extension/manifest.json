@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Transcript Copier",
+  "name": "ExtractMD",
   "version": "1.0.0",
-  "description": "Automatically opens and copies YouTube video transcripts to clipboard",
+  "description": "Extract and copy information as Markdown from YouTube, Hacker News, and more.",
   "permissions": [
     "activeTab",
     "storage",
@@ -10,21 +10,22 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://www.youtube.com/*"
+    "https://www.youtube.com/*",
+    "https://news.ycombinator.com/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
+      "matches": ["https://www.youtube.com/*", "https://news.ycombinator.com/*"],
       "js": ["content.js"],
       "run_at": "document_end"
     }
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Copy YouTube Transcript",
+    "default_title": "ExtractMD: Copy Info as Markdown",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
@@ -42,7 +43,7 @@
         "default": "Ctrl+Shift+Y",
         "mac": "Command+Shift+Y"
       },
-      "description": "Copy YouTube transcript"
+      "description": "Extract and copy info as Markdown"
     }
   }
 } 

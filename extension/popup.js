@@ -9,6 +9,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const jumpToDomainCheckbox = document.getElementById('jumpToDomain');
     const jumpToDomainUrlInput = document.getElementById('jumpToDomainUrl');
     
+    // HN Comments settings
+    const hnIncludeAuthorCheckbox = document.getElementById('hnIncludeAuthor');
+    const hnIncludeTimeCheckbox = document.getElementById('hnIncludeTime');
+    const hnIncludeRepliesCheckbox = document.getElementById('hnIncludeReplies');
+    const copyHNCommentsButton = document.getElementById('copyHNCommentsButton');
+    
+    // HN News settings
+    const hnNewsIncludeTitleCheckbox = document.getElementById('hnNewsIncludeTitle');
+    const hnNewsIncludeUrlCheckbox = document.getElementById('hnNewsIncludeUrl');
+    const hnNewsIncludeSiteCheckbox = document.getElementById('hnNewsIncludeSite');
+    const hnNewsIncludePointsCheckbox = document.getElementById('hnNewsIncludePoints');
+    const hnNewsIncludeAuthorCheckbox = document.getElementById('hnNewsIncludeAuthor');
+    const hnNewsIncludeTimeCheckbox = document.getElementById('hnNewsIncludeTime');
+    const hnNewsIncludeCommentsCheckbox = document.getElementById('hnNewsIncludeComments');
+    const copyHNNewsButton = document.getElementById('copyHNNewsButton');
+    
     // Load saved settings
     chrome.storage.sync.get({
         includeTimestamps: true,
@@ -16,7 +32,17 @@ document.addEventListener('DOMContentLoaded', function() {
         addChannelToTranscript: true,
         addUrlToTranscript: true,
         jumpToDomain: false,
-        jumpToDomainUrl: 'https://chat.openai.com/'
+        jumpToDomainUrl: 'https://chat.openai.com/',
+        hnIncludeAuthor: true,
+        hnIncludeTime: true,
+        hnIncludeReplies: true,
+        hnNewsIncludeTitle: true,
+        hnNewsIncludeUrl: true,
+        hnNewsIncludeSite: true,
+        hnNewsIncludePoints: true,
+        hnNewsIncludeAuthor: true,
+        hnNewsIncludeTime: true,
+        hnNewsIncludeComments: true
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         document.getElementById('addTitleToTranscript').checked = items.addTitleToTranscript;
@@ -24,6 +50,16 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('addUrlToTranscript').checked = items.addUrlToTranscript;
         jumpToDomainCheckbox.checked = items.jumpToDomain;
         jumpToDomainUrlInput.value = items.jumpToDomainUrl;
+        hnIncludeAuthorCheckbox.checked = items.hnIncludeAuthor;
+        hnIncludeTimeCheckbox.checked = items.hnIncludeTime;
+        hnIncludeRepliesCheckbox.checked = items.hnIncludeReplies;
+        hnNewsIncludeTitleCheckbox.checked = items.hnNewsIncludeTitle;
+        hnNewsIncludeUrlCheckbox.checked = items.hnNewsIncludeUrl;
+        hnNewsIncludeSiteCheckbox.checked = items.hnNewsIncludeSite;
+        hnNewsIncludePointsCheckbox.checked = items.hnNewsIncludePoints;
+        hnNewsIncludeAuthorCheckbox.checked = items.hnNewsIncludeAuthor;
+        hnNewsIncludeTimeCheckbox.checked = items.hnNewsIncludeTime;
+        hnNewsIncludeCommentsCheckbox.checked = items.hnNewsIncludeComments;
     });
     
     // Save settings when changed
@@ -44,6 +80,36 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     jumpToDomainUrlInput.addEventListener('input', function() {
         chrome.storage.sync.set({ jumpToDomainUrl: jumpToDomainUrlInput.value });
+    });
+    hnIncludeAuthorCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnIncludeAuthor: hnIncludeAuthorCheckbox.checked });
+    });
+    hnIncludeTimeCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnIncludeTime: hnIncludeTimeCheckbox.checked });
+    });
+    hnIncludeRepliesCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnIncludeReplies: hnIncludeRepliesCheckbox.checked });
+    });
+    hnNewsIncludeTitleCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnNewsIncludeTitle: hnNewsIncludeTitleCheckbox.checked });
+    });
+    hnNewsIncludeUrlCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnNewsIncludeUrl: hnNewsIncludeUrlCheckbox.checked });
+    });
+    hnNewsIncludeSiteCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnNewsIncludeSite: hnNewsIncludeSiteCheckbox.checked });
+    });
+    hnNewsIncludePointsCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnNewsIncludePoints: hnNewsIncludePointsCheckbox.checked });
+    });
+    hnNewsIncludeAuthorCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnNewsIncludeAuthor: hnNewsIncludeAuthorCheckbox.checked });
+    });
+    hnNewsIncludeTimeCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnNewsIncludeTime: hnNewsIncludeTimeCheckbox.checked });
+    });
+    hnNewsIncludeCommentsCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnNewsIncludeComments: hnNewsIncludeCommentsCheckbox.checked });
     });
 
     const videoInfoWarning = document.createElement('div');
@@ -82,6 +148,88 @@ document.addEventListener('DOMContentLoaded', function() {
                 missing = true;
             }
             videoInfoWarning.style.display = missing ? 'block' : 'none';
+        });
+    });
+    
+    // Enable HN button only on HN item pages
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        const tab = tabs[0];
+        if (tab.url && tab.url.match(/^https:\/\/news\.ycombinator\.com\/item\?id=\d+/)) {
+            copyHNCommentsButton.disabled = false;
+        } else {
+            copyHNCommentsButton.disabled = true;
+        }
+    });
+
+    copyHNCommentsButton.addEventListener('click', function() {
+        // Get current HN settings
+        chrome.storage.sync.get({
+            hnIncludeAuthor: true,
+            hnIncludeTime: true,
+            hnIncludeReplies: true
+        }, function(items) {
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                const tab = tabs[0];
+                chrome.tabs.sendMessage(tab.id, {
+                    action: 'copyHNComments',
+                    settings: {
+                        hnIncludeAuthor: items.hnIncludeAuthor,
+                        hnIncludeTime: items.hnIncludeTime,
+                        hnIncludeReplies: items.hnIncludeReplies
+                    }
+                }, function(response) {
+                    if (response && response.success) {
+                        showStatus('HN comments copied as Markdown!', 'success');
+                    } else {
+                        showStatus('Failed to copy HN comments.', 'error');
+                    }
+                });
+            });
+        });
+    });
+    
+    // Enable HN News button only on HN main/news page
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        const tab = tabs[0];
+        if (tab.url && tab.url.match(/^https:\/\/news\.ycombinator\.com\/(news|newest|front|best|ask|show|jobs)/)) {
+            copyHNNewsButton.disabled = false;
+        } else {
+            copyHNNewsButton.disabled = true;
+        }
+    });
+
+    copyHNNewsButton.addEventListener('click', function() {
+        // Get current HN news settings
+        chrome.storage.sync.get({
+            hnNewsIncludeTitle: true,
+            hnNewsIncludeUrl: true,
+            hnNewsIncludeSite: true,
+            hnNewsIncludePoints: true,
+            hnNewsIncludeAuthor: true,
+            hnNewsIncludeTime: true,
+            hnNewsIncludeComments: true
+        }, function(items) {
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                const tab = tabs[0];
+                chrome.tabs.sendMessage(tab.id, {
+                    action: 'copyHNNews',
+                    settings: {
+                        hnNewsIncludeTitle: items.hnNewsIncludeTitle,
+                        hnNewsIncludeUrl: items.hnNewsIncludeUrl,
+                        hnNewsIncludeSite: items.hnNewsIncludeSite,
+                        hnNewsIncludePoints: items.hnNewsIncludePoints,
+                        hnNewsIncludeAuthor: items.hnNewsIncludeAuthor,
+                        hnNewsIncludeTime: items.hnNewsIncludeTime,
+                        hnNewsIncludeComments: items.hnNewsIncludeComments
+                    }
+                }, function(response) {
+                    if (response && response.success) {
+                        showStatus('HN news copied as Markdown!', 'success');
+                    } else {
+                        showStatus('Failed to copy HN news.', 'error');
+                    }
+                });
+            });
         });
     });
     

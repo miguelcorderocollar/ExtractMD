@@ -6,80 +6,69 @@
     <title>YouTube Transcript Copier</title>
     <style>
         body {
-            width: 300px;
-            padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 320px;
+            padding: 0;
             margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f7f7fa;
+            color: #222;
         }
-        
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            padding: 20px 0 10px 0;
         }
-        
         .header h1 {
             margin: 0;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
+            letter-spacing: 0.01em;
         }
-        
         .header p {
-            margin: 5px 0 0 0;
+            margin: 6px 0 0 0;
             font-size: 12px;
-            opacity: 0.8;
+            color: #666;
+            opacity: 0.85;
         }
-        
         .settings {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            backdrop-filter: blur(10px);
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            padding: 16px 14px 10px 14px;
+            margin: 0 14px 16px 14px;
         }
-        
         .setting-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
-        
         .setting-item:last-child {
             margin-bottom: 0;
         }
-        
         .setting-label {
             font-size: 14px;
             font-weight: 500;
+            color: #222;
         }
-        
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 40px;
+            width: 36px;
             height: 20px;
         }
-        
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-        
         .slider {
             position: absolute;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(255, 255, 255, 0.3);
-            transition: 0.3s;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e4e4e7;
+            transition: 0.2s;
             border-radius: 20px;
         }
-        
         .slider:before {
             position: absolute;
             content: "";
@@ -87,82 +76,89 @@
             width: 16px;
             left: 2px;
             bottom: 2px;
-            background-color: white;
-            transition: 0.3s;
+            background-color: #fff;
+            transition: 0.2s;
             border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
-        
         input:checked + .slider {
-            background-color: #4CAF50;
+            background-color: #6366f1;
         }
-        
         input:checked + .slider:before {
-            transform: translateX(20px);
+            transform: translateX(16px);
         }
-        
         .action-button {
             width: 100%;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 11px;
+            background: #f3f4f6;
+            border: none;
             border-radius: 6px;
-            color: white;
+            color: #222;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: background 0.2s;
+            margin-top: 10px;
         }
-        
         .action-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
+            background: #e5e7eb;
         }
-        
         .action-button:active {
-            transform: translateY(0);
+            background: #e0e7ff;
         }
-        
         .action-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
-        
         .shortcut-info {
             text-align: center;
             font-size: 11px;
-            opacity: 0.7;
-            margin-top: 10px;
+            color: #888;
+            margin: 0 0 10px 0;
         }
-        
         .status {
-            margin-top: 10px;
+            margin: 10px 14px 0 14px;
             padding: 8px 12px;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 12px;
             text-align: center;
             display: none;
         }
-        
         .status.success {
-            background: rgba(76, 175, 80, 0.2);
-            border: 1px solid rgba(76, 175, 80, 0.3);
+            background: #e6fbe8;
+            color: #256029;
+            border: 1px solid #b6e2c6;
         }
-        
         .status.error {
-            background: rgba(244, 67, 54, 0.2);
-            border: 1px solid rgba(244, 67, 54, 0.3);
+            background: #fbeaea;
+            color: #a4262c;
+            border: 1px solid #f5c2c7;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 5px 8px;
+            border-radius: 5px;
+            border: 1px solid #e5e7eb;
+            font-size: 13px;
+            background: #fafafa;
+            color: #222;
+            margin-top: 2px;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: #fff;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>YouTube Transcript Copier</h1>
-        <p>Automatically copy video transcripts</p>
+        <h1>ExtractMD</h1>
+        <p>Extract and copy info as Markdown from YouTube, Hacker News, and more.</p>
     </div>
-    
     <div class="settings">
+        <h2 style="font-size:15px;margin-bottom:8px;">YouTube Transcript Settings</h2>
         <div class="setting-item">
             <span class="setting-label">Include timestamps</span>
             <label class="toggle-switch">
@@ -200,16 +196,89 @@
         </div>
         <div class="setting-item" style="flex-direction:column;align-items:flex-start;gap:4px;">
             <span class="setting-label" style="font-size:12px;">Target domain/URL</span>
-            <input type="text" id="jumpToDomainUrl" placeholder="https://chat.openai.com/" style="width:100%;padding:4px 8px;border-radius:4px;border:none;font-size:12px;">
+            <input type="text" id="jumpToDomainUrl" placeholder="https://chat.openai.com/">
         </div>
     </div>
-    
+    <div class="settings">
+        <h2 style="font-size:15px;margin-bottom:8px;">Hacker News Comments Settings</h2>
+        <div class="setting-item">
+            <span class="setting-label">Include author</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hnIncludeAuthor" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Include time</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hnIncludeTime" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Include replies (threaded)</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hnIncludeReplies" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <div class="settings">
+        <h2 style="font-size:15px;margin-bottom:8px;">Hacker News News Settings</h2>
+        <div class="setting-item">
+            <span class="setting-label">Include title</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hnNewsIncludeTitle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Include URL</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hnNewsIncludeUrl" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Include site</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hnNewsIncludeSite" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Include points</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hnNewsIncludePoints" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Include author</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hnNewsIncludeAuthor" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Include time</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hnNewsIncludeTime" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Include comments count</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hnNewsIncludeComments" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
     <div class="shortcut-info">
         Keyboard shortcut: Ctrl+Shift+Y (or Cmd+Shift+Y on Mac)
     </div>
-    
     <div class="status" id="status"></div>
-    
     <script src="popup.js"></script>
 </body>
 </html> 
