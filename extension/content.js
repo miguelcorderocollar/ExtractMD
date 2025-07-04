@@ -38,78 +38,101 @@ function updateButtonVisibility() {
   }
 }
 
-// Initialize floating button when page loads
-function initializeFloatingButton() {
-  // Article Exporter: check for <article> tags
+// --- MutationObserver for dynamic article detection ---
+let articleObserver = null;
+
+function manageFloatingButtonForArticles() {
   const articles = Array.from(document.querySelectorAll('article'));
+  let floatingButton = document.getElementById('yt-transcript-floating-button');
   if (articles.length > 0) {
-    // Place floating button in bottom right (like other cases)
-    let floatingButton = document.getElementById('yt-transcript-floating-button');
-    if (floatingButton) floatingButton.remove();
-    floatingButton = document.createElement('div');
-    floatingButton.id = 'yt-transcript-floating-button';
-    floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
-    floatingButton.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(255, 255, 255, 0.95);
-      color: #222;
-      border: 1px solid #ccc;
-      border-radius: 50%;
-      width: 56px;
-      height: 56px;
-      cursor: pointer;
-      font-size: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      user-select: none;
-      opacity: 1;
-    `;
-    floatingButton.addEventListener('mouseenter', () => {
-      floatingButton.style.background = '#f3f4f6';
-    });
-    floatingButton.addEventListener('mouseleave', () => {
-      floatingButton.style.background = 'rgba(255, 255, 255, 0.95)';
-    });
-    floatingButton.addEventListener('click', async () => {
-      if (isProcessing) return;
-      isProcessing = true;
-      floatingButton.innerHTML = `<div class=\"button-emoji\">⏳</div>`;
-      try {
-        const settings = await new Promise(resolve => {
-          chrome.storage.sync.get({ articleExporterIncludeImages: true }, resolve);
-        });
-        let md = '';
-        if (articles.length === 1) {
-          md = await extractArticleMarkdown(articles[0], settings.articleExporterIncludeImages);
-        } else {
-          const mdArr = await Promise.all(articles.map((a, i) => extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(md => `## Article ${i+1}\n\n${md}`)));
-          md = mdArr.join('\n\n---\n\n');
+    if (!floatingButton) {
+      // Create the floating button if it doesn't exist
+      floatingButton = document.createElement('div');
+      floatingButton.id = 'yt-transcript-floating-button';
+      floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
+      floatingButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        color: #222;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        cursor: pointer;
+        font-size: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        user-select: none;
+        opacity: 1;
+      `;
+      floatingButton.addEventListener('mouseenter', () => {
+        floatingButton.style.background = '#f3f4f6';
+      });
+      floatingButton.addEventListener('mouseleave', () => {
+        floatingButton.style.background = 'rgba(255, 255, 255, 0.95)';
+      });
+      floatingButton.addEventListener('click', async () => {
+        if (isProcessing) return;
+        isProcessing = true;
+        floatingButton.innerHTML = `<div class=\"button-emoji\">⏳</div>`;
+        try {
+          const settings = await new Promise(resolve => {
+            chrome.storage.sync.get({ articleExporterIncludeImages: true }, resolve);
+          });
+          let md = '';
+          if (articles.length === 1) {
+            md = await extractArticleMarkdown(articles[0], settings.articleExporterIncludeImages);
+          } else {
+            const mdArr = await Promise.all(articles.map((a, i) => extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(md => `## Article ${i+1}\n\n${md}`)));
+            md = mdArr.join('\n\n---\n\n');
+          }
+          await copyToClipboard(md, true);
+          floatingButton.innerHTML = `<div class=\"button-emoji\">✅</div>`;
+          showNotification('Article(s) copied as Markdown!', 'success');
+          setTimeout(() => {
+            floatingButton.innerHTML = `<div class=\\"button-emoji\\">📝</div>`;
+            isProcessing = false;
+          }, 2000);
+        } catch (e) {
+          floatingButton.innerHTML = `<div class=\"button-emoji\">❌</div>`;
+          showNotification('Failed to copy article(s).', 'error');
+          console.error('Error in floating button handler:', e);
+          setTimeout(() => {
+            floatingButton.innerHTML = `<div class=\\"button-emoji\\">📝</div>`;
+            isProcessing = false;
+          }, 3000);
         }
-        await copyToClipboard(md, true);
-        floatingButton.innerHTML = `<div class=\"button-emoji\">✅</div>`;
-        showNotification('Article(s) copied as Markdown!', 'success');
-        setTimeout(() => {
-          floatingButton.innerHTML = `<div class=\\\"button-emoji\\\">📝</div>`;
-          isProcessing = false;
-        }, 2000);
-      } catch (e) {
-        floatingButton.innerHTML = `<div class=\"button-emoji\">❌</div>`;
-        showNotification('Failed to copy article(s).', 'error');
-        setTimeout(() => {
-          floatingButton.innerHTML = `<div class=\\\"button-emoji\\\">📝</div>`;
-          isProcessing = false;
-        }, 3000);
-      }
-    });
-    document.body.appendChild(floatingButton);
-    return;
+      });
+      document.body.appendChild(floatingButton);
+    } else {
+      floatingButton.style.display = 'flex';
+    }
+  } else {
+    // No articles: remove or hide the button
+    if (floatingButton) {
+      floatingButton.remove();
+    }
   }
+}
+
+function setupArticleMutationObserver() {
+  if (articleObserver) return; // Prevent multiple observers
+  articleObserver = new MutationObserver(() => {
+    manageFloatingButtonForArticles();
+  });
+  articleObserver.observe(document.body, { childList: true, subtree: true });
+}
+
+// --- End MutationObserver logic ---
+
+// Replace the article logic in initializeFloatingButton with observer setup
+function initializeFloatingButton() {
   // Show on YouTube video, HN item, or HN news pages
   const isYouTube = window.location.hostname.includes('youtube.com') && window.location.pathname.includes('/watch');
   const isHNItem = window.location.hostname.includes('ycombinator.com') && window.location.pathname === '/item';
@@ -122,77 +145,82 @@ function initializeFloatingButton() {
     window.location.pathname === '/show' ||
     window.location.pathname === '/jobs'
   );
-  if (!isYouTube && !isHNItem && !isHNNews) {
+
+  if (isYouTube || isHNItem || isHNNews) {
+    // Run the original logic for YouTube and HN
+    // (this is the code that creates the floating button for those sites)
+    // ... existing code for YouTube/HN floating button ...
+    // (leave as it was before the MutationObserver change)
+    // Place the original YouTube/HN floating button logic here
+    // (copy from your previous implementation)
+    // ... existing code ...
+    // Create floating button
+    floatingButton = document.createElement('div');
+    floatingButton.id = 'yt-transcript-floating-button';
+    floatingButton.innerHTML = `
+      <div class="button-emoji">📝</div>
+    `;
+    // Add styles
+    floatingButton.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      color: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      cursor: pointer;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      user-select: none;
+      opacity: 0.7;
+    `;
+    // Hover effects
+    floatingButton.addEventListener('mouseenter', () => {
+      if (!isProcessing) {
+        floatingButton.style.transform = 'translateY(-2px) scale(1.1)';
+        floatingButton.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
+        floatingButton.style.opacity = '1';
+        floatingButton.style.background = 'rgba(255, 255, 255, 0.25)';
+      }
+    });
+    floatingButton.addEventListener('mouseleave', () => {
+      if (!isProcessing) {
+        floatingButton.style.transform = 'translateY(0) scale(1)';
+        floatingButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        floatingButton.style.opacity = '0.7';
+        floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
+      }
+    });
+    // Click handler
+    floatingButton.addEventListener('click', async () => {
+      if (isProcessing) return;
+      if (isYouTube) {
+        await handleFloatingButtonClick();
+      } else if (isHNItem) {
+        await handleHNFloatingButtonClick();
+      } else if (isHNNews) {
+        await handleHNNewsFloatingButtonClick();
+      }
+    });
+    // Add to page
+    document.body.appendChild(floatingButton);
+    // Set initial visibility
+    updateButtonVisibility();
     return;
   }
-  
-  // Create floating button
-  floatingButton = document.createElement('div');
-  floatingButton.id = 'yt-transcript-floating-button';
-  floatingButton.innerHTML = `
-    <div class="button-emoji">📝</div>
-  `;
-  
-  // Add styles
-  floatingButton.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    color: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    cursor: pointer;
-    font-size: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    user-select: none;
-    opacity: 0.7;
-  `;
-  
-  // Hover effects
-  floatingButton.addEventListener('mouseenter', () => {
-    if (!isProcessing) {
-      floatingButton.style.transform = 'translateY(-2px) scale(1.1)';
-      floatingButton.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
-      floatingButton.style.opacity = '1';
-      floatingButton.style.background = 'rgba(255, 255, 255, 0.25)';
-    }
-  });
-  
-  floatingButton.addEventListener('mouseleave', () => {
-    if (!isProcessing) {
-      floatingButton.style.transform = 'translateY(0) scale(1)';
-      floatingButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-      floatingButton.style.opacity = '0.7';
-      floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
-    }
-  });
-  
-  // Click handler
-  floatingButton.addEventListener('click', async () => {
-    if (isProcessing) return;
-    if (isYouTube) {
-    await handleFloatingButtonClick();
-    } else if (isHNItem) {
-      await handleHNFloatingButtonClick();
-    } else if (isHNNews) {
-      await handleHNNewsFloatingButtonClick();
-    }
-  });
-  
-  // Add to page
-  document.body.appendChild(floatingButton);
-  
-  // Set initial visibility
-  updateButtonVisibility();
+
+  // Otherwise, set up the MutationObserver for articles
+  setupArticleMutationObserver();
+  manageFloatingButtonForArticles();
 }
 
 // Handle floating button click
