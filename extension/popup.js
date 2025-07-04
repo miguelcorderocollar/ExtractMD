@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const hnNewsIncludeCommentsCheckbox = document.getElementById('hnNewsIncludeComments');
     const copyHNNewsButton = document.getElementById('copyHNNewsButton');
     
+    // Article Exporter settings
+    const articleExporterIncludeImagesCheckbox = document.getElementById('articleExporterIncludeImages');
+    
     // Load saved settings
     chrome.storage.sync.get({
         includeTimestamps: true,
@@ -42,7 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
         hnNewsIncludePoints: true,
         hnNewsIncludeAuthor: true,
         hnNewsIncludeTime: true,
-        hnNewsIncludeComments: true
+        hnNewsIncludeComments: true,
+        articleExporterIncludeImages: true
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         document.getElementById('addTitleToTranscript').checked = items.addTitleToTranscript;
@@ -60,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hnNewsIncludeAuthorCheckbox.checked = items.hnNewsIncludeAuthor;
         hnNewsIncludeTimeCheckbox.checked = items.hnNewsIncludeTime;
         hnNewsIncludeCommentsCheckbox.checked = items.hnNewsIncludeComments;
+        articleExporterIncludeImagesCheckbox.checked = items.articleExporterIncludeImages;
     });
     
     // Save settings when changed
@@ -110,6 +115,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     hnNewsIncludeCommentsCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ hnNewsIncludeComments: hnNewsIncludeCommentsCheckbox.checked });
+    });
+    articleExporterIncludeImagesCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ articleExporterIncludeImages: articleExporterIncludeImagesCheckbox.checked });
     });
 
     const videoInfoWarning = document.createElement('div');

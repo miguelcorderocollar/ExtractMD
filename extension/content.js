@@ -1,6 +1,3 @@
-// Content script for YouTube Transcript Copier
-console.log('YouTube Transcript Copier content script loaded');
-
 // Global state for the floating button
 let floatingButton = null;
 let isProcessing = false;
@@ -43,6 +40,76 @@ function updateButtonVisibility() {
 
 // Initialize floating button when page loads
 function initializeFloatingButton() {
+  // Article Exporter: check for <article> tags
+  const articles = Array.from(document.querySelectorAll('article'));
+  if (articles.length > 0) {
+    // Place floating button in bottom right (like other cases)
+    let floatingButton = document.getElementById('yt-transcript-floating-button');
+    if (floatingButton) floatingButton.remove();
+    floatingButton = document.createElement('div');
+    floatingButton.id = 'yt-transcript-floating-button';
+    floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
+    floatingButton.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #222;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      cursor: pointer;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      user-select: none;
+      opacity: 1;
+    `;
+    floatingButton.addEventListener('mouseenter', () => {
+      floatingButton.style.background = '#f3f4f6';
+    });
+    floatingButton.addEventListener('mouseleave', () => {
+      floatingButton.style.background = 'rgba(255, 255, 255, 0.95)';
+    });
+    floatingButton.addEventListener('click', async () => {
+      if (isProcessing) return;
+      isProcessing = true;
+      floatingButton.innerHTML = `<div class=\"button-emoji\">⏳</div>`;
+      try {
+        const settings = await new Promise(resolve => {
+          chrome.storage.sync.get({ articleExporterIncludeImages: true }, resolve);
+        });
+        let md = '';
+        if (articles.length === 1) {
+          md = await extractArticleMarkdown(articles[0], settings.articleExporterIncludeImages);
+        } else {
+          const mdArr = await Promise.all(articles.map((a, i) => extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(md => `## Article ${i+1}\n\n${md}`)));
+          md = mdArr.join('\n\n---\n\n');
+        }
+        await copyToClipboard(md, true);
+        floatingButton.innerHTML = `<div class=\"button-emoji\">✅</div>`;
+        showNotification('Article(s) copied as Markdown!', 'success');
+        setTimeout(() => {
+          floatingButton.innerHTML = `<div class=\\\"button-emoji\\\">📝</div>`;
+          isProcessing = false;
+        }, 2000);
+      } catch (e) {
+        floatingButton.innerHTML = `<div class=\"button-emoji\">❌</div>`;
+        showNotification('Failed to copy article(s).', 'error');
+        setTimeout(() => {
+          floatingButton.innerHTML = `<div class=\\\"button-emoji\\\">📝</div>`;
+          isProcessing = false;
+        }, 3000);
+      }
+    });
+    document.body.appendChild(floatingButton);
+    return;
+  }
   // Show on YouTube video, HN item, or HN news pages
   const isYouTube = window.location.hostname.includes('youtube.com') && window.location.pathname.includes('/watch');
   const isHNItem = window.location.hostname.includes('ycombinator.com') && window.location.pathname === '/item';
@@ -113,7 +180,7 @@ function initializeFloatingButton() {
   floatingButton.addEventListener('click', async () => {
     if (isProcessing) return;
     if (isYouTube) {
-      await handleFloatingButtonClick();
+    await handleFloatingButtonClick();
     } else if (isHNItem) {
       await handleHNFloatingButtonClick();
     } else if (isHNNews) {
@@ -147,7 +214,6 @@ async function handleFloatingButtonClick() {
     }, 2000);
     
   } catch (error) {
-    console.error('Error in floating button handler:', error);
     setButtonError();
     
     // Reset to normal state after 3 seconds
@@ -282,10 +348,14 @@ function setButtonNormal() {
   floatingButton.style.opacity = '0.7';
 }
 
-// Initialize floating button when DOM is ready
+// Ensure floating button is initialized after DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeFloatingButton);
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('%c👋 Hi dev! If you are reading this, you probably like poking around. Have a great day! – ExtractMD', 'color: #ff5252; font-size: 16px; font-weight: bold;');
+    initializeFloatingButton();
+  });
 } else {
+  console.log('%c👋 Hi dev! If you are reading this, you probably like poking around. Have a great day! – ExtractMD', 'color: #ff5252; font-size: 16px; font-weight: bold;');
   initializeFloatingButton();
 }
 
@@ -371,7 +441,6 @@ window.copyYouTubeTranscript = async function(settings = null) {
         }, resolve);
       });
     }
-    console.log('Starting transcript copy process with settings:', mergedSettings);
     // Step 1: Click the "Show more" button to expand description
     await expandDescription();
     // Step 2: Wait and click "Show transcript" button
@@ -383,29 +452,21 @@ window.copyYouTubeTranscript = async function(settings = null) {
       chrome.runtime.sendMessage({ action: 'openNewTab', url: mergedSettings.jumpToDomainUrl });
     }
   } catch (error) {
-    console.error('Error copying transcript:', error);
     showNotification('Error: ' + error.message, 'error');
     throw error; // Re-throw to handle in floating button
   }
 };
 
 async function expandDescription() {
-  console.log('Expanding description...');
-  
   // Look for the expand button
   const expandButton = document.querySelector('tp-yt-paper-button#expand');
   if (expandButton) {
     expandButton.click();
-    console.log('Clicked expand button');
     await sleep(500); // Wait 500ms as specified
-  } else {
-    console.log('Expand button not found, description might already be expanded');
   }
 }
 
 async function clickShowTranscript() {
-  console.log('Looking for Show transcript button...');
-  
   // Wait for the button to appear
   let showTranscriptButton = null;
   let attempts = 0;
@@ -421,15 +482,12 @@ async function clickShowTranscript() {
   
   if (showTranscriptButton) {
     showTranscriptButton.click();
-    console.log('Clicked Show transcript button');
   } else {
     throw new Error('Show transcript button not found. This video might not have a transcript available.');
   }
 }
 
 async function waitForTranscriptAndCopy(settings = {}) {
-  console.log('Waiting for transcript to load...');
-  
   // Wait for transcript segments to appear
   let transcriptContainer = null;
   let attempts = 0;
@@ -448,7 +506,6 @@ async function waitForTranscriptAndCopy(settings = {}) {
     throw new Error('Transcript failed to load within timeout period.');
   }
   
-  console.log('Transcript loaded, extracting content...');
   
   // Extract transcript text
   let transcriptText = extractTranscriptText();
@@ -538,9 +595,7 @@ async function copyToClipboard(text, includeTimestamps) {
   
   try {
     await navigator.clipboard.writeText(textToCopy);
-    console.log('Text copied to clipboard');
   } catch (error) {
-    console.error('Failed to copy to clipboard:', error);
     // Fallback method
     const textArea = document.createElement('textarea');
     textArea.value = textToCopy;
@@ -730,7 +785,7 @@ function htmlToMarkdown(html) {
     .replace(/<a [^>]*href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)')
     .replace(/<i>(.*?)<\/i>/gi, '*$1*')
     .replace(/<b>(.*?)<\/b>/gi, '**$1**')
-    .replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/gi, function(_, code) { return `\n\n\n${code}\n\n`; })
+    .replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/gi, function(_, code) { return '```' + code + '```'; })
     .replace(/<[^>]+>/g, '') // Remove any other tags
     .replace(/&quot;/g, '"')
     .replace(/&amp;/g, '&')
@@ -806,4 +861,60 @@ function extractHNNewsMarkdown(settings) {
     md += line + '\n';
   });
   return md.trim();
+}
+
+async function extractArticleMarkdown(articleElem, includeImages) {
+  // Recursively convert article HTML to Markdown
+  function nodeToMarkdown(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.textContent;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return '';
+    }
+    const tag = node.tagName.toLowerCase();
+    if (tag === 'h1') return `# ${node.textContent.trim()}\n\n`;
+    if (tag === 'h2') return `## ${node.textContent.trim()}\n\n`;
+    if (tag === 'h3') return `### ${node.textContent.trim()}\n\n`;
+    if (tag === 'h4') return `#### ${node.textContent.trim()}\n\n`;
+    if (tag === 'h5') return `##### ${node.textContent.trim()}\n\n`;
+    if (tag === 'h6') return `###### ${node.textContent.trim()}\n\n`;
+    if (tag === 'p') return `${Array.from(node.childNodes).map(nodeToMarkdown).join('')}\n\n`;
+    if (tag === 'ul') return `\n${Array.from(node.children).map(li => `- ${nodeToMarkdown(li)}`).join('')}\n`;
+    if (tag === 'ol') return `\n${Array.from(node.children).map((li, i) => `${i+1}. ${nodeToMarkdown(li)}`).join('')}\n`;
+    if (tag === 'li') return `${Array.from(node.childNodes).map(nodeToMarkdown).join('')}`;
+    if (tag === 'strong' || tag === 'b') return `**${node.textContent}**`;
+    if (tag === 'em' || tag === 'i') return `*${node.textContent}*`;
+    if (tag === 'blockquote') return `> ${node.textContent}\n\n`;
+    if (tag === 'code') return '```' + node.textContent + '```';
+    if (tag === 'pre') return '```' + node.textContent + '```';
+    if (tag === 'img' && includeImages) {
+      const alt = node.getAttribute('alt') || '';
+      let src = node.getAttribute('src') || '';
+      if (src) {
+        // Convert relative URLs to absolute
+        if (!src.match(/^https?:\/\//)) {
+          if (src.startsWith('/')) {
+            src = window.location.origin + src;
+          } else {
+            // Relative to current path
+            const base = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
+            src = base + src;
+          }
+        }
+        return `![${alt}](${src})\n\n`;
+      }
+    }
+    // Default: recurse into children
+    return Array.from(node.childNodes).map(nodeToMarkdown).join('');
+  }
+  let markdown = '';
+  const children = Array.from(articleElem.childNodes);
+  children.forEach(child => {
+    const md = nodeToMarkdown(child);
+    if (md && md.trim()) {
+      markdown += md;
+    }
+  });
+  return markdown.trim();
 } 
