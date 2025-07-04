@@ -97,14 +97,36 @@ Open the extension popup to configure:
 - **Copy failed**: Check if the page has loaded completely and try again
 - **Extension not working**: Try refreshing the page or reinstalling the extension
 
-## Development
+## Development & Bundling
 
-To modify the extension:
+This extension uses [esbuild](https://esbuild.github.io/) to bundle modular JavaScript files for Chrome extension compatibility.
 
-1. Edit the files in the `extension` folder
-2. Go to `chrome://extensions/`
-3. Click the refresh icon on the extension card
-4. Test your changes
+### Setup
+
+1. Install dependencies:
+   ```sh
+   npm install
+   ```
+
+2. Build the extension:
+   ```sh
+   npm run build
+   ```
+
+3. For development (auto-rebuild on changes):
+   ```sh
+   npm run watch
+   ```
+
+4. In your `manifest.json`, make sure the content script points to `dist/content.js`.
+
+5. Load the `dist/` folder's files in your Chrome extension.
+
+---
+
+**Note:**
+- All your modular code lives in `extension/`, but only the bundled output in `dist/` is loaded by Chrome.
+- Do not use ES module `import`/`export` in files referenced directly by the extension, only in your source files.
 
 ## File Structure
 

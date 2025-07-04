@@ -1,0 +1,28 @@
+{
+  "name": "extractMD",
+  "version": "1.0.0",
+  "description": "A Chrome extension that extracts and copies information as Markdown from YouTube, Hacker News, and articles, with a beautiful floating button and rich settings.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node build.js",
+    "watch": "esbuild extension/content.js --bundle --outfile=extension/dist/content.js --format=iife --sourcemap --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miguelcorderocollar/yt-transcript-extension.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/miguelcorderocollar/yt-transcript-extension/issues"
+  },
+  "homepage": "https://github.com/miguelcorderocollar/yt-transcript-extension#readme",
+  "devDependencies": {
+    "esbuild": "^0.25.5"
+  }
+}

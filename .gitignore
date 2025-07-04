@@ -1,1 +1,4 @@
 /temp
+node_modules/
+dist/
+extension/dist/
