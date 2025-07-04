@@ -85,11 +85,13 @@ function manageFloatingButtonForArticles() {
           const settings = await new Promise(resolve => {
             chrome.storage.sync.get({ articleExporterIncludeImages: true }, resolve);
           });
+          // Always get the current articles at click time
+          const currentArticles = Array.from(document.querySelectorAll('article'));
           let md = '';
-          if (articles.length === 1) {
-            md = await extractArticleMarkdown(articles[0], settings.articleExporterIncludeImages);
+          if (currentArticles.length === 1) {
+            md = await extractArticleMarkdown(currentArticles[0], settings.articleExporterIncludeImages);
           } else {
-            const mdArr = await Promise.all(articles.map((a, i) => extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(md => `## Article ${i+1}\n\n${md}`)));
+            const mdArr = await Promise.all(currentArticles.map((a, i) => extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(md => `## Article ${i+1}\n\n${md}`)));
             md = mdArr.join('\n\n---\n\n');
           }
           await copyToClipboard(md, true);
