@@ -187,4 +187,16 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         reader.readAsText(file);
     });
+
+    // Accordion logic
+    const collapsibles = document.querySelectorAll('.collapsible');
+    collapsibles.forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const container = this.nextElementSibling;
+            if (container) {
+                container.classList.toggle('open');
+            }
+        });
+    });
 }); 
