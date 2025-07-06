@@ -57,6 +57,70 @@ async function extractArticleMarkdown(articleElem, includeImages) {
   return markdown.trim();
 }
 
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, function(tag) {
+    const charsToReplace = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    };
+    return charsToReplace[tag] || tag;
+  });
+}
+
+async function showArticleInfoNotification(articles, highlightLongest = false) {
+  const articleCount = articles.length;
+  const articleText = articleCount === 1 ? 'Article' : 'Articles';
+
+  // Try to get main headings from articles
+  const headings = [];
+  let longestIdx = -1;
+  if (highlightLongest && articleCount > 1) {
+    // Find the longest article by markdown length
+    const lengths = await Promise.all(articles.map(async (article) => {
+      const md = await extractArticleMarkdown(article, true);
+      return md.length;
+    }));
+    longestIdx = lengths.indexOf(Math.max(...lengths));
+  }
+  articles.forEach((article, index) => {
+    // Look for h1, h2, h3 tags within the article
+    let heading = article.querySelector('h1, h2, h3')?.textContent?.trim();
+    if (!heading) {
+      // Fallback: try to get first paragraph or use article index
+      const firstParagraph = article.querySelector('p')?.textContent?.trim();
+      if (firstParagraph && firstParagraph.length > 50) {
+        heading = firstParagraph.substring(0, 50) + '...';
+      } else {
+        heading = `Article ${index + 1}`;
+      }
+    }
+    heading = escapeHtml(heading);
+    if (highlightLongest && index === longestIdx) {
+      heading = '⭐ • ' + heading;
+    } else {
+      heading = '• ' + heading;
+    }
+    headings.push(heading);
+  });
+
+  let message = `${articleCount} ${articleText} found`;
+  if (headings.length > 0) {
+    if (articleCount === 1) {
+      message += `:<br>${headings[0]}`;
+    } else {
+      message += `:<br>${headings.slice(0, 3).join('<br>')}`;
+      if (headings.length > 3) {
+        message += `<br>... and ${headings.length - 3} more`;
+      }
+    }
+  }
+
+  showNotification(message, 'info');
+}
+
 function manageFloatingButtonForArticles() {
   const articles = Array.from(document.querySelectorAll('article'));
   let floatingButton = document.getElementById('yt-transcript-floating-button');
@@ -64,7 +128,7 @@ function manageFloatingButtonForArticles() {
     if (!floatingButton) {
       floatingButton = document.createElement('div');
       floatingButton.id = 'yt-transcript-floating-button';
-      floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
+      floatingButton.innerHTML = `<div class=\"button-emoji\">📝</div>`;
       floatingButton.style.cssText = `
         position: fixed;
         bottom: 20px;
@@ -92,6 +156,12 @@ function manageFloatingButtonForArticles() {
       floatingButton.addEventListener('mouseleave', () => {
         floatingButton.style.background = 'rgba(255, 255, 255, 0.95)';
       });
+      // Show article info notification if setting is enabled
+      chrome.storage.sync.get({ articleExporterShowInfo: true, articleExporterOnlyLongest: false }, function(settings) {
+        if (settings.articleExporterShowInfo) {
+          showArticleInfoNotification(articles, settings.articleExporterOnlyLongest);
+        }
+      });
       floatingButton.addEventListener('click', async () => {
         if (isProcessing) return;
         isProcessing = true;
@@ -100,7 +170,8 @@ function manageFloatingButtonForArticles() {
           const settings = await new Promise(resolve => {
             chrome.storage.sync.get({ 
               articleExporterIncludeImages: true,
-              articleExporterOnlyLongest: false 
+              articleExporterOnlyLongest: false,
+              articleExporterShowInfo: true
             }, resolve);
           });
           const currentArticles = Array.from(document.querySelectorAll('article'));

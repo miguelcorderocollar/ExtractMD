@@ -29,6 +29,10 @@ export async function copyToClipboard(text, includeTimestamps) {
   }
 }
 
+/**
+ * Shows a notification. Message can contain <br> for line breaks.
+ * If you use user content, escape it for HTML.
+ */
 export function showNotification(message, type = 'info', prominent = false) {
   // Create a notification element
   const notification = document.createElement('div');
@@ -47,7 +51,7 @@ export function showNotification(message, type = 'info', prominent = false) {
     transition: opacity 0.3s ease;
     max-width: 350px;
     word-wrap: break-word;
-    text-align: center;
+    text-align: left;
   `;
   // Set background color based on type
   switch (type) {
@@ -60,7 +64,7 @@ export function showNotification(message, type = 'info', prominent = false) {
     default:
       notification.style.backgroundColor = '#2196F3';
   }
-  notification.textContent = message;
+  notification.innerHTML = message;
   document.body.appendChild(notification);
   // Remove after 3 seconds (or 5s if prominent)
   setTimeout(() => {
