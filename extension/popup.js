@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const hnNewsIncludeTimeCheckbox = document.getElementById('hnNewsIncludeTime');
     const hnNewsIncludeCommentsCheckbox = document.getElementById('hnNewsIncludeComments');
     const articleExporterIncludeImagesCheckbox = document.getElementById('articleExporterIncludeImages');
+    const articleExporterOnlyLongestCheckbox = document.getElementById('articleExporterOnlyLongest');
     const statusDiv = document.getElementById('status');
 
     // Import/Export elements
@@ -44,7 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
         hnNewsIncludeAuthor: true,
         hnNewsIncludeTime: true,
         hnNewsIncludeComments: true,
-        articleExporterIncludeImages: true
+        articleExporterIncludeImages: true,
+        articleExporterOnlyLongest: false
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
@@ -63,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hnNewsIncludeTimeCheckbox.checked = items.hnNewsIncludeTime;
         hnNewsIncludeCommentsCheckbox.checked = items.hnNewsIncludeComments;
         articleExporterIncludeImagesCheckbox.checked = items.articleExporterIncludeImages;
+        articleExporterOnlyLongestCheckbox.checked = items.articleExporterOnlyLongest;
     });
 
     // Save settings when changed
@@ -116,6 +119,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     articleExporterIncludeImagesCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ articleExporterIncludeImages: articleExporterIncludeImagesCheckbox.checked });
+    });
+    articleExporterOnlyLongestCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ articleExporterOnlyLongest: articleExporterOnlyLongestCheckbox.checked });
     });
 
     // Status message

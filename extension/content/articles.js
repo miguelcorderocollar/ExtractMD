@@ -98,21 +98,50 @@ function manageFloatingButtonForArticles() {
         floatingButton.innerHTML = `<div class=\"button-emoji\">⏳</div>`;
         try {
           const settings = await new Promise(resolve => {
-            chrome.storage.sync.get({ articleExporterIncludeImages: true }, resolve);
+            chrome.storage.sync.get({ 
+              articleExporterIncludeImages: true,
+              articleExporterOnlyLongest: false 
+            }, resolve);
           });
           const currentArticles = Array.from(document.querySelectorAll('article'));
           let md = '';
-          if (currentArticles.length === 1) {
-            md = await extractArticleMarkdown(currentArticles[0], settings.articleExporterIncludeImages);
+          let articlesToProcess = currentArticles;
+          let totalArticles = currentArticles.length;
+          
+          // If only longest article is enabled and there are multiple articles
+          if (settings.articleExporterOnlyLongest && currentArticles.length > 1) {
+            // Find the longest article by text content length
+            const articleLengths = await Promise.all(currentArticles.map(async (article, index) => {
+              const articleMd = await extractArticleMarkdown(article, settings.articleExporterIncludeImages);
+              return { index, length: articleMd.length, article, markdown: articleMd };
+            }));
+            
+            // Sort by length (descending) and take the longest
+            articleLengths.sort((a, b) => b.length - a.length);
+            const longestArticle = articleLengths[0];
+            articlesToProcess = [longestArticle.article];
+            md = longestArticle.markdown;
           } else {
-            const mdArr = await Promise.all(currentArticles.map((a, i) => extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(md => `## Article ${i+1}\n\n${md}`)));
-            md = mdArr.join('\n\n---\n\n');
+            // Process all articles as before
+            if (currentArticles.length === 1) {
+              md = await extractArticleMarkdown(currentArticles[0], settings.articleExporterIncludeImages);
+            } else {
+              const mdArr = await Promise.all(currentArticles.map((a, i) => extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(md => `## Article ${i+1}\n\n${md}`)));
+              md = mdArr.join('\n\n---\n\n');
+            }
           }
+          
           await copyToClipboard(md, true);
           floatingButton.innerHTML = `<div class=\"button-emoji\">✅</div>`;
-          const articleCount = currentArticles.length;
-          const articleText = articleCount === 1 ? 'Article' : 'Articles';
-          showNotification(`${articleCount} ${articleText} copied as Markdown!`, 'success');
+          
+          // Update notification based on settings
+          const processedCount = articlesToProcess.length;
+          if (settings.articleExporterOnlyLongest && totalArticles > 1) {
+            showNotification(`1/${totalArticles} Articles copied as Markdown!`, 'success');
+          } else {
+            const articleText = processedCount === 1 ? 'Article' : 'Articles';
+            showNotification(`${processedCount} ${articleText} copied as Markdown!`, 'success');
+          }
           setTimeout(() => {
             floatingButton.innerHTML = `<div class=\\"button-emoji\\">📝</div>`;
             isProcessing = false;
