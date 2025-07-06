@@ -22,11 +22,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const articleExporterOnlyLongestCheckbox = document.getElementById('articleExporterOnlyLongest');
     const articleExporterShowInfoCheckbox = document.getElementById('articleExporterShowInfo');
     const statusDiv = document.getElementById('status');
+    const enableUsageKpiCheckbox = document.getElementById('showUsageKpi');
 
     // Import/Export elements
     const exportBtn = document.getElementById('exportSettingsBtn');
     const importBtn = document.getElementById('importSettingsBtn');
     const importFileInput = document.getElementById('importSettingsFile');
+
+    // KPI elements
+    const kpiSection = document.getElementById('kpi-section');
+    const kpiCounters = document.getElementById('kpi-counters');
+    const clearKpiBtn = document.getElementById('clearKpiBtn');
 
     // Load saved settings
     chrome.storage.sync.get({
@@ -48,7 +54,8 @@ document.addEventListener('DOMContentLoaded', function() {
         hnNewsIncludeComments: true,
         articleExporterIncludeImages: true,
         articleExporterOnlyLongest: false,
-        articleExporterShowInfo: true
+        articleExporterShowInfo: true,
+        enableUsageKpi: true,
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
@@ -69,6 +76,8 @@ document.addEventListener('DOMContentLoaded', function() {
         articleExporterIncludeImagesCheckbox.checked = items.articleExporterIncludeImages;
         articleExporterOnlyLongestCheckbox.checked = items.articleExporterOnlyLongest;
         articleExporterShowInfoCheckbox.checked = items.articleExporterShowInfo;
+        enableUsageKpiCheckbox.checked = items.enableUsageKpi !== false;
+        document.getElementById('kpi-section').style.display = items.enableUsageKpi === false ? 'none' : 'flex';
     });
 
     // Save settings when changed
@@ -128,6 +137,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     articleExporterShowInfoCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ articleExporterShowInfo: articleExporterShowInfoCheckbox.checked });
+    });
+    enableUsageKpiCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ enableUsageKpi: enableUsageKpiCheckbox.checked }, function() {
+            document.getElementById('kpi-section').style.display = enableUsageKpiCheckbox.checked ? 'flex' : 'none';
+        });
     });
 
     // Status message
@@ -209,6 +223,32 @@ document.addEventListener('DOMContentLoaded', function() {
             if (container) {
                 container.classList.toggle('open');
             }
+        });
+    });
+
+    // Helper: Render KPI counters
+    function renderKpiCounters(stats) {
+        kpiCounters.innerHTML = `
+            <span title="YouTube transcript copies">YT: <b>${stats.youtube || 0}</b></span>
+            <span title="Article exports">Articles: <b>${stats.articles || 0}</b></span>
+            <span title="HN comments exports">HN Comments: <b>${stats.hn_comments || 0}</b></span>
+            <span title="HN news exports">HN News: <b>${stats.hn_news || 0}</b></span>
+        `;
+    }
+
+    // Load and display KPI counters
+    function loadKpiCounters() {
+        chrome.storage.sync.get({ usageStats: {} }, function(items) {
+            renderKpiCounters(items.usageStats || {});
+        });
+    }
+    loadKpiCounters();
+
+    // Clear KPI counters
+    clearKpiBtn.addEventListener('click', function() {
+        chrome.storage.sync.set({ usageStats: { youtube: 0, articles: 0, hn_comments: 0, hn_news: 0 } }, function() {
+            loadKpiCounters();
+            showStatus('Usage counters cleared!', 'success');
         });
     });
 }); 

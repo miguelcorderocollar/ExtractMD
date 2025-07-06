@@ -55,6 +55,14 @@ function handleHNFloatingButtonClick() {
         });
         md = extractHNCommentsMarkdown(settings);
         await copyToClipboard(md, true);
+        // Increment KPI counter for HN Comments only if enabled
+        chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
+          if (items.enableUsageKpi !== false) {
+            const stats = items.usageStats || {};
+            stats.hn_comments = (stats.hn_comments || 0) + 1;
+            chrome.storage.sync.set({ usageStats: stats });
+          }
+        });
         setButtonSuccess();
         showNotification('HN comments copied to clipboard!', 'success');
         // Check global jumpToDomain setting
@@ -76,6 +84,14 @@ function handleHNFloatingButtonClick() {
         });
         md = extractHNNewsMarkdown(settings);
         await copyToClipboard(md, true);
+        // Increment KPI counter for HN News only if enabled
+        chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
+          if (items.enableUsageKpi !== false) {
+            const stats = items.usageStats || {};
+            stats.hn_news = (stats.hn_news || 0) + 1;
+            chrome.storage.sync.set({ usageStats: stats });
+          }
+        });
         setButtonSuccess();
         showNotification('HN news copied to clipboard!', 'success');
         // Check global jumpToDomain setting

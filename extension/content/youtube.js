@@ -144,6 +144,14 @@ async function waitForTranscriptAndCopy(settings = {}) {
   transcriptText = metaMd + transcriptText;
   const userSettings = await getSettings();
   await copyToClipboard(transcriptText, userSettings.includeTimestamps);
+  // Increment KPI counter only if enabled
+  chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
+    if (items.enableUsageKpi !== false) {
+      const stats = items.usageStats || {};
+      stats.youtube = (stats.youtube || 0) + 1;
+      chrome.storage.sync.set({ usageStats: stats });
+    }
+  });
   showNotification('Transcript copied to clipboard!', 'success');
 }
 

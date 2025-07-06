@@ -256,6 +256,13 @@
                 <span class="setting-label" style="font-size:12px;">Target domain/URL</span>
                 <input type="text" id="jumpToDomainUrl" placeholder="https://chat.openai.com/">
             </div>
+            <div class="setting-item">
+                <span class="setting-label">Enable usage KPIs</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="showUsageKpi" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
     </div>
     <button class="collapsible"><img src="images/youtube.svg" class="section-icon" alt="YouTube"> <span>YouTube Transcript Settings</span></button>
@@ -398,6 +405,10 @@
         </div>
     </div>
     <hr class="divider">
+    <div id="kpi-section" style="margin: 0 14px 10px 14px; display: flex; align-items: center; justify-content: space-between;">
+        <div id="kpi-counters" style="display: flex; gap: 16px; font-size: 13px; font-weight: 500;"></div>
+        <button id="clearKpiBtn" title="Clear usage counters" style="background: #f3f4f6; border: 1px solid #bfc6e0; border-radius: 6px; font-size: 12px; padding: 2px 8px; cursor: pointer; margin-left: 8px;">Clear</button>
+    </div>
     <div style="display: flex; gap: 8px; margin: 14px 14px 10px 14px;">
         <button id="exportSettingsBtn" class="action-button" style="flex:1;">Export Settings</button>
         <button id="importSettingsBtn" class="action-button" style="flex:1;">Import Settings</button>

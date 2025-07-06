@@ -50,6 +50,12 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 - **Extension Popup**: Manual copy and settings
 - **Keyboard Shortcut**: `Ctrl+Shift+Y` (or `Cmd+Shift+Y` on Mac)
 
+## Usage KPIs
+
+- The extension tracks how many times you use each integration (YouTube transcript, Article export, HN Comments, HN News) and displays these as simple counters (KPIs) in the popup.
+- You can clear these counters at any time with the 'Clear' button next to the KPIs.
+- This feature is enabled by default, but you can disable it in General Settings. Disabling will hide the KPI section from the popup and stop tracking usage.
+
 ## Settings
 
 Open the extension popup to configure:
@@ -148,6 +154,7 @@ This extension uses [esbuild](https://esbuild.github.io/) to bundle modular Java
 │   │   ├── youtube.js           # YouTube extraction logic
 │   │   ├── hackernews.js        # Hacker News extraction logic
 │   │   ├── utils.js             # Shared utility functions
+│   │   └── kpi.js             # KPI functionality
 │   ├── images/                  # Section icons for popup
 │   │   ├── article.svg
 │   │   ├── hackernews.svg

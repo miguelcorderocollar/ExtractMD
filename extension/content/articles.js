@@ -203,6 +203,14 @@ function manageFloatingButtonForArticles() {
           }
           
           await copyToClipboard(md, true);
+          // Increment KPI counter only if enabled
+          chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
+            if (items.enableUsageKpi !== false) {
+              const stats = items.usageStats || {};
+              stats.articles = (stats.articles || 0) + 1;
+              chrome.storage.sync.set({ usageStats: stats });
+            }
+          });
           floatingButton.innerHTML = `<div class=\"button-emoji\">✅</div>`;
           
           // Update notification based on settings
