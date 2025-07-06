@@ -110,7 +110,9 @@ function manageFloatingButtonForArticles() {
           }
           await copyToClipboard(md, true);
           floatingButton.innerHTML = `<div class=\"button-emoji\">✅</div>`;
-          showNotification('Article(s) copied as Markdown!', 'success');
+          const articleCount = currentArticles.length;
+          const articleText = articleCount === 1 ? 'Article' : 'Articles';
+          showNotification(`${articleCount} ${articleText} copied as Markdown!`, 'success');
           setTimeout(() => {
             floatingButton.innerHTML = `<div class=\\"button-emoji\\">📝</div>`;
             isProcessing = false;
