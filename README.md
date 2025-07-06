@@ -19,6 +19,8 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 - **Article to Markdown**:
   - Extracts readable articles as Markdown
   - Option to include images
+  - Option to only copy the longest article (if multiple are found)
+  - Info notification shows number of articles and their main headings (optionally, with the longest highlighted)
 - **Jump to Domain**: Optionally open a custom site (e.g., ChatGPT) after copying
 - **Network + DOM Fallback**: Uses network API data when possible, falls back to DOM parsing
 - **Visual Feedback**: Button and notifications for all actions
@@ -38,6 +40,7 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 - **YouTube Video**: Floating button in bottom-right. Click to copy transcript as Markdown.
 - **Hacker News**: On news or item pages, floating button copies news list or comments as Markdown.
 - **Articles**: On readable articles, floating button copies article as Markdown (optionally with images).
+  - When articles are detected, an info notification appears (if enabled) showing the number of articles and their main headings. If "only copy longest" is enabled, the longest is marked with a star.
 
 #### Button States
 - Idle (📝) → Loading (⏳) → Success (✅) → Idle
@@ -64,6 +67,8 @@ Open the extension popup to configure:
   - Include title, URL, site, points, author, time, comments
 - **Article Exporter**:
   - Include images
+  - Only copy longest article (if multiple are found)
+  - Show info notification with article count and headings (optionally highlight the longest)
 - **Jump to Domain**:
   - Enable/disable
   - Set custom URL (e.g., ChatGPT)
@@ -133,22 +138,38 @@ This extension uses [esbuild](https://esbuild.github.io/) to bundle modular Java
 ```
 .
 ├── extension/
-│   ├── manifest.json          # Extension configuration
-│   ├── background.js          # Background service worker
-│   ├── content.js             # Content script (floating button, extraction logic)
-│   ├── popup.html             # Extension popup interface
-│   ├── popup.js               # Popup functionality and settings
-│   └── icons/
-│       ├── icon16.png
-│       ├── icon48.png
-│       └── icon128.png
+│   ├── manifest.json            # Extension configuration
+│   ├── background.js            # Background service worker
+│   ├── content.js               # Main content script (entry point for bundling)
+│   ├── popup.html               # Extension popup interface
+│   ├── popup.js                 # Popup functionality and settings
+│   ├── content/                 # Modular content scripts
+│   │   ├── articles.js          # Article extraction logic
+│   │   ├── youtube.js           # YouTube extraction logic
+│   │   ├── hackernews.js        # Hacker News extraction logic
+│   │   ├── utils.js             # Shared utility functions
+│   ├── images/                  # Section icons for popup
+│   │   ├── article.svg
+│   │   ├── hackernews.svg
+│   │   └── youtube.svg
+│   ├── icons/                   # Extension icons
+│   │   ├── icon16.png
+│   │   ├── icon48.png
+│   │   └── icon128.png
+│   └── dist/
+│       └── content.js           # Bundled content script (output by build)
+│       └── content.js.map       # Source map for debugging
 ├── scripts/
-│   └── create_icons.py        # Icon generation script
+│   └── create_icons.py          # Icon generation script
 ├── docs/
-│   └── prompt.md              # Design and prompt documentation
-└── README.md                  # This file
+│   └── prompt.md                # Design and prompt documentation
+└── README.md                    # This file
 ```
 
 ## License
 
-This project is open source and available under the MIT License. 
+This project is open source and available under the MIT License.
+
+## About Development
+
+This extension was developed using [Cursor](https://www.cursor.so/), an AI-powered code editor that accelerates building, refactoring, and understanding codebases. 
