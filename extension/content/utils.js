@@ -5,7 +5,8 @@ export async function getSettings() {
     chrome.storage.sync.get({
       includeTimestamps: true,
       jumpToDomain: false,
-      jumpToDomainUrl: 'https://chat.openai.com/'
+      jumpToDomainUrl: 'https://chat.openai.com/',
+      closeTabAfterExtraction: false
     }, (settings) => {
       resolve(settings);
     });
@@ -81,6 +82,10 @@ export function showNotification(message, type = 'info', prominent = false) {
 
 export function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function closeCurrentTab() {
+  chrome.runtime.sendMessage({ action: 'closeCurrentTab' });
 }
 
 export function htmlToMarkdown(html) {

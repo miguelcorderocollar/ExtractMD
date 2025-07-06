@@ -21,6 +21,7 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
   - Option to only copy the longest article (if multiple are found)
   - Info notification shows number of articles and their main headings (optionally, with the longest highlighted)
 - **Jump to Domain**: Optionally open a custom site (e.g., ChatGPT) after copying
+- **Close Tab After Extraction**: Automatically close the current tab after successful extraction
 - **Visual Feedback**: Button and notifications for all actions
 
 ## Requirements
@@ -88,6 +89,8 @@ Open the extension popup to configure:
 - **Jump to Domain**:
   - Enable/disable
   - Set custom URL (e.g., ChatGPT)
+- **Close Tab After Extraction**:
+  - Enable/disable automatic tab closing after successful extraction
 - All settings are saved and persist across sessions
 
 ## How It Works

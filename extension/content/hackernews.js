@@ -1,5 +1,5 @@
 // Hacker News-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, htmlToMarkdown, getSettings } from './utils.js';
+import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab } from './utils.js';
 
 let isProcessing = false;
 let floatingButton = null;
@@ -70,6 +70,12 @@ function handleHNFloatingButtonClick() {
         if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
           chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
         }
+        // Close tab after extraction if setting is enabled
+        if (globalSettings.closeTabAfterExtraction) {
+          setTimeout(() => {
+            closeCurrentTab();
+          }, 500); // Wait 500ms after showing the notification
+        }
       } else if (isHNNewsPage()) {
         const settings = await new Promise(resolve => {
           chrome.storage.sync.get({
@@ -98,6 +104,12 @@ function handleHNFloatingButtonClick() {
         const globalSettings = await getSettings();
         if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
           chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
+        }
+        // Close tab after extraction if setting is enabled
+        if (globalSettings.closeTabAfterExtraction) {
+          setTimeout(() => {
+            closeCurrentTab();
+          }, 500); // Wait 500ms after showing the notification
         }
       } else {
         setButtonError();

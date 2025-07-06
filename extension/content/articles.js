@@ -1,6 +1,6 @@
 // Generic article extraction logic for ExtractMD extension
 
-import { copyToClipboard, showNotification, getSettings } from './utils.js';
+import { copyToClipboard, showNotification, getSettings, closeCurrentTab } from './utils.js';
 
 let isProcessing = false;
 let articleObserver = null;
@@ -225,6 +225,12 @@ function manageFloatingButtonForArticles() {
           const globalSettings = await getSettings();
           if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
             chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
+          }
+          // Close tab after extraction if setting is enabled
+          if (globalSettings.closeTabAfterExtraction) {
+            setTimeout(() => {
+              closeCurrentTab();
+            }, 500); // Wait 500ms after showing the notification
           }
           setTimeout(() => {
             floatingButton.innerHTML = `<div class=\\"button-emoji\\">📝</div>`;

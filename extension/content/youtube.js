@@ -1,5 +1,5 @@
 // YouTube-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, sleep, getSettings } from './utils.js';
+import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab } from './utils.js';
 
 let floatingButton = null;
 let isProcessing = false;
@@ -153,6 +153,13 @@ async function waitForTranscriptAndCopy(settings = {}) {
     }
   });
   showNotification('Transcript copied to clipboard!', 'success');
+  
+  // Close tab after extraction if setting is enabled
+  if (userSettings.closeTabAfterExtraction) {
+    setTimeout(() => {
+      closeCurrentTab();
+    }, 500); // Wait 500ms after showing the notification
+  }
 }
 
 function extractTranscriptText() {

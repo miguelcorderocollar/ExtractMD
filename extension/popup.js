@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const articleExporterShowInfoCheckbox = document.getElementById('articleExporterShowInfo');
     const statusDiv = document.getElementById('status');
     const enableUsageKpiCheckbox = document.getElementById('showUsageKpi');
+    const closeTabAfterExtractionCheckbox = document.getElementById('closeTabAfterExtraction');
 
     // Import/Export elements
     const exportBtn = document.getElementById('exportSettingsBtn');
@@ -56,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         articleExporterOnlyLongest: false,
         articleExporterShowInfo: true,
         enableUsageKpi: true,
+        closeTabAfterExtraction: false,
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
@@ -77,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         articleExporterOnlyLongestCheckbox.checked = items.articleExporterOnlyLongest;
         articleExporterShowInfoCheckbox.checked = items.articleExporterShowInfo;
         enableUsageKpiCheckbox.checked = items.enableUsageKpi !== false;
+        closeTabAfterExtractionCheckbox.checked = items.closeTabAfterExtraction;
         document.getElementById('kpi-section').style.display = items.enableUsageKpi === false ? 'none' : 'flex';
     });
 
@@ -142,6 +145,9 @@ document.addEventListener('DOMContentLoaded', function() {
         chrome.storage.sync.set({ enableUsageKpi: enableUsageKpiCheckbox.checked }, function() {
             document.getElementById('kpi-section').style.display = enableUsageKpiCheckbox.checked ? 'flex' : 'none';
         });
+    });
+    closeTabAfterExtractionCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ closeTabAfterExtraction: closeTabAfterExtractionCheckbox.checked });
     });
 
     // Status message
