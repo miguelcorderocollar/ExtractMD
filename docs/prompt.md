@@ -12,8 +12,7 @@ Develop a Chrome extension from scratch to automate transcript extraction from Y
   - After transcript extraction, display a green checkmark in the button for 5 seconds, then revert to the original icon.
   - If not on a YouTube video page, do not show the button and, if triggered (e.g., via keybinding), show a notification: "This extension only works on YouTube video pages."
 
-- **Keybinding (Optional)**:
-  - Allow triggering the extension via a customizable keyboard shortcut (if feasible within Chrome extension permissions).
+
 
 - **Transcript Extraction Process**:
   1. **Check Context**:

@@ -6,9 +6,7 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 
 - **Floating Button**: Appears on YouTube videos, Hacker News (news & comments), and article pages
 - **Smart States**: Button shows idle, loading, success, and error states
-- **Multiple Activation Methods**:
-  - Click the floating button
-  - Keyboard shortcut: `Ctrl+Shift+Y` (or `Cmd+Shift+Y` on Mac)
+- **Floating Button Activation**: Click the floating button to extract and copy content
 - **YouTube Transcript Extraction**:
   - Copies full transcript, supports chapters
   - Settings: include/exclude timestamps, add video title, channel, and URL
@@ -57,9 +55,7 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 - Idle (📝) → Loading (⏳) → Success (✅) → Idle
 - Error (❌) if something fails
 
-#### Other Methods
-- **Extension Popup**: Manual copy and settings
-- **Keyboard Shortcut**: `Ctrl+Shift+Y` (or `Cmd+Shift+Y` on Mac)
+
 
 ## Usage KPIs
 
@@ -112,7 +108,7 @@ Open the extension popup to configure:
   - `scripting`: Execute scripts in tabs
 - **Host Permissions**: `<all_urls>` (works on YouTube, Hacker News, and articles)
 - **Content Script**: Injects floating button and handles extraction
-- **Background Script**: Manages extension button clicks and keyboard shortcuts
+- **Background Script**: Manages extension button clicks
 
 ## Troubleshooting
 
