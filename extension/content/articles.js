@@ -1,6 +1,6 @@
 // Generic article extraction logic for ExtractMD extension
 
-import { copyToClipboard, showNotification } from './utils.js';
+import { copyToClipboard, showNotification, getSettings } from './utils.js';
 
 let isProcessing = false;
 let articleObserver = null;
@@ -212,6 +212,11 @@ function manageFloatingButtonForArticles() {
           } else {
             const articleText = processedCount === 1 ? 'Article' : 'Articles';
             showNotification(`${processedCount} ${articleText} copied as Markdown!`, 'success');
+          }
+          // Check global jumpToDomain setting
+          const globalSettings = await getSettings();
+          if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
+            chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
           }
           setTimeout(() => {
             floatingButton.innerHTML = `<div class=\\"button-emoji\\">📝</div>`;

@@ -1,5 +1,5 @@
 // Hacker News-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, htmlToMarkdown } from './utils.js';
+import { copyToClipboard, showNotification, htmlToMarkdown, getSettings } from './utils.js';
 
 let isProcessing = false;
 let floatingButton = null;
@@ -57,6 +57,11 @@ function handleHNFloatingButtonClick() {
         await copyToClipboard(md, true);
         setButtonSuccess();
         showNotification('HN comments copied to clipboard!', 'success');
+        // Check global jumpToDomain setting
+        const globalSettings = await getSettings();
+        if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
+          chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
+        }
       } else if (isHNNewsPage()) {
         const settings = await new Promise(resolve => {
           chrome.storage.sync.get({
@@ -73,6 +78,11 @@ function handleHNFloatingButtonClick() {
         await copyToClipboard(md, true);
         setButtonSuccess();
         showNotification('HN news copied to clipboard!', 'success');
+        // Check global jumpToDomain setting
+        const globalSettings = await getSettings();
+        if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
+          chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
+        }
       } else {
         setButtonError();
         showNotification('Not a supported HN page.', 'error');
@@ -98,8 +108,9 @@ function isHNItemPage() {
 
 function isHNNewsPage() {
   if (!window.location.hostname.includes('ycombinator.com')) return false;
-  const validPaths = ['/news','/newest','/front','/best','/ask','/show','/jobs'];
-  return validPaths.includes(window.location.pathname);
+  const path = window.location.pathname;
+  const validPaths = ['', '/', '/news','/newest','/front','/best','/ask','/show','/jobs'];
+  return validPaths.includes(path);
 }
 
 function extractHNCommentsMarkdown(settings) {
@@ -153,8 +164,9 @@ function extractHNCommentsMarkdown(settings) {
 function extractHNNewsMarkdown(settings) {
   // Only run on HN main/news pages
   if (!window.location.hostname.includes('ycombinator.com')) throw new Error('Not on HN');
-  const validPaths = ['/news','/newest','/front','/best','/ask','/show','/jobs'];
-  if (!validPaths.includes(window.location.pathname)) throw new Error('Not on HN news page');
+  const path = window.location.pathname;
+  const validPaths = ['', '/', '/news','/newest','/front','/best','/ask','/show','/jobs'];
+  if (!validPaths.includes(path)) throw new Error('Not on HN news page');
   // Find all news items
   const tbodies = Array.from(document.querySelectorAll('tbody'));
   let newsRows = [];

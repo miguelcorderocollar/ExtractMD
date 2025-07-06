@@ -3,7 +3,9 @@
 export async function getSettings() {
   return new Promise((resolve) => {
     chrome.storage.sync.get({
-      includeTimestamps: true
+      includeTimestamps: true,
+      jumpToDomain: false,
+      jumpToDomainUrl: 'https://chat.openai.com/'
     }, (settings) => {
       resolve(settings);
     });
