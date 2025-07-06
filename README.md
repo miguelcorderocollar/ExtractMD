@@ -4,23 +4,18 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 
 ## Features
 
-- **Floating Button**: Appears on YouTube videos, Hacker News (news & comments), and article pages
-- **Smart States**: Button shows idle, loading, success, and error states
-- **Floating Button Activation**: Click the floating button to extract and copy content
-- **YouTube Transcript Extraction**:
-  - Copies full transcript, supports chapters
-  - Settings: include/exclude timestamps, add video title, channel, and URL
-- **Hacker News Support**:
-  - Copy news lists or full comment threads as Markdown
-  - Settings: include author, time, replies, points, etc.
-- **Article to Markdown**:
-  - Extracts readable articles as Markdown
-  - Option to include images
-  - Option to only copy the longest article (if multiple are found)
-  - Info notification shows number of articles and their main headings (optionally, with the longest highlighted)
-- **Jump to Domain**: Optionally open a custom site (e.g., ChatGPT) after copying
-- **Close Tab After Extraction**: Automatically close the current tab after successful extraction
-- **Visual Feedback**: Button and notifications for all actions
+| Feature | Description |
+|---------|-------------|
+| **Floating Button** | Appears on YouTube videos, Hacker News (news & comments), and article pages |
+| **Smart States** | Button shows idle, loading, success, and error states |
+| **YouTube Transcript Extraction** | Copies full transcript with chapters, customizable formatting |
+| **Hacker News Support** | Copy news lists or full comment threads as Markdown |
+| **Article to Markdown** | Extracts readable articles as Markdown with image support |
+| **Jump to Domain** | Optionally open a custom site (e.g., ChatGPT) after copying |
+| **Close Tab After Extraction** | Automatically close the current tab after successful extraction |
+| **Visual Feedback** | Button and notifications for all actions |
+| **Usage KPIs** | Track usage statistics for each feature |
+| **Settings Import/Export** | Save and restore your configuration |
 
 ## Requirements
 
@@ -55,8 +50,6 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 - Idle (📝) → Loading (⏳) → Success (✅) → Idle
 - Error (❌) if something fails
 
-
-
 ## Usage KPIs
 
 - The extension tracks how many times you use each integration (YouTube transcript, Article export, HN Comments, HN News) and displays these as simple counters (KPIs) in the popup.
@@ -65,29 +58,55 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 
 ## Settings
 
-Open the extension popup to configure:
+Open the extension popup to configure all settings. All settings are saved and persist across sessions.
 
-- **YouTube Transcript**:
-  - Include timestamps
-  - Add video title
-  - Add channel name
-  - Add video URL
-- **Hacker News Comments**:
-  - Include author
-  - Include time
-  - Include replies
-- **Hacker News News**:
-  - Include title, URL, site, points, author, time, comments
-- **Article Exporter**:
-  - Include images
-  - Only copy longest article (if multiple are found)
-  - Show info notification with article count and headings (optionally highlight the longest)
-- **Jump to Domain**:
-  - Enable/disable
-  - Set custom URL (e.g., ChatGPT)
-- **Close Tab After Extraction**:
-  - Enable/disable automatic tab closing after successful extraction
-- All settings are saved and persist across sessions
+### General Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Jump to Domain** | Enable/disable automatic navigation to a custom site after copying |
+| **Target Domain/URL** | Set custom URL (e.g., https://chat.openai.com/) |
+| **Enable Usage KPIs** | Track and display usage statistics |
+| **Close Tab After Extraction** | Automatically close the current tab after successful extraction |
+
+### YouTube Transcript Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Include Timestamps** | Add timestamps to transcript entries |
+| **Add Video Title** | Include video title at the top of transcript |
+| **Add Channel Name** | Include channel name in transcript |
+| **Add Video URL** | Include video URL in transcript |
+
+### HN Comments Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Include Author** | Show comment author names |
+| **Include Time** | Show comment timestamps |
+| **Include Replies** | Include threaded replies in export |
+| **Include Page URL** | Add the HN page URL to the export |
+
+### HN News Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Include Title** | Show news item titles |
+| **Include URL** | Include links to news articles |
+| **Include Site** | Show source website names |
+| **Include Points** | Show upvote counts |
+| **Include Author** | Show submission authors |
+| **Include Time** | Show submission timestamps |
+| **Include Comments Count** | Show number of comments |
+
+### Article Exporter Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Include Images** | Include images in article export |
+| **Only Copy Longest Article** | When multiple articles are found, copy only the longest one |
+| **Show Article Info** | Display notification with article count and headings |
+| **Include Page URL** | Add the page URL to the article export |
 
 ## How It Works
 

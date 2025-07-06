@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const articleExporterIncludeImagesCheckbox = document.getElementById('articleExporterIncludeImages');
     const articleExporterOnlyLongestCheckbox = document.getElementById('articleExporterOnlyLongest');
     const articleExporterShowInfoCheckbox = document.getElementById('articleExporterShowInfo');
+    const articleExporterIncludeUrlCheckbox = document.getElementById('articleExporterIncludeUrl');
+    const hnIncludeUrlCheckbox = document.getElementById('hnIncludeUrl');
     const statusDiv = document.getElementById('status');
     const enableUsageKpiCheckbox = document.getElementById('showUsageKpi');
     const closeTabAfterExtractionCheckbox = document.getElementById('closeTabAfterExtraction');
@@ -56,6 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
         articleExporterIncludeImages: true,
         articleExporterOnlyLongest: false,
         articleExporterShowInfo: true,
+        articleExporterIncludeUrl: true,
+        hnIncludeUrl: true,
         enableUsageKpi: true,
         closeTabAfterExtraction: false,
     }, function(items) {
@@ -78,6 +82,8 @@ document.addEventListener('DOMContentLoaded', function() {
         articleExporterIncludeImagesCheckbox.checked = items.articleExporterIncludeImages;
         articleExporterOnlyLongestCheckbox.checked = items.articleExporterOnlyLongest;
         articleExporterShowInfoCheckbox.checked = items.articleExporterShowInfo;
+        articleExporterIncludeUrlCheckbox.checked = items.articleExporterIncludeUrl;
+        hnIncludeUrlCheckbox.checked = items.hnIncludeUrl;
         enableUsageKpiCheckbox.checked = items.enableUsageKpi !== false;
         closeTabAfterExtractionCheckbox.checked = items.closeTabAfterExtraction;
         document.getElementById('kpi-section').style.display = items.enableUsageKpi === false ? 'none' : 'flex';
@@ -140,6 +146,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     articleExporterShowInfoCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ articleExporterShowInfo: articleExporterShowInfoCheckbox.checked });
+    });
+    articleExporterIncludeUrlCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ articleExporterIncludeUrl: articleExporterIncludeUrlCheckbox.checked });
+    });
+    hnIncludeUrlCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnIncludeUrl: hnIncludeUrlCheckbox.checked });
     });
     enableUsageKpiCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ enableUsageKpi: enableUsageKpiCheckbox.checked }, function() {

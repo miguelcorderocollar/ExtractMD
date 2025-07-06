@@ -50,7 +50,8 @@ function handleHNFloatingButtonClick() {
           chrome.storage.sync.get({
             hnIncludeAuthor: true,
             hnIncludeTime: true,
-            hnIncludeReplies: true
+            hnIncludeReplies: true,
+            hnIncludeUrl: true
           }, resolve);
         });
         md = extractHNCommentsMarkdown(settings);
@@ -182,10 +183,14 @@ function extractHNCommentsMarkdown(settings) {
     return md.split('\n').map(line => (depth > 0 ? '>'.repeat(depth) + ' ' + line : line)).join('\n') + '\n';
   }
   let result = comments.map(c => renderComment(c, 0)).join('\n');
-  // Add title and URL
+  // Add title and URL if setting is enabled
   const title = document.querySelector('title')?.textContent || '';
-  const url = window.location.href;
-  result = `# ${title}\n\n**URL:** ${url}\n\n` + result;
+  if (settings.hnIncludeUrl) {
+    const url = window.location.href;
+    result = `# ${title}\n\n**URL:** ${url}\n\n` + result;
+  } else {
+    result = `# ${title}\n\n` + result;
+  }
   return result.trim();
 }
 

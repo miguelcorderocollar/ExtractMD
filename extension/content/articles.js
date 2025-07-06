@@ -171,7 +171,8 @@ function manageFloatingButtonForArticles() {
             chrome.storage.sync.get({ 
               articleExporterIncludeImages: true,
               articleExporterOnlyLongest: false,
-              articleExporterShowInfo: true
+              articleExporterShowInfo: true,
+              articleExporterIncludeUrl: true
             }, resolve);
           });
           const currentArticles = Array.from(document.querySelectorAll('article'));
@@ -192,6 +193,13 @@ function manageFloatingButtonForArticles() {
             const longestArticle = articleLengths[0];
             articlesToProcess = [longestArticle.article];
             md = longestArticle.markdown;
+            
+            // Add URL if setting is enabled
+            if (settings.articleExporterIncludeUrl) {
+              const pageUrl = window.location.href;
+              const pageTitle = document.title || 'Article';
+              md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
+            }
           } else {
             // Process all articles as before
             if (currentArticles.length === 1) {
@@ -200,6 +208,13 @@ function manageFloatingButtonForArticles() {
               const mdArr = await Promise.all(currentArticles.map((a, i) => extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(md => `## Article ${i+1}\n\n${md}`)));
               md = mdArr.join('\n\n---\n\n');
             }
+          }
+          
+          // Add URL if setting is enabled
+          if (settings.articleExporterIncludeUrl) {
+            const pageUrl = window.location.href;
+            const pageTitle = document.title || 'Article';
+            md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
           }
           
           await copyToClipboard(md, true);
