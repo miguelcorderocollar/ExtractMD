@@ -8,7 +8,6 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 - **Smart States**: Button shows idle, loading, success, and error states
 - **Multiple Activation Methods**:
   - Click the floating button
-  - Extension popup button
   - Keyboard shortcut: `Ctrl+Shift+Y` (or `Cmd+Shift+Y` on Mac)
 - **YouTube Transcript Extraction**:
   - Copies full transcript, supports chapters
@@ -22,16 +21,27 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
   - Option to only copy the longest article (if multiple are found)
   - Info notification shows number of articles and their main headings (optionally, with the longest highlighted)
 - **Jump to Domain**: Optionally open a custom site (e.g., ChatGPT) after copying
-- **Network + DOM Fallback**: Uses network API data when possible, falls back to DOM parsing
 - **Visual Feedback**: Button and notifications for all actions
+
+## Requirements
+
+- [Node.js](https://nodejs.org/) (which includes npm) must be installed on your system.
 
 ## Installation
 
 1. **Download/Clone** this repository to your local machine
-2. **Open Chrome** and navigate to `chrome://extensions/`
-3. **Enable "Developer mode"** in the top-right corner
-4. **Click "Load unpacked"** and select the `extension` folder
-5. **The extension will appear** in your Chrome toolbar
+2. **Install dependencies** by running:
+   ```sh
+   npm install
+   ```
+3. **Build the extension** by running:
+   ```sh
+   npm run build
+   ```
+4. **Open Chrome** and navigate to `chrome://extensions/`
+5. **Enable "Developer mode"** in the top-right corner
+6. **Click "Load unpacked"** and select the `extension` folder
+7. **The extension will appear** in your Chrome toolbar
 
 ## Usage
 
