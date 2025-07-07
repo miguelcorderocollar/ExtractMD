@@ -1,6 +1,6 @@
 // Generic article extraction logic for ExtractMD extension
 
-import { copyToClipboard, showNotification, getSettings, closeCurrentTab } from './utils.js';
+import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal } from './utils.js';
 
 let isProcessing = false;
 let articleObserver = null;
@@ -165,7 +165,7 @@ function manageFloatingButtonForArticles() {
       floatingButton.addEventListener('click', async () => {
         if (isProcessing) return;
         isProcessing = true;
-        floatingButton.innerHTML = `<div class=\"button-emoji\">⏳</div>`;
+        setButtonLoading(floatingButton);
         try {
           const settings = await new Promise(resolve => {
             chrome.storage.sync.get({ 
@@ -226,7 +226,7 @@ function manageFloatingButtonForArticles() {
               chrome.storage.sync.set({ usageStats: stats });
             }
           });
-          floatingButton.innerHTML = `<div class=\"button-emoji\">✅</div>`;
+          setButtonSuccess(floatingButton);
           
           // Update notification based on settings
           const processedCount = articlesToProcess.length;
@@ -248,14 +248,14 @@ function manageFloatingButtonForArticles() {
             }, 500); // Wait 500ms after showing the notification
           }
           setTimeout(() => {
-            floatingButton.innerHTML = `<div class=\\"button-emoji\\">📝</div>`;
+            setButtonNormal(floatingButton);
             isProcessing = false;
           }, 2000);
         } catch (e) {
-          floatingButton.innerHTML = `<div class=\"button-emoji\">❌</div>`;
+          setButtonError(floatingButton);
           showNotification('Failed to copy article(s).', 'error');
           setTimeout(() => {
-            floatingButton.innerHTML = `<div class=\\"button-emoji\\">📝</div>`;
+            setButtonNormal(floatingButton);
             isProcessing = false;
           }, 3000);
         }

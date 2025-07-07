@@ -106,4 +106,42 @@ export function htmlToMarkdown(html) {
   // Replace placeholder with triple backticks
   text = text.replace(/\u007F\u007F\u007F/g, '```');
   return text.trim();
+}
+
+export function setButtonLoading(button) {
+  if (!button) return;
+  button.innerHTML = `<div class="button-emoji">⏳</div>`;
+  button.style.background = 'rgba(255, 193, 7, 0.8)';
+  button.style.border = '1px solid rgba(255, 193, 7, 0.3)';
+  button.style.cursor = 'not-allowed';
+  button.style.fontSize = '20px';
+  button.style.opacity = '1';
+}
+
+export function setButtonSuccess(button) {
+  if (!button) return;
+  button.innerHTML = `<div class="button-emoji">✅</div>`;
+  button.style.background = 'rgba(76, 175, 80, 0.8)';
+  button.style.border = '1px solid rgba(76, 175, 80, 0.3)';
+  button.style.fontSize = '24px';
+  button.style.opacity = '1';
+}
+
+export function setButtonError(button) {
+  if (!button) return;
+  button.innerHTML = `<div class="button-emoji">❌</div>`;
+  button.style.background = 'rgba(244, 67, 54, 0.8)';
+  button.style.border = '1px solid rgba(244, 67, 54, 0.3)';
+  button.style.fontSize = '24px';
+  button.style.opacity = '1';
+}
+
+export function setButtonNormal(button) {
+  if (!button) return;
+  button.innerHTML = `<div class="button-emoji">📝</div>`;
+  button.style.background = 'rgba(255, 255, 255, 0.15)';
+  button.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+  button.style.cursor = 'pointer';
+  button.style.fontSize = '24px';
+  button.style.opacity = '0.7';
 } 

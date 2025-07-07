@@ -1,49 +1,14 @@
 // Hacker News-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab } from './utils.js';
+import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal } from './utils.js';
 
 let isProcessing = false;
 let floatingButton = null;
-
-function setButtonLoading() {
-  if (!floatingButton) return;
-  floatingButton.innerHTML = `<div class="button-emoji">⏳</div>`;
-  floatingButton.style.background = 'rgba(255, 193, 7, 0.8)';
-  floatingButton.style.border = '1px solid rgba(255, 193, 7, 0.3)';
-  floatingButton.style.cursor = 'not-allowed';
-  floatingButton.style.fontSize = '20px';
-  floatingButton.style.opacity = '1';
-}
-function setButtonSuccess() {
-  if (!floatingButton) return;
-  floatingButton.innerHTML = `<div class="button-emoji">✅</div>`;
-  floatingButton.style.background = 'rgba(76, 175, 80, 0.8)';
-  floatingButton.style.border = '1px solid rgba(76, 175, 80, 0.3)';
-  floatingButton.style.fontSize = '24px';
-  floatingButton.style.opacity = '1';
-}
-function setButtonError() {
-  if (!floatingButton) return;
-  floatingButton.innerHTML = `<div class="button-emoji">❌</div>`;
-  floatingButton.style.background = 'rgba(244, 67, 54, 0.8)';
-  floatingButton.style.border = '1px solid rgba(244, 67, 54, 0.3)';
-  floatingButton.style.fontSize = '24px';
-  floatingButton.style.opacity = '1';
-}
-function setButtonNormal() {
-  if (!floatingButton) return;
-  floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
-  floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
-  floatingButton.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-  floatingButton.style.cursor = 'pointer';
-  floatingButton.style.fontSize = '24px';
-  floatingButton.style.opacity = '0.7';
-}
 
 function handleHNFloatingButtonClick() {
   return async function() {
     try {
       isProcessing = true;
-      setButtonLoading();
+      setButtonLoading(floatingButton);
       let md = '';
       if (isHNItemPage()) {
         const settings = await new Promise(resolve => {
@@ -65,7 +30,7 @@ function handleHNFloatingButtonClick() {
             chrome.storage.sync.set({ usageStats: stats });
           }
         });
-        setButtonSuccess();
+        setButtonSuccess(floatingButton);
         showNotification('HN comments copied to clipboard!', 'success');
         // Check global jumpToDomain setting
         const globalSettings = await getSettings();
@@ -100,7 +65,7 @@ function handleHNFloatingButtonClick() {
             chrome.storage.sync.set({ usageStats: stats });
           }
         });
-        setButtonSuccess();
+        setButtonSuccess(floatingButton);
         showNotification('HN news copied to clipboard!', 'success');
         // Check global jumpToDomain setting
         const globalSettings = await getSettings();
@@ -114,18 +79,18 @@ function handleHNFloatingButtonClick() {
           }, 500); // Wait 500ms after showing the notification
         }
       } else {
-        setButtonError();
+        setButtonError(floatingButton);
         showNotification('Not a supported HN page.', 'error');
       }
       setTimeout(() => {
-        setButtonNormal();
+        setButtonNormal(floatingButton);
         isProcessing = false;
       }, 2000);
     } catch (error) {
-      setButtonError();
+      setButtonError(floatingButton);
       showNotification('Failed to copy HN content.', 'error');
       setTimeout(() => {
-        setButtonNormal();
+        setButtonNormal(floatingButton);
         isProcessing = false;
       }, 3000);
     }
@@ -325,6 +290,6 @@ export function initHackerNewsFeatures() {
   });
   floatingButton.addEventListener('click', handleHNFloatingButtonClick());
   document.body.appendChild(floatingButton);
-  setButtonNormal();
+  setButtonNormal(floatingButton);
   console.debug('[ExtractMD] Floating button created and added to DOM (HN)');
 } 

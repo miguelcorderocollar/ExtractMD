@@ -1,5 +1,5 @@
 // YouTube-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab } from './utils.js';
+import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal } from './utils.js';
 
 let floatingButton = null;
 let isProcessing = false;
@@ -30,44 +30,6 @@ function updateButtonVisibility() {
   } else {
     floatingButton.style.display = 'flex';
   }
-}
-
-function setButtonLoading() {
-  if (!floatingButton) return;
-  floatingButton.innerHTML = `<div class="button-emoji">⏳</div>`;
-  floatingButton.style.background = 'rgba(255, 193, 7, 0.8)';
-  floatingButton.style.border = '1px solid rgba(255, 193, 7, 0.3)';
-  floatingButton.style.cursor = 'not-allowed';
-  floatingButton.style.fontSize = '20px';
-  floatingButton.style.opacity = '1';
-}
-
-function setButtonSuccess() {
-  if (!floatingButton) return;
-  floatingButton.innerHTML = `<div class="button-emoji">✅</div>`;
-  floatingButton.style.background = 'rgba(76, 175, 80, 0.8)';
-  floatingButton.style.border = '1px solid rgba(76, 175, 80, 0.3)';
-  floatingButton.style.fontSize = '24px';
-  floatingButton.style.opacity = '1';
-}
-
-function setButtonError() {
-  if (!floatingButton) return;
-  floatingButton.innerHTML = `<div class="button-emoji">❌</div>`;
-  floatingButton.style.background = 'rgba(244, 67, 54, 0.8)';
-  floatingButton.style.border = '1px solid rgba(244, 67, 54, 0.3)';
-  floatingButton.style.fontSize = '24px';
-  floatingButton.style.opacity = '1';
-}
-
-function setButtonNormal() {
-  if (!floatingButton) return;
-  floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
-  floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
-  floatingButton.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-  floatingButton.style.cursor = 'pointer';
-  floatingButton.style.fontSize = '24px';
-  floatingButton.style.opacity = '0.7';
 }
 
 function startPlayerObserver() {
@@ -320,18 +282,18 @@ function initializeFloatingButton() {
   floatingButton.addEventListener('click', async () => {
     if (isProcessing) return;
     isProcessing = true;
-    setButtonLoading();
+    setButtonLoading(floatingButton);
     try {
       await window.copyYouTubeTranscript();
-      setButtonSuccess();
+      setButtonSuccess(floatingButton);
       setTimeout(() => {
-        setButtonNormal();
+        setButtonNormal(floatingButton);
         isProcessing = false;
       }, 2000);
     } catch (error) {
-      setButtonError();
+      setButtonError(floatingButton);
       setTimeout(() => {
-        setButtonNormal();
+        setButtonNormal(floatingButton);
         isProcessing = false;
       }, 3000);
     }
