@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const articleExporterShowInfoCheckbox = document.getElementById('articleExporterShowInfo');
     const articleExporterIncludeUrlCheckbox = document.getElementById('articleExporterIncludeUrl');
     const hnIncludeUrlCheckbox = document.getElementById('hnIncludeUrl');
+    const hnIncludeItemTextCheckbox = document.getElementById('hnIncludeItemText');
     const statusDiv = document.getElementById('status');
     const enableUsageKpiCheckbox = document.getElementById('showUsageKpi');
     const closeTabAfterExtractionCheckbox = document.getElementById('closeTabAfterExtraction');
@@ -60,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
         articleExporterShowInfo: true,
         articleExporterIncludeUrl: true,
         hnIncludeUrl: true,
+        hnIncludeItemText: true,
         enableUsageKpi: true,
         closeTabAfterExtraction: false,
     }, function(items) {
@@ -84,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
         articleExporterShowInfoCheckbox.checked = items.articleExporterShowInfo;
         articleExporterIncludeUrlCheckbox.checked = items.articleExporterIncludeUrl;
         hnIncludeUrlCheckbox.checked = items.hnIncludeUrl;
+        hnIncludeItemTextCheckbox.checked = items.hnIncludeItemText;
         enableUsageKpiCheckbox.checked = items.enableUsageKpi !== false;
         closeTabAfterExtractionCheckbox.checked = items.closeTabAfterExtraction;
         document.getElementById('kpi-section').style.display = items.enableUsageKpi === false ? 'none' : 'flex';
@@ -152,6 +155,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     hnIncludeUrlCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ hnIncludeUrl: hnIncludeUrlCheckbox.checked });
+    });
+    hnIncludeItemTextCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ hnIncludeItemText: hnIncludeItemTextCheckbox.checked });
     });
     enableUsageKpiCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ enableUsageKpi: enableUsageKpiCheckbox.checked }, function() {

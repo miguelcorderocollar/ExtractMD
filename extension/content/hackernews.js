@@ -51,7 +51,8 @@ function handleHNFloatingButtonClick() {
             hnIncludeAuthor: true,
             hnIncludeTime: true,
             hnIncludeReplies: true,
-            hnIncludeUrl: true
+            hnIncludeUrl: true,
+            hnIncludeItemText: true
           }, resolve);
         });
         md = extractHNCommentsMarkdown(settings);
@@ -182,15 +183,30 @@ function extractHNCommentsMarkdown(settings) {
     }
     return md.split('\n').map(line => (depth > 0 ? '>'.repeat(depth) + ' ' + line : line)).join('\n') + '\n';
   }
+  let itemTextMd = '';
+  if (settings.hnIncludeItemText) {
+    // Find the item text in the fatitem table
+    const fatitem = document.querySelector('table.fatitem');
+    if (fatitem) {
+      const toptext = fatitem.querySelector('.toptext');
+      if (toptext) {
+        itemTextMd = htmlToMarkdown(toptext.innerHTML).trim();
+      }
+    }
+  }
   let result = comments.map(c => renderComment(c, 0)).join('\n');
-  // Add title and URL if setting is enabled
+  // Add title, URL, and item text if enabled
   const title = document.querySelector('title')?.textContent || '';
+  let header = `# ${title}\n\n`;
   if (settings.hnIncludeUrl) {
     const url = window.location.href;
-    result = `# ${title}\n\n**URL:** ${url}\n\n` + result;
-  } else {
-    result = `# ${title}\n\n` + result;
+    header += `**URL:** ${url}\n\n`;
   }
+  if (itemTextMd) {
+    header += `## Post Content\n\n${itemTextMd}\n\n`;
+  }
+  header += '## Comments\n\n';
+  result = header + result;
   return result.trim();
 }
 
