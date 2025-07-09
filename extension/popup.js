@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const enableUsageKpiCheckbox = document.getElementById('showUsageKpi');
     const closeTabAfterExtractionCheckbox = document.getElementById('closeTabAfterExtraction');
     const downloadInsteadOfCopyCheckbox = document.getElementById('downloadInsteadOfCopy');
+    const enableYouTubeIntegrationCheckbox = document.getElementById('enableYouTubeIntegration');
+    const enableHackerNewsIntegrationCheckbox = document.getElementById('enableHackerNewsIntegration');
+    const enableArticleIntegrationCheckbox = document.getElementById('enableArticleIntegration');
 
     // Import/Export elements
     const exportBtn = document.getElementById('exportSettingsBtn');
@@ -66,6 +69,9 @@ document.addEventListener('DOMContentLoaded', function() {
         enableUsageKpi: true,
         closeTabAfterExtraction: false,
         downloadInsteadOfCopy: false,
+        enableYouTubeIntegration: true,
+        enableHackerNewsIntegration: true,
+        enableArticleIntegration: true,
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
@@ -92,6 +98,33 @@ document.addEventListener('DOMContentLoaded', function() {
         enableUsageKpiCheckbox.checked = items.enableUsageKpi !== false;
         closeTabAfterExtractionCheckbox.checked = items.closeTabAfterExtraction;
         downloadInsteadOfCopyCheckbox.checked = items.downloadInsteadOfCopy;
+        enableYouTubeIntegrationCheckbox.checked = items.enableYouTubeIntegration !== false;
+        enableHackerNewsIntegrationCheckbox.checked = items.enableHackerNewsIntegration !== false;
+        enableArticleIntegrationCheckbox.checked = items.enableArticleIntegration !== false;
+        // Hide/show both the collapsible and container for integrations
+        const collapsibles = document.querySelectorAll('.collapsible');
+        const containers = document.querySelectorAll('.container');
+        // collapsibles/containers: 0=General, 1=YT, 2=HN Comments, 3=HN News, 4=Article
+        if (collapsibles[1] && containers[1]) {
+          const show = items.enableYouTubeIntegration !== false;
+          collapsibles[1].style.display = show ? '' : 'none';
+          containers[1].style.display = show ? '' : 'none';
+        }
+        if (collapsibles[2] && containers[2]) {
+          const show = items.enableHackerNewsIntegration !== false;
+          collapsibles[2].style.display = show ? '' : 'none';
+          containers[2].style.display = show ? '' : 'none';
+        }
+        if (collapsibles[3] && containers[3]) {
+          const show = items.enableHackerNewsIntegration !== false;
+          collapsibles[3].style.display = show ? '' : 'none';
+          containers[3].style.display = show ? '' : 'none';
+        }
+        if (collapsibles[4] && containers[4]) {
+          const show = items.enableArticleIntegration !== false;
+          collapsibles[4].style.display = show ? '' : 'none';
+          containers[4].style.display = show ? '' : 'none';
+        }
         document.getElementById('kpi-section').style.display = items.enableUsageKpi === false ? 'none' : 'flex';
     });
 
@@ -173,6 +206,60 @@ document.addEventListener('DOMContentLoaded', function() {
     downloadInsteadOfCopyCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ downloadInsteadOfCopy: downloadInsteadOfCopyCheckbox.checked });
     });
+    // Integration enable/disable toggles (no reload, update UI in-place)
+    enableYouTubeIntegrationCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ enableYouTubeIntegration: enableYouTubeIntegrationCheckbox.checked }, function() {
+            updateIntegrationVisibility();
+        });
+    });
+    enableHackerNewsIntegrationCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ enableHackerNewsIntegration: enableHackerNewsIntegrationCheckbox.checked }, function() {
+            updateIntegrationVisibility();
+        });
+    });
+    enableArticleIntegrationCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ enableArticleIntegration: enableArticleIntegrationCheckbox.checked }, function() {
+            updateIntegrationVisibility();
+        });
+    });
+
+    // Helper to update integration visibility and preserve General Settings open state
+    function updateIntegrationVisibility() {
+        // Preserve General Settings open state
+        const generalOpen = containers[0].classList.contains('open');
+        chrome.storage.sync.get({
+            enableYouTubeIntegration: true,
+            enableHackerNewsIntegration: true,
+            enableArticleIntegration: true,
+        }, function(items) {
+            if (collapsibles[1] && containers[1]) {
+                const show = items.enableYouTubeIntegration !== false;
+                collapsibles[1].style.display = show ? '' : 'none';
+                containers[1].style.display = show ? '' : 'none';
+            }
+            if (collapsibles[2] && containers[2]) {
+                const show = items.enableHackerNewsIntegration !== false;
+                collapsibles[2].style.display = show ? '' : 'none';
+                containers[2].style.display = show ? '' : 'none';
+            }
+            if (collapsibles[3] && containers[3]) {
+                const show = items.enableHackerNewsIntegration !== false;
+                collapsibles[3].style.display = show ? '' : 'none';
+                containers[3].style.display = show ? '' : 'none';
+            }
+            if (collapsibles[4] && containers[4]) {
+                const show = items.enableArticleIntegration !== false;
+                collapsibles[4].style.display = show ? '' : 'none';
+                containers[4].style.display = show ? '' : 'none';
+            }
+            // Restore General Settings open state
+            if (generalOpen) {
+                containers[0].classList.add('open');
+            } else {
+                containers[0].classList.remove('open');
+            }
+        });
+    }
 
     // Status message
     function showStatus(message, type) {

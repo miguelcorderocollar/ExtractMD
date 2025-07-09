@@ -72,6 +72,9 @@ Open the extension popup to configure all settings. All settings are saved and p
 | **Enable Usage KPIs** | Track and display usage statistics |
 | **Close Tab After Extraction** | Automatically close the current tab after successful extraction |
 | **Download .md instead of copy to clipboard** | Instantly download extracted Markdown as a .md file instead of copying to clipboard |
+| **Enable YouTube integration** | Show/hide YouTube transcript extraction and its settings |
+| **Enable Hacker News integration** | Show/hide Hacker News extraction and its settings |
+| **Enable Article integration** | Show/hide Article extraction and its settings |
 
 ### YouTube Transcript Settings
 
@@ -170,6 +173,7 @@ This extension uses [esbuild](https://esbuild.github.io/) to bundle modular Java
 **Note:**
 - All your modular code lives in `extension/`, but only the bundled output in `dist/` is loaded by Chrome.
 - Do not use ES module `import`/`export` in files referenced directly by the extension, only in your source files.
+- **Note:** If an integration is disabled, all its settings are hidden and the floating button will not appear for that integration on supported pages.
 
 ## File Structure
 

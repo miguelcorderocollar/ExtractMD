@@ -191,54 +191,57 @@ window.copyYouTubeTranscript = async function(settings = null) {
 
 export function initYouTubeFeatures() {
   console.debug('[ExtractMD] initYouTubeFeatures called');
-  // Ensure floating button is initialized after DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      console.debug('[ExtractMD] DOMContentLoaded for YouTube');
+  chrome.storage.sync.get({ enableYouTubeIntegration: true }, function(items) {
+    if (items.enableYouTubeIntegration === false) return;
+    // Ensure floating button is initialized after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        console.debug('[ExtractMD] DOMContentLoaded for YouTube');
+        initializeFloatingButton();
+      });
+    } else {
       initializeFloatingButton();
-    });
-  } else {
-    initializeFloatingButton();
-  }
+    }
 
-  // Also initialize on YouTube navigation (SPA behavior)
-  let currentUrl = window.location.href;
-  const observer = new MutationObserver(() => {
-    if (window.location.href !== currentUrl) {
-      currentUrl = window.location.href;
-      if (floatingButton && floatingButton.parentNode) {
-        floatingButton.parentNode.removeChild(floatingButton);
-        floatingButton = null;
+    // Also initialize on YouTube navigation (SPA behavior)
+    let currentUrl = window.location.href;
+    const observer = new MutationObserver(() => {
+      if (window.location.href !== currentUrl) {
+        currentUrl = window.location.href;
+        if (floatingButton && floatingButton.parentNode) {
+          floatingButton.parentNode.removeChild(floatingButton);
+          floatingButton = null;
+        }
+        setTimeout(initializeFloatingButton, 1000);
       }
-      setTimeout(initializeFloatingButton, 1000);
-    }
-  });
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
 
-  // Monitor for fullscreen changes
-  document.addEventListener('fullscreenchange', updateButtonVisibility);
-  document.addEventListener('webkitfullscreenchange', updateButtonVisibility);
-  document.addEventListener('mozfullscreenchange', updateButtonVisibility);
-  document.addEventListener('MSFullscreenChange', updateButtonVisibility);
+    // Monitor for fullscreen changes
+    document.addEventListener('fullscreenchange', updateButtonVisibility);
+    document.addEventListener('webkitfullscreenchange', updateButtonVisibility);
+    document.addEventListener('mozfullscreenchange', updateButtonVisibility);
+    document.addEventListener('MSFullscreenChange', updateButtonVisibility);
 
-  // Monitor for YouTube player state changes (theater mode, fullscreen buttons)
-  const playerObserver = new MutationObserver(() => {
-    updateButtonVisibility();
-  });
-  startPlayerObserver();
-  // Also start player observer on YouTube navigation
-  const urlObserver = new MutationObserver(() => {
-    if (window.location.href !== currentUrl) {
-      currentUrl = window.location.href;
-      setTimeout(startPlayerObserver, 1000);
-    }
-  });
-  urlObserver.observe(document.body, {
-    childList: true,
-    subtree: true
+    // Monitor for YouTube player state changes (theater mode, fullscreen buttons)
+    const playerObserver = new MutationObserver(() => {
+      updateButtonVisibility();
+    });
+    startPlayerObserver();
+    // Also start player observer on YouTube navigation
+    const urlObserver = new MutationObserver(() => {
+      if (window.location.href !== currentUrl) {
+        currentUrl = window.location.href;
+        setTimeout(startPlayerObserver, 1000);
+      }
+    });
+    urlObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
   });
 }
 

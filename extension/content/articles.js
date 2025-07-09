@@ -294,7 +294,9 @@ function setupArticleMutationObserver() {
 }
 
 export function initArticleFeatures() {
-  console.debug('[ExtractMD] initArticleFeatures called');
-  setupArticleMutationObserver();
-  manageFloatingButtonForArticles();
+  chrome.storage.sync.get({ enableArticleIntegration: true }, function(items) {
+    if (items.enableArticleIntegration === false) return;
+    setupArticleMutationObserver();
+    manageFloatingButtonForArticles();
+  });
 } 

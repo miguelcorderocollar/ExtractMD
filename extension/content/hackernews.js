@@ -258,54 +258,57 @@ function extractHNNewsMarkdown(settings) {
 
 export function initHackerNewsFeatures() {
   console.debug('[ExtractMD] initHackerNewsFeatures called');
-  if (!(isHNItemPage() || isHNNewsPage())) return;
-  if (document.getElementById('yt-transcript-floating-button')) {
-    console.debug('[ExtractMD] Floating button already exists (HN)');
-    return;
-  }
-  floatingButton = document.createElement('div');
-  floatingButton.id = 'yt-transcript-floating-button';
-  floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
-  floatingButton.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    color: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    cursor: pointer;
-    font-size: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    user-select: none;
-    opacity: 0.7;
-  `;
-  floatingButton.addEventListener('mouseenter', () => {
-    if (!isProcessing) {
-      floatingButton.style.transform = 'translateY(-2px) scale(1.1)';
-      floatingButton.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
-      floatingButton.style.opacity = '1';
-      floatingButton.style.background = 'rgba(255, 255, 255, 0.25)';
+  chrome.storage.sync.get({ enableHackerNewsIntegration: true }, function(items) {
+    if (items.enableHackerNewsIntegration === false) return;
+    if (!(isHNItemPage() || isHNNewsPage())) return;
+    if (document.getElementById('yt-transcript-floating-button')) {
+      console.debug('[ExtractMD] Floating button already exists (HN)');
+      return;
     }
+    floatingButton = document.createElement('div');
+    floatingButton.id = 'yt-transcript-floating-button';
+    floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
+    floatingButton.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      color: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      cursor: pointer;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      user-select: none;
+      opacity: 0.7;
+    `;
+    floatingButton.addEventListener('mouseenter', () => {
+      if (!isProcessing) {
+        floatingButton.style.transform = 'translateY(-2px) scale(1.1)';
+        floatingButton.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
+        floatingButton.style.opacity = '1';
+        floatingButton.style.background = 'rgba(255, 255, 255, 0.25)';
+      }
+    });
+    floatingButton.addEventListener('mouseleave', () => {
+      if (!isProcessing) {
+        floatingButton.style.transform = 'translateY(0) scale(1)';
+        floatingButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        floatingButton.style.opacity = '0.7';
+        floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
+      }
+    });
+    floatingButton.addEventListener('click', handleHNFloatingButtonClick());
+    document.body.appendChild(floatingButton);
+    setButtonNormal(floatingButton);
+    console.debug('[ExtractMD] Floating button created and added to DOM (HN)');
   });
-  floatingButton.addEventListener('mouseleave', () => {
-    if (!isProcessing) {
-      floatingButton.style.transform = 'translateY(0) scale(1)';
-      floatingButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-      floatingButton.style.opacity = '0.7';
-      floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
-    }
-  });
-  floatingButton.addEventListener('click', handleHNFloatingButtonClick());
-  document.body.appendChild(floatingButton);
-  setButtonNormal(floatingButton);
-  console.debug('[ExtractMD] Floating button created and added to DOM (HN)');
 } 
