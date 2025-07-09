@@ -16,6 +16,7 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 | **Visual Feedback** | Button and notifications for all actions |
 | **Usage KPIs** | Track usage statistics for each feature |
 | **Settings Import/Export** | Save and restore your configuration |
+| **Download .md Option** | Instantly download extracted Markdown as a .md file instead of copying to clipboard (configurable in settings) |
 
 ## Requirements
 
@@ -46,6 +47,8 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 - **Articles**: On readable articles, floating button copies article as Markdown (optionally with images).
   - When articles are detected, an info notification appears (if enabled) showing the number of articles and their main headings. If "only copy longest" is enabled, the longest is marked with a star.
 
+**If 'Download .md instead of copy to clipboard' is enabled in settings, clicking the floating button will instantly download a Markdown file with a smart filename instead of copying to clipboard.**
+
 #### Button States
 - Idle (📝) → Loading (⏳) → Success (✅) → Idle
 - Error (❌) if something fails
@@ -68,6 +71,7 @@ Open the extension popup to configure all settings. All settings are saved and p
 | **Target Domain/URL** | Set custom URL (e.g., https://chat.openai.com/) |
 | **Enable Usage KPIs** | Track and display usage statistics |
 | **Close Tab After Extraction** | Automatically close the current tab after successful extraction |
+| **Download .md instead of copy to clipboard** | Instantly download extracted Markdown as a .md file instead of copying to clipboard |
 
 ### YouTube Transcript Settings
 

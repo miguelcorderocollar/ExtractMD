@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusDiv = document.getElementById('status');
     const enableUsageKpiCheckbox = document.getElementById('showUsageKpi');
     const closeTabAfterExtractionCheckbox = document.getElementById('closeTabAfterExtraction');
+    const downloadInsteadOfCopyCheckbox = document.getElementById('downloadInsteadOfCopy');
 
     // Import/Export elements
     const exportBtn = document.getElementById('exportSettingsBtn');
@@ -64,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hnIncludeItemText: true,
         enableUsageKpi: true,
         closeTabAfterExtraction: false,
+        downloadInsteadOfCopy: false,
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
@@ -89,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hnIncludeItemTextCheckbox.checked = items.hnIncludeItemText;
         enableUsageKpiCheckbox.checked = items.enableUsageKpi !== false;
         closeTabAfterExtractionCheckbox.checked = items.closeTabAfterExtraction;
+        downloadInsteadOfCopyCheckbox.checked = items.downloadInsteadOfCopy;
         document.getElementById('kpi-section').style.display = items.enableUsageKpi === false ? 'none' : 'flex';
     });
 
@@ -166,6 +169,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     closeTabAfterExtractionCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ closeTabAfterExtraction: closeTabAfterExtractionCheckbox.checked });
+    });
+    downloadInsteadOfCopyCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ downloadInsteadOfCopy: downloadInsteadOfCopyCheckbox.checked });
     });
 
     // Status message

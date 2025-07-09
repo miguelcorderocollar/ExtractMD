@@ -1,6 +1,6 @@
 // Generic article extraction logic for ExtractMD extension
 
-import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal } from './utils.js';
+import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile } from './utils.js';
 
 let isProcessing = false;
 let articleObserver = null;
@@ -172,7 +172,8 @@ function manageFloatingButtonForArticles() {
               articleExporterIncludeImages: true,
               articleExporterOnlyLongest: false,
               articleExporterShowInfo: true,
-              articleExporterIncludeUrl: true
+              articleExporterIncludeUrl: true,
+              downloadInsteadOfCopy: false
             }, resolve);
           });
           const currentArticles = Array.from(document.querySelectorAll('article'));
@@ -217,7 +218,28 @@ function manageFloatingButtonForArticles() {
             md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
           }
           
-          await copyToClipboard(md, true);
+          chrome.storage.sync.get({ downloadInsteadOfCopy: false }, function(items) {
+            if (items.downloadInsteadOfCopy) {
+              downloadMarkdownFile(md, document.title, 'ExtractMD');
+              setButtonSuccess(floatingButton);
+              if (settings.articleExporterOnlyLongest && totalArticles > 1) {
+                showNotification(`1/${totalArticles} Articles downloaded as Markdown!`, 'success');
+              } else {
+                const articleText = processedCount === 1 ? 'Article' : 'Articles';
+                showNotification(`${processedCount} ${articleText} downloaded as Markdown!`, 'success');
+              }
+            } else {
+              copyToClipboard(md, true);
+              setButtonSuccess(floatingButton);
+              if (settings.articleExporterOnlyLongest && totalArticles > 1) {
+                showNotification(`1/${totalArticles} Articles copied as Markdown!`, 'success');
+              } else {
+                const articleText = processedCount === 1 ? 'Article' : 'Articles';
+                showNotification(`${processedCount} ${articleText} copied as Markdown!`, 'success');
+              }
+            }
+          });
+          
           // Increment KPI counter only if enabled
           chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
             if (items.enableUsageKpi !== false) {
@@ -226,16 +248,7 @@ function manageFloatingButtonForArticles() {
               chrome.storage.sync.set({ usageStats: stats });
             }
           });
-          setButtonSuccess(floatingButton);
           
-          // Update notification based on settings
-          const processedCount = articlesToProcess.length;
-          if (settings.articleExporterOnlyLongest && totalArticles > 1) {
-            showNotification(`1/${totalArticles} Articles copied as Markdown!`, 'success');
-          } else {
-            const articleText = processedCount === 1 ? 'Article' : 'Articles';
-            showNotification(`${processedCount} ${articleText} copied as Markdown!`, 'success');
-          }
           // Check global jumpToDomain setting
           const globalSettings = await getSettings();
           if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {

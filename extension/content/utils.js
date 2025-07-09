@@ -144,4 +144,21 @@ export function setButtonNormal(button) {
   button.style.cursor = 'pointer';
   button.style.fontSize = '24px';
   button.style.opacity = '0.7';
+}
+
+export function downloadMarkdownFile(markdown, title = '', extensionName = 'ExtractMD') {
+  let safeTitle = title || document.title || 'Untitled';
+  safeTitle = safeTitle.replace(/[^a-zA-Z0-9\-_ ]/g, '').replace(/\s+/g, '_').substring(0, 50);
+  const filename = `${safeTitle}_${extensionName}.md`;
+  const blob = new Blob([markdown], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
 } 

@@ -1,5 +1,5 @@
 // Hacker News-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal } from './utils.js';
+import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile } from './utils.js';
 
 let isProcessing = false;
 let floatingButton = null;
@@ -21,7 +21,17 @@ function handleHNFloatingButtonClick() {
           }, resolve);
         });
         md = extractHNCommentsMarkdown(settings);
-        await copyToClipboard(md, true);
+        chrome.storage.sync.get({ downloadInsteadOfCopy: false }, function(items) {
+          if (items.downloadInsteadOfCopy) {
+            downloadMarkdownFile(md, document.title, 'ExtractMD');
+            setButtonSuccess(floatingButton);
+            showNotification('HN comments downloaded as .md!', 'success');
+          } else {
+            copyToClipboard(md, true);
+            setButtonSuccess(floatingButton);
+            showNotification('HN comments copied to clipboard!', 'success');
+          }
+        });
         // Increment KPI counter for HN Comments only if enabled
         chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
           if (items.enableUsageKpi !== false) {
@@ -30,8 +40,6 @@ function handleHNFloatingButtonClick() {
             chrome.storage.sync.set({ usageStats: stats });
           }
         });
-        setButtonSuccess(floatingButton);
-        showNotification('HN comments copied to clipboard!', 'success');
         // Check global jumpToDomain setting
         const globalSettings = await getSettings();
         if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
@@ -56,7 +64,17 @@ function handleHNFloatingButtonClick() {
           }, resolve);
         });
         md = extractHNNewsMarkdown(settings);
-        await copyToClipboard(md, true);
+        chrome.storage.sync.get({ downloadInsteadOfCopy: false }, function(items) {
+          if (items.downloadInsteadOfCopy) {
+            downloadMarkdownFile(md, document.title, 'ExtractMD');
+            setButtonSuccess(floatingButton);
+            showNotification('HN news downloaded as .md!', 'success');
+          } else {
+            copyToClipboard(md, true);
+            setButtonSuccess(floatingButton);
+            showNotification('HN news copied to clipboard!', 'success');
+          }
+        });
         // Increment KPI counter for HN News only if enabled
         chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
           if (items.enableUsageKpi !== false) {
@@ -65,8 +83,6 @@ function handleHNFloatingButtonClick() {
             chrome.storage.sync.set({ usageStats: stats });
           }
         });
-        setButtonSuccess(floatingButton);
-        showNotification('HN news copied to clipboard!', 'success');
         // Check global jumpToDomain setting
         const globalSettings = await getSettings();
         if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {

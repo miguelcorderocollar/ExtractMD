@@ -1,5 +1,5 @@
 // YouTube-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal } from './utils.js';
+import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile } from './utils.js';
 
 let floatingButton = null;
 let isProcessing = false;
@@ -105,7 +105,19 @@ async function waitForTranscriptAndCopy(settings = {}) {
   }
   transcriptText = metaMd + transcriptText;
   const userSettings = await getSettings();
-  await copyToClipboard(transcriptText, userSettings.includeTimestamps);
+  chrome.storage.sync.get({ downloadInsteadOfCopy: false }, function(items) {
+    if (items.downloadInsteadOfCopy) {
+      // Use video title for filename
+      let title = '';
+      const titleElem = document.querySelector('div#title h1 yt-formatted-string');
+      if (titleElem) title = titleElem.textContent.trim();
+      downloadMarkdownFile(transcriptText, title, 'ExtractMD');
+      showNotification('Transcript downloaded as .md!', 'success');
+    } else {
+      copyToClipboard(transcriptText, userSettings.includeTimestamps);
+      showNotification('Transcript copied to clipboard!', 'success');
+    }
+  });
   // Increment KPI counter only if enabled
   chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
     if (items.enableUsageKpi !== false) {
@@ -114,7 +126,6 @@ async function waitForTranscriptAndCopy(settings = {}) {
       chrome.storage.sync.set({ usageStats: stats });
     }
   });
-  showNotification('Transcript copied to clipboard!', 'success');
   
   // Close tab after extraction if setting is enabled
   if (userSettings.closeTabAfterExtraction) {
