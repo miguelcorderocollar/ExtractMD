@@ -16,8 +16,8 @@ export async function getSettings() {
 export async function copyToClipboard(text, includeTimestamps) {
   let textToCopy = text;
   if (!includeTimestamps) {
-    // Remove timestamps from the text
-    textToCopy = text.replace(/\[\d+:\d+\]/g, '').replace(/\n\s*\n/g, '\n').trim();
+    // Remove timestamps in [mm:ss], [h:mm:ss], or [hh:mm:ss] formats
+    textToCopy = text.replace(/\[\d{1,2}(:\d{2}){1,2}\]/g, '').replace(/\n\s*\n/g, '\n').trim();
   }
   try {
     await navigator.clipboard.writeText(textToCopy);
