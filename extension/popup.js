@@ -44,6 +44,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const kpiCounters = document.getElementById('kpi-counters');
     const clearKpiBtn = document.getElementById('clearKpiBtn');
 
+    // Add handler for opening options page
+    const openOptionsBtn = document.getElementById('openOptionsBtn');
+    if (openOptionsBtn) {
+      openOptionsBtn.addEventListener('click', () => {
+        if (chrome && chrome.runtime && chrome.runtime.openOptionsPage) {
+          chrome.runtime.openOptionsPage();
+        } else {
+          window.open('options.html', '_blank');
+        }
+      });
+    }
+
     // Load saved settings
     chrome.storage.sync.get({
         includeTimestamps: true,
