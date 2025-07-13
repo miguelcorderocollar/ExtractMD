@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const enableYouTubeIntegrationCheckbox = document.getElementById('enableYouTubeIntegration');
     const enableHackerNewsIntegrationCheckbox = document.getElementById('enableHackerNewsIntegration');
     const enableArticleIntegrationCheckbox = document.getElementById('enableArticleIntegration');
+    const downloadIfTokensExceedInput = document.getElementById('downloadIfTokensExceed');
+    const showTokenCountInNotificationCheckbox = document.getElementById('showTokenCountInNotification');
 
     // Import/Export elements
     const exportBtn = document.getElementById('exportSettingsBtn');
@@ -69,9 +71,11 @@ document.addEventListener('DOMContentLoaded', function() {
         enableUsageKpi: true,
         closeTabAfterExtraction: false,
         downloadInsteadOfCopy: false,
+        downloadIfTokensExceed: 0,
         enableYouTubeIntegration: true,
         enableHackerNewsIntegration: true,
         enableArticleIntegration: true,
+        showTokenCountInNotification: false,
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
@@ -98,9 +102,11 @@ document.addEventListener('DOMContentLoaded', function() {
         enableUsageKpiCheckbox.checked = items.enableUsageKpi !== false;
         closeTabAfterExtractionCheckbox.checked = items.closeTabAfterExtraction;
         downloadInsteadOfCopyCheckbox.checked = items.downloadInsteadOfCopy;
+        downloadIfTokensExceedInput.value = items.downloadIfTokensExceed || '';
         enableYouTubeIntegrationCheckbox.checked = items.enableYouTubeIntegration !== false;
         enableHackerNewsIntegrationCheckbox.checked = items.enableHackerNewsIntegration !== false;
         enableArticleIntegrationCheckbox.checked = items.enableArticleIntegration !== false;
+        showTokenCountInNotificationCheckbox.checked = items.showTokenCountInNotification === true;
         // Hide/show both the collapsible and container for integrations
         const collapsibles = document.querySelectorAll('.collapsible');
         const containers = document.querySelectorAll('.container');
@@ -205,6 +211,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     downloadInsteadOfCopyCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ downloadInsteadOfCopy: downloadInsteadOfCopyCheckbox.checked });
+    });
+    downloadIfTokensExceedInput.addEventListener('input', function() {
+        let val = parseInt(downloadIfTokensExceedInput.value, 10);
+        if (isNaN(val) || val < 0) val = 0;
+        chrome.storage.sync.set({ downloadIfTokensExceed: val });
+    });
+    showTokenCountInNotificationCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ showTokenCountInNotification: showTokenCountInNotificationCheckbox.checked });
     });
     // Integration enable/disable toggles (no reload, update UI in-place)
     enableYouTubeIntegrationCheckbox.addEventListener('change', function() {

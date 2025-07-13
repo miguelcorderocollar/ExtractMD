@@ -1,5 +1,6 @@
 // YouTube-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile } from './utils.js';
+import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { encode } from 'gpt-tokenizer';
 
 let floatingButton = null;
 let isProcessing = false;
@@ -105,19 +106,32 @@ async function waitForTranscriptAndCopy(settings = {}) {
   }
   transcriptText = metaMd + transcriptText;
   const userSettings = await getSettings();
-  chrome.storage.sync.get({ downloadInsteadOfCopy: false }, function(items) {
-    if (items.downloadInsteadOfCopy) {
-      // Use video title for filename
-      let title = '';
-      const titleElem = document.querySelector('div#title h1 yt-formatted-string');
-      if (titleElem) title = titleElem.textContent.trim();
-      downloadMarkdownFile(transcriptText, title, 'ExtractMD');
-      showNotification('Transcript downloaded as .md!', 'success');
-    } else {
-      copyToClipboard(transcriptText, userSettings.includeTimestamps);
-      showNotification('Transcript copied to clipboard!', 'success');
-    }
-  });
+  chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
+        if (items.downloadInsteadOfCopy) {
+            // Use video title for filename
+            let title = '';
+            const titleElem = document.querySelector('div#title h1 yt-formatted-string');
+            if (titleElem) title = titleElem.textContent.trim();
+            downloadMarkdownFile(transcriptText, title, 'ExtractMD');
+            showSuccessNotificationWithTokens('Transcript downloaded as .md!', transcriptText);
+        } else {
+            // Check token threshold
+            let threshold = parseInt(items.downloadIfTokensExceed, 10);
+            if (!isNaN(threshold) && threshold > 0) {
+                const tokens = encode(transcriptText).length;
+                if (tokens >= threshold * 1000) {
+                    let title = '';
+                    const titleElem = document.querySelector('div#title h1 yt-formatted-string');
+                    if (titleElem) title = titleElem.textContent.trim();
+                    downloadMarkdownFile(transcriptText, title, 'ExtractMD');
+                    showSuccessNotificationWithTokens('Transcript downloaded as .md (token threshold)!', transcriptText);
+                    return;
+                }
+            }
+            copyToClipboard(transcriptText, userSettings.includeTimestamps);
+            showSuccessNotificationWithTokens('Transcript copied to clipboard!', transcriptText);
+        }
+    });
   // Increment KPI counter only if enabled
   chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
     if (items.enableUsageKpi !== false) {

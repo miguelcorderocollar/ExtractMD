@@ -2,9 +2,10 @@
 alwaysApply: true
 ---
 
-###G eneral Rules
+### General Rules
 - Always update the README after implementing a new feature or making a change that deserves to be documented.
 - Always remind when you think a commit is needed and suggest a commit in codeblock clearly visible:
+- Try not to repeat functionality or components and reuse them like using files like utils.js
 
 ---
 

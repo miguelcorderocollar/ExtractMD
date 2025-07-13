@@ -1,5 +1,6 @@
 // Hacker News-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile } from './utils.js';
+import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
 let floatingButton = null;
@@ -21,15 +22,26 @@ function handleHNFloatingButtonClick() {
           }, resolve);
         });
         md = extractHNCommentsMarkdown(settings);
-        chrome.storage.sync.get({ downloadInsteadOfCopy: false }, function(items) {
+        chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
           if (items.downloadInsteadOfCopy) {
             downloadMarkdownFile(md, document.title, 'ExtractMD');
             setButtonSuccess(floatingButton);
-            showNotification('HN comments downloaded as .md!', 'success');
+            showSuccessNotificationWithTokens('HN comments downloaded as .md!', md);
           } else {
+            // Check token threshold
+            let threshold = parseInt(items.downloadIfTokensExceed, 10);
+            if (!isNaN(threshold) && threshold > 0) {
+              const tokens = encode(md).length;
+              if (tokens >= threshold * 1000) {
+                downloadMarkdownFile(md, document.title, 'ExtractMD');
+                setButtonSuccess(floatingButton);
+                showSuccessNotificationWithTokens('HN comments downloaded as .md (token threshold)!', md);
+                return;
+              }
+            }
             copyToClipboard(md, true);
             setButtonSuccess(floatingButton);
-            showNotification('HN comments copied to clipboard!', 'success');
+            showSuccessNotificationWithTokens('HN comments copied to clipboard!', md);
           }
         });
         // Increment KPI counter for HN Comments only if enabled
@@ -64,15 +76,26 @@ function handleHNFloatingButtonClick() {
           }, resolve);
         });
         md = extractHNNewsMarkdown(settings);
-        chrome.storage.sync.get({ downloadInsteadOfCopy: false }, function(items) {
+        chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
           if (items.downloadInsteadOfCopy) {
             downloadMarkdownFile(md, document.title, 'ExtractMD');
             setButtonSuccess(floatingButton);
-            showNotification('HN news downloaded as .md!', 'success');
+            showSuccessNotificationWithTokens('HN news downloaded as .md!', md);
           } else {
+            // Check token threshold
+            let threshold = parseInt(items.downloadIfTokensExceed, 10);
+            if (!isNaN(threshold) && threshold > 0) {
+              const tokens = encode(md).length;
+              if (tokens >= threshold * 1000) {
+                downloadMarkdownFile(md, document.title, 'ExtractMD');
+                setButtonSuccess(floatingButton);
+                showSuccessNotificationWithTokens('HN news downloaded as .md (token threshold)!', md);
+                return;
+              }
+            }
             copyToClipboard(md, true);
             setButtonSuccess(floatingButton);
-            showNotification('HN news copied to clipboard!', 'success');
+            showSuccessNotificationWithTokens('HN news copied to clipboard!', md);
           }
         });
         // Increment KPI counter for HN News only if enabled

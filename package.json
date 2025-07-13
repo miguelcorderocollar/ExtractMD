@@ -24,5 +24,8 @@
   "homepage": "https://github.com/miguelcorderocollar/yt-transcript-extension#readme",
   "devDependencies": {
     "esbuild": "^0.25.5"
+  },
+  "dependencies": {
+    "gpt-tokenizer": "^3.0.1"
   }
 }

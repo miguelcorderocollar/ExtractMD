@@ -1,5 +1,7 @@
 // Utility functions for ExtractMD extension
 
+import { encode } from 'gpt-tokenizer';
+
 export async function getSettings() {
   return new Promise((resolve) => {
     chrome.storage.sync.get({
@@ -78,6 +80,24 @@ export function showNotification(message, type = 'info', prominent = false) {
       }
     }, 300);
   }, prominent ? 5000 : 3000);
+}
+
+/**
+ * Shows a success notification, optionally appending token count if enabled in settings.
+ * @param {string} message - The base message to show.
+ * @param {string} text - The text to count tokens for.
+ * @param {string} [type='success'] - Notification type (default: 'success').
+ * @param {boolean} [prominent=false] - Whether to show as prominent notification.
+ */
+export function showSuccessNotificationWithTokens(message, text, type = 'success', prominent = false) {
+  chrome.storage.sync.get({ showTokenCountInNotification: false }, function(items) {
+    let msg = message;
+    if (items.showTokenCountInNotification) {
+      const tokens = encode(text).length;
+      msg += `<br><span style='font-weight:normal;font-size:13px;'>${tokens} tokens</span>`;
+    }
+    showNotification(msg, type, prominent);
+  });
 }
 
 export function sleep(ms) {

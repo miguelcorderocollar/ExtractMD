@@ -17,6 +17,8 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 | **Usage KPIs** | Track usage statistics for each feature |
 | **Settings Import/Export** | Save and restore your configuration |
 | **Download .md Option** | Instantly download extracted Markdown as a .md file instead of copying to clipboard (configurable in settings) |
+| **Token-based Download** | Optionally download instead of copy if exported Markdown exceeds a configurable token threshold (uses GPT token count) |
+| **Token Count in Notification** | Optionally show the token count (GPT tokens) on a new line in the success notification after copying or downloading |
 
 ## Requirements
 
@@ -49,6 +51,12 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 
 **If 'Download .md instead of copy to clipboard' is enabled in settings, clicking the floating button will instantly download a Markdown file with a smart filename instead of copying to clipboard.**
 
+**If 'Download if tokens exceed (thousands)' is set, and the exported Markdown exceeds this threshold (measured in GPT tokens), the file will be downloaded instead of copied. This is ignored if the 'always download' setting is enabled.**
+
+**If 'Show token count in success notification' is enabled in settings, the number of tokens (GPT tokens) will be shown on a new line in the success notification after copying or downloading.**
+
+Token counting uses the [gpt-tokenizer](https://www.npmjs.com/package/gpt-tokenizer) package and is approximate for GPT models.
+
 #### Button States
 - Idle (📝) → Loading (⏳) → Success (✅) → Idle
 - Error (❌) if something fails
@@ -72,6 +80,8 @@ Open the extension popup to configure all settings. All settings are saved and p
 | **Enable Usage KPIs** | Track and display usage statistics |
 | **Close Tab After Extraction** | Automatically close the current tab after successful extraction |
 | **Download .md instead of copy to clipboard** | Instantly download extracted Markdown as a .md file instead of copying to clipboard |
+| **Download if tokens exceed (thousands)** | If the exported Markdown exceeds this many tokens (GPT tokens, in thousands), download instead of copy. Set to 0 to disable. |
+| **Show token count in success notification** | Show the token count (GPT tokens) on a new line in the success notification after copying or downloading |
 | **Enable YouTube integration** | Show/hide YouTube transcript extraction and its settings |
 | **Enable Hacker News integration** | Show/hide Hacker News extraction and its settings |
 | **Enable Article integration** | Show/hide Article extraction and its settings |

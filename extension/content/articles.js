@@ -1,6 +1,7 @@
 // Generic article extraction logic for ExtractMD extension
 
-import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile } from './utils.js';
+import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
 let articleObserver = null;
@@ -173,7 +174,8 @@ function manageFloatingButtonForArticles() {
               articleExporterOnlyLongest: false,
               articleExporterShowInfo: true,
               articleExporterIncludeUrl: true,
-              downloadInsteadOfCopy: false
+              downloadInsteadOfCopy: false,
+              downloadIfTokensExceed: 0
             }, resolve);
           });
           const currentArticles = Array.from(document.querySelectorAll('article'));
@@ -218,24 +220,40 @@ function manageFloatingButtonForArticles() {
             md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
           }
           
-          chrome.storage.sync.get({ downloadInsteadOfCopy: false }, function(items) {
+          chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
             if (items.downloadInsteadOfCopy) {
               downloadMarkdownFile(md, document.title, 'ExtractMD');
               setButtonSuccess(floatingButton);
               if (settings.articleExporterOnlyLongest && totalArticles > 1) {
-                showNotification(`1/${totalArticles} Articles downloaded as Markdown!`, 'success');
+                showSuccessNotificationWithTokens(`1/${totalArticles} Articles downloaded as Markdown!`, md);
               } else {
                 const articleText = processedCount === 1 ? 'Article' : 'Articles';
-                showNotification(`${processedCount} ${articleText} downloaded as Markdown!`, 'success');
+                showSuccessNotificationWithTokens(`${processedCount} ${articleText} downloaded as Markdown!`, md);
               }
             } else {
+              // Check token threshold
+              let threshold = parseInt(items.downloadIfTokensExceed, 10);
+              if (!isNaN(threshold) && threshold > 0) {
+                const tokens = encode(md).length;
+                if (tokens >= threshold * 1000) {
+                  downloadMarkdownFile(md, document.title, 'ExtractMD');
+                  setButtonSuccess(floatingButton);
+                  if (settings.articleExporterOnlyLongest && totalArticles > 1) {
+                    showSuccessNotificationWithTokens(`1/${totalArticles} Articles downloaded as Markdown! (token threshold)`, md);
+                  } else {
+                    const articleText = processedCount === 1 ? 'Article' : 'Articles';
+                    showSuccessNotificationWithTokens(`${processedCount} ${articleText} downloaded as Markdown! (token threshold)`, md);
+                  }
+                  return;
+                }
+              }
               copyToClipboard(md, true);
               setButtonSuccess(floatingButton);
               if (settings.articleExporterOnlyLongest && totalArticles > 1) {
-                showNotification(`1/${totalArticles} Articles copied as Markdown!`, 'success');
+                showSuccessNotificationWithTokens(`1/${totalArticles} Articles copied as Markdown!`, md);
               } else {
                 const articleText = processedCount === 1 ? 'Article' : 'Articles';
-                showNotification(`${processedCount} ${articleText} copied as Markdown!`, 'success');
+                showSuccessNotificationWithTokens(`${processedCount} ${articleText} copied as Markdown!`, md);
               }
             }
           });
