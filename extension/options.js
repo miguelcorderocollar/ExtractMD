@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     articleExporterOnlyLongest: document.getElementById('articleExporterOnlyLongest'),
     articleExporterShowInfo: document.getElementById('articleExporterShowInfo'),
     articleExporterIncludeUrl: document.getElementById('articleExporterIncludeUrl'),
+    enableDarkTheme: document.getElementById('enableDarkTheme'),
   };
 
   // Import/Export elements
@@ -76,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
     articleExporterOnlyLongest: false,
     articleExporterShowInfo: true,
     articleExporterIncludeUrl: true,
+    enableDarkTheme: false,
   }, function(items) {
     for (const key in settings) {
       if (!settings[key]) continue;
@@ -89,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     updateIntegrationVisibility();
     updateKpiVisibility();
+    updateDarkTheme();
   });
 
   // Save settings on change
@@ -115,6 +118,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (key === 'showUsageKpi') {
           updateKpiVisibility();
         }
+        if (key === 'enableDarkTheme') {
+          updateDarkTheme();
+        }
       });
     });
   }
@@ -132,13 +138,22 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.kpi-section').style.display = settings.showUsageKpi.checked ? '' : 'none';
   }
 
+  // Dark theme logic
+  function updateDarkTheme() {
+    if (settings.enableDarkTheme.checked) {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
+  }
+
   // Render KPI counters
   function renderKpiCounters(stats) {
     kpiCounters.innerHTML = `
       <span class="kpi-item"><img src="images/youtube.svg" class="kpi-logo" alt="YouTube"> YT: <b>${stats.youtube || 0}</b></span>
+      <span class="kpi-item"><img src="images/article.svg" class="kpi-logo" alt="Article"> Articles: <b>${stats.articles || 0}</b></span>
       <span class="kpi-item"><img src="images/hackernews.svg" class="kpi-logo" alt="HN Comments"> HN Comments: <b>${stats.hn_comments || 0}</b></span>
       <span class="kpi-item"><img src="images/hackernews.svg" class="kpi-logo" alt="HN News"> HN News: <b>${stats.hn_news || 0}</b></span>
-      <span class="kpi-item"><img src="images/article.svg" class="kpi-logo" alt="Article"> Articles: <b>${stats.articles || 0}</b></span>
     `;
   }
 

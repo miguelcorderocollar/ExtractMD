@@ -5,11 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ExtractMD Options</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2em; background: #fafbfc; color: #222; }
+    :root {
+      --color-bg: #fafbfc;
+      --color-fg: #222;
+      --color-section-bg: #fff;
+      --color-section-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      --color-title: #d32f2f;
+      --color-link: #6366f1;
+      --color-divider: #d1d5db;
+      --color-toggle-bg: #e4e4e7;
+      --color-toggle-checked: #6366f1;
+      --color-toggle-slider: #fff;
+      --color-input-bg: #fafafa;
+      --color-input-border: #e5e7eb;
+      --color-input-focus: #6366f1;
+      --color-btn-bg: #6366f1;
+      --color-btn-fg: #fff;
+      --color-btn-secondary-bg: #f3f4f6;
+      --color-btn-secondary-fg: #222;
+      --color-btn-secondary-border: #bfc6f1;
+      --color-btn-secondary-hover-bg: #ececf2;
+      --color-btn-secondary-hover-border: #6366f1;
+      --color-footer: #888;
+      --color-kpi-section-bg: #f3f4f6;
+    }
+    body { font-family: Arial, sans-serif; margin: 2em; background: var(--color-bg); color: var(--color-fg); }
     .main-container { max-width: 700px; margin: 0 auto; }
-    h1 { color: #d32f2f; }
+    h1 { color: var(--color-title); }
     .desc { margin-bottom: 2em; }
-    .settings-section { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 24px 20px; margin-bottom: 2em; }
+    .settings-section { background: var(--color-section-bg); border-radius: 12px; box-shadow: var(--color-section-shadow); padding: 24px 20px; margin-bottom: 2em; }
     .settings-title { font-size: 1.2em; font-weight: bold; margin-bottom: 1em; }
     .settings-title {
       display: flex;
@@ -21,54 +45,145 @@
       height: 24px;
       vertical-align: middle;
       margin-right: 4px;
+      color: #222;
+    }
+    body.dark-theme .section-title-icon {
+      color: #f3f4f6;
     }
     .setting-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .setting-label { font-size: 15px; font-weight: 500; color: #222; }
+    .setting-label { font-size: 15px; font-weight: 500; color: var(--color-fg); }
     .toggle-switch { position: relative; display: inline-block; width: 36px; height: 20px; }
     .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e4e4e7; transition: 0.2s; border-radius: 20px; }
-    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: #fff; transition: 0.2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-    input:checked + .slider { background-color: #6366f1; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--color-toggle-bg); transition: 0.2s; border-radius: 20px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: var(--color-toggle-slider); transition: 0.2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    input:checked + .slider { background-color: var(--color-toggle-checked); }
     input:checked + .slider:before { transform: translateX(16px); }
-    input[type="text"], input[type="number"] { width: 220px; padding: 5px 8px; border-radius: 5px; border: 1px solid #e5e7eb; font-size: 14px; background: #fafafa; color: #222; margin-left: 10px; }
-    input[type="text"]:focus, input[type="number"]:focus { outline: none; border-color: #6366f1; background: #fff; }
-    .action-button { padding: 10px 18px; background: #6366f1; border: none; border-radius: 8px; color: #fff; font-size: 15px; font-weight: 500; cursor: pointer; margin-right: 10px; margin-top: 10px; transition: background 0.2s, box-shadow 0.2s; box-shadow: 0 1px 4px rgba(60,60,100,0.08); }
+    input[type="text"], input[type="number"] { width: 220px; padding: 5px 8px; border-radius: 5px; border: 1px solid var(--color-input-border); font-size: 14px; background: var(--color-input-bg); color: var(--color-fg); margin-left: 10px; }
+    input[type="text"]:focus, input[type="number"]:focus { outline: none; border-color: var(--color-input-focus); background: #fff; }
+    .action-button { padding: 10px 18px; background: var(--color-btn-bg); border: none; border-radius: 8px; color: var(--color-btn-fg); font-size: 15px; font-weight: 500; cursor: pointer; margin-right: 10px; margin-top: 10px; transition: background 0.2s, box-shadow 0.2s; box-shadow: 0 1px 4px rgba(60,60,100,0.08); }
     .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .action-button.kpi-clear { background: #f3f4f6; color: #222; border: 1.5px solid #bfc6e0; margin-top: 18px; margin-left: 0; }
-    .action-button.kpi-clear:hover { background: #ececf2; border-color: #6366f1; color: #222; }
+    .action-button.kpi-clear { background: var(--color-btn-secondary-bg); color: var(--color-btn-secondary-fg); border: 1.5px solid var(--color-btn-secondary-border); margin-top: 18px; margin-left: 0; }
+    .action-button.kpi-clear:hover { background: var(--color-btn-secondary-hover-bg); border-color: var(--color-btn-secondary-hover-border); color: var(--color-btn-secondary-fg); }
     .action-button.secondary {
-      background: #f3f4f6;
-      color: #222;
-      border: 1.5px solid #bfc6f1;
+      background: var(--color-btn-secondary-bg);
+      color: var(--color-btn-secondary-fg);
+      border: 1.5px solid var(--color-btn-secondary-border);
       box-shadow: none;
     }
     .action-button.secondary:hover {
-      background: #ececf2;
-      border-color: #6366f1;
+      background: var(--color-btn-secondary-hover-bg);
+      border-color: var(--color-btn-secondary-hover-border);
+      color: var(--color-btn-secondary-fg);
+    }
+    .kpi-section { margin-top: 2em; background: var(--color-kpi-section-bg); border-radius: 8px; padding: 18px; }
+    .kpi-counters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 32px;
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      align-items: center;
+      justify-items: start;
+    }
+    .kpi-item { display: flex; align-items: center; gap: 8px; }
+    .kpi-logo {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
       color: #222;
     }
-    .kpi-section { margin-top: 2em; background: #f3f4f6; border-radius: 8px; padding: 18px; }
-    .kpi-counters { display: flex; gap: 32px; font-size: 16px; font-weight: 500; margin-bottom: 10px; align-items: center; }
-    .kpi-item { display: flex; align-items: center; gap: 8px; }
-    .kpi-logo { width: 24px; height: 24px; vertical-align: middle; }
-    .footer { margin-top: 3em; text-align: center; color: #888; font-size: 13px; }
+    body.dark-theme .kpi-logo {
+      color: #f3f4f6;
+    }
+    /* Do NOT change color for YouTube and Hacker News icons in dark mode */
+    body.dark-theme .kpi-logo[src$="youtube.svg"],
+    body.dark-theme .kpi-logo[src$="hackernews.svg"] {
+      color: initial !important;
+      filter: none !important;
+    }
+    /* Article KPI icon white in dark mode */
+    body.dark-theme .kpi-logo[src$="article.svg"] {
+      color: #fff !important;
+      filter: invert(1) brightness(2) !important;
+    }
+    /* Keep original color for YT and HN section-title-icon in dark mode */
+    body.dark-theme .section-title-icon[src$="youtube.svg"],
+    body.dark-theme .section-title-icon[src$="hackernews.svg"] {
+      color: initial !important;
+      filter: none !important;
+    }
+    .footer { margin-top: 3em; text-align: center; color: var(--color-footer); font-size: 13px; }
     .help-links { margin-top: 2em; }
-    .help-links a { color: #6366f1; text-decoration: none; margin-right: 18px; }
-    .divider { border-top: 2px solid #d1d5db; margin: 2em 0; }
+    .help-links a { color: var(--color-link); text-decoration: none; margin-right: 18px; }
+    .divider { border-top: 2px solid var(--color-divider); margin: 2em 0; }
+    body.dark-theme {
+      --color-bg: #181a1b;
+      --color-fg: #f3f4f6;
+      --color-section-bg: #23272b;
+      --color-section-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      --color-title: #ff6b6b;
+      --color-link: #8b9cf6;
+      --color-divider: #23272b;
+      --color-toggle-bg: #23272b;
+      --color-toggle-checked: #8b9cf6;
+      --color-toggle-slider: #23272b;
+      --color-input-bg: #23272b;
+      --color-input-border: #444;
+      --color-input-focus: #8b9cf6;
+      --color-btn-bg: #8b9cf6;
+      --color-btn-fg: #23272b;
+      --color-btn-secondary-bg: #23272b;
+      --color-btn-secondary-fg: #f3f4f6;
+      --color-btn-secondary-border: #8b9cf6;
+      --color-btn-secondary-hover-bg: #23272b;
+      --color-btn-secondary-hover-border: #ff6b6b;
+      --color-footer: #aaa;
+      --color-kpi-section-bg: #23272b;
+    }
+    .footer a {
+      color: var(--color-link);
+      text-decoration: underline dotted;
+      font-weight: 600;
+    }
+    body.dark-theme .footer a {
+      color: #b5c7ff;
+      text-shadow: 0 1px 2px #181a1b;
+    }
+    .main-container > div[style*='font-size:1.1em'] {
+      color: #444;
+    }
+    body.dark-theme .main-container > div[style*='font-size:1.1em'] {
+      color: #e0e6f7 !important;
+      text-shadow: 0 1px 2px #181a1b;
+    }
+    .desc {
+      color: #888;
+    }
+    body.dark-theme .desc {
+      color: #bfc6f1;
+      text-shadow: 0 1px 2px #181a1b;
+    }
+    .svg-color {
+      filter: none;
+      color: inherit;
+    }
+    body.dark-theme .svg-color {
+      filter: invert(1) brightness(2);
+      color: #f3f4f6;
+    }
   </style>
 </head>
 <body>
   <div class="main-container">
     <div style="margin-bottom: 2.5em;">
-      <h1 style="font-size:2.3em; color:#d32f2f; font-weight:800; letter-spacing:-1px; margin-bottom:0.2em; line-height:1.1;">
-        <span style="background: linear-gradient(90deg,#d32f2f 60%,#6366f1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">ExtractMD</span> <span style="font-size:0.6em; font-weight:600; color:#6366f1; letter-spacing:0;">Options</span>
-      </h1>
-      <div style="font-size:1.1em; color:#444; margin-bottom:0.5em; font-weight:500;">All settings & customization for extraction, integrations, and advanced features.</div>
-      <div class="desc" style="color:#888; font-size:1em;">Configure your extraction preferences, integrations, and advanced features here. This page contains all settings and customization options.</div>
+      <h1 class="main-title"><span class="gradient-title">ExtractMD</span> <span class="main-title-options">Options</span></h1>
+      <div class="subtitle top-subtitle">All settings & customization for extraction, integrations, and advanced features.</div>
+      <div class="desc top-desc">Configure your extraction preferences, integrations, and advanced features here. This page contains all settings and customization options.</div>
     </div>
     <form id="settingsForm">
       <div class="settings-section">
-        <div class="settings-title"><img src="images/settings.svg" class="section-title-icon" alt="Settings">General Settings</div>
+        <div class="settings-title"><img src="images/settings.svg" class="section-title-icon svg-color" alt="Settings">General Settings</div>
         <div class="setting-item">
           <span class="setting-label">Enable YouTube integration</span>
           <label class="toggle-switch">
@@ -133,9 +248,16 @@
             <span class="slider"></span>
           </label>
         </div>
+        <div class="setting-item">
+          <span class="setting-label">Enable Dark Theme</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="enableDarkTheme">
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
       <div class="settings-section" id="ytSection">
-        <div class="settings-title"><img src="images/youtube.svg" class="section-title-icon" alt="YouTube">YouTube Transcript Settings</div>
+        <div class="settings-title"><img src="images/youtube.svg" class="section-title-icon svg-color" alt="YouTube">YouTube Transcript Settings</div>
         <div class="setting-item">
           <span class="setting-label">Include timestamps</span>
           <label class="toggle-switch">
@@ -166,7 +288,7 @@
         </div>
       </div>
       <div class="settings-section" id="hnCommentsSection">
-        <div class="settings-title"><img src="images/hackernews.svg" class="section-title-icon" alt="Hacker News">Hacker News Comments Settings</div>
+        <div class="settings-title"><img src="images/hackernews.svg" class="section-title-icon svg-color" alt="Hacker News">Hacker News Comments Settings</div>
         <div class="setting-item">
           <span class="setting-label">Include author</span>
           <label class="toggle-switch">
@@ -204,7 +326,7 @@
         </div>
       </div>
       <div class="settings-section" id="hnNewsSection">
-        <div class="settings-title"><img src="images/hackernews.svg" class="section-title-icon" alt="Hacker News">Hacker News News Settings</div>
+        <div class="settings-title"><img src="images/hackernews.svg" class="section-title-icon svg-color" alt="Hacker News">Hacker News News Settings</div>
         <div class="setting-item">
           <span class="setting-label">Include title</span>
           <label class="toggle-switch">
@@ -256,7 +378,7 @@
         </div>
       </div>
       <div class="settings-section" id="articleSection">
-        <div class="settings-title"><img src="images/article.svg" class="section-title-icon" alt="Article">Article Exporter</div>
+        <div class="settings-title"><img src="images/article.svg" class="section-title-icon svg-color" alt="Article">Article Exporter</div>
         <div class="setting-item">
           <span class="setting-label">Include images</span>
           <label class="toggle-switch">

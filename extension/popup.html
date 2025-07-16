@@ -5,13 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTube Transcript Copier</title>
     <style>
+        :root {
+            --color-bg: #ececf2;
+            --color-fg: #222;
+            --color-section-bg: #fff;
+            --color-section-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            --color-title: #d32f2f;
+            --color-link: #6366f1;
+            --color-divider: #d1d5db;
+            --color-toggle-bg: #e4e4e7;
+            --color-toggle-checked: #6366f1;
+            --color-toggle-slider: #fff;
+            --color-input-bg: #fafafa;
+            --color-input-border: #e5e7eb;
+            --color-input-focus: #6366f1;
+            --color-btn-bg: #6366f1;
+            --color-btn-fg: #fff;
+            --color-btn-secondary-bg: #f3f4f6;
+            --color-btn-secondary-fg: #222;
+            --color-btn-secondary-border: #bfc6f1;
+            --color-btn-secondary-hover-bg: #ececf2;
+            --color-btn-secondary-hover-border: #6366f1;
+            --color-footer: #888;
+            --color-kpi-section-bg: #f3f4f6;
+        }
         body {
             width: 420px;
             padding: 0;
             margin: 0;
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #ececf2;
-            color: #222;
+            background: var(--color-bg);
+            color: var(--color-fg);
             border-radius: 16px;
             box-shadow: 0 4px 24px rgba(60,60,100,0.10);
         }
@@ -33,9 +57,9 @@
             opacity: 0.85;
         }
         .settings {
-            background: #fff;
+            background: var(--color-section-bg);
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            box-shadow: var(--color-section-shadow);
             padding: 16px 14px;
             margin: 0;
         }
@@ -51,7 +75,7 @@
         .setting-label {
             font-size: 14px;
             font-weight: 500;
-            color: #222;
+            color: var(--color-fg);
         }
         .toggle-switch {
             position: relative;
@@ -68,7 +92,7 @@
             position: absolute;
             cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #e4e4e7;
+            background-color: var(--color-toggle-bg);
             transition: 0.2s;
             border-radius: 20px;
         }
@@ -79,13 +103,13 @@
             width: 16px;
             left: 2px;
             bottom: 2px;
-            background-color: #fff;
+            background-color: var(--color-toggle-slider);
             transition: 0.2s;
             border-radius: 50%;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
         input:checked + .slider {
-            background-color: #6366f1;
+            background-color: var(--color-toggle-checked);
         }
         input:checked + .slider:before {
             transform: translateX(16px);
@@ -93,10 +117,10 @@
         .action-button {
             width: 100%;
             padding: 11px;
-            background: #f3f4f6;
-            border: 1.5px solid #bfc6e0;
+            background: var(--color-btn-secondary-bg);
+            border: 1.5px solid var(--color-btn-secondary-border);
             border-radius: 8px;
-            color: #222;
+            color: var(--color-btn-secondary-fg);
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
@@ -105,8 +129,8 @@
             box-shadow: 0 1px 4px rgba(60,60,100,0.06);
         }
         .action-button:hover {
-            background: #ececf2;
-            border-color: #6366f1;
+            background: var(--color-btn-secondary-hover-bg);
+            border-color: var(--color-btn-secondary-hover-border);
             box-shadow: 0 2px 8px rgba(60,60,100,0.10);
         }
         .action-button:active {
@@ -139,16 +163,16 @@
             width: 100%;
             padding: 5px 8px;
             border-radius: 5px;
-            border: 1px solid #e5e7eb;
+            border: 1px solid var(--color-input-border);
             font-size: 13px;
-            background: #fafafa;
-            color: #222;
+            background: var(--color-input-bg);
+            color: var(--color-fg);
             margin-top: 2px;
             box-sizing: border-box;
         }
         input[type="text"]:focus {
             outline: none;
-            border-color: #6366f1;
+            border-color: var(--color-input-focus);
             background: #fff;
         }
         button.collapsible {
@@ -196,7 +220,7 @@
             color: #fff;
         }
         .container {
-            background: #fff;
+            background: var(--color-section-bg);
             border: 1.5px solid #e0e3ef;
             border-radius: 14px;
             box-shadow: 0 2px 8px rgba(60,60,100,0.06);
@@ -219,16 +243,107 @@
         .footer-credit {
             text-align: center;
             font-size: 11px;
-            color: #888;
+            color: var(--color-footer);
             margin: 16px 0 0 0;
         }
         .footer-credit a {
-            color: #6366f1;
+            color: var(--color-link);
             text-decoration: none;
         }
         .divider {
-            border-top: 2px solid #d1d5db;
+            border-top: 2px solid var(--color-divider);
             margin: 18px 14px 14px 14px;
+        }
+        /* Dark theme overrides */
+        body.dark-theme {
+            --color-bg: #181a1b;
+            --color-fg: #f3f4f6;
+            --color-section-bg: #23272b;
+            --color-section-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            --color-title: #ff6b6b;
+            --color-link: #8b9cf6;
+            --color-divider: #23272b;
+            --color-toggle-bg: #23272b;
+            --color-toggle-checked: #8b9cf6;
+            --color-toggle-slider: #23272b;
+            --color-input-bg: #23272b;
+            --color-input-border: #444;
+            --color-input-focus: #8b9cf6;
+            --color-btn-bg: #8b9cf6;
+            --color-btn-fg: #23272b;
+            --color-btn-secondary-bg: #23272b;
+            --color-btn-secondary-fg: #f3f4f6;
+            --color-btn-secondary-border: #8b9cf6;
+            --color-btn-secondary-hover-bg: #23272b;
+            --color-btn-secondary-hover-border: #ff6b6b;
+            --color-footer: #aaa;
+            --color-kpi-section-bg: #23272b;
+        }
+        .section-icon, .section-title-icon {
+            color: #222;
+        }
+        body.dark-theme .section-icon, body.dark-theme .section-title-icon {
+            color: #f3f4f6;
+        }
+        #kpi-counters svg {
+            color: #222;
+        }
+        body.dark-theme #kpi-counters svg {
+            color: #f3f4f6;
+        }
+        .footer-credit a {
+            color: var(--color-link);
+            text-decoration: underline dotted;
+            font-weight: 600;
+        }
+        body.dark-theme .footer-credit a {
+            color: #b5c7ff;
+            text-shadow: 0 1px 2px #181a1b;
+        }
+        .subtitle {
+            color: #666;
+        }
+        body.dark-theme .subtitle {
+            color: #e0e6f7;
+            text-shadow: 0 1px 2px #181a1b;
+        }
+        .kpi-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .kpi-logo {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            color: #222;
+        }
+        body.dark-theme .kpi-logo {
+            color: initial !important;
+            filter: none !important;
+        }
+        body.dark-theme .kpi-logo[src$="article.svg"] {
+            color: #fff !important;
+            filter: invert(1) brightness(2) !important;
+        }
+        #kpi-section {
+            background: var(--color-kpi-section-bg);
+            border-radius: 8px;
+            padding: 14px 12px;
+            margin: 0 14px 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            box-shadow: 0 2px 8px rgba(60,60,100,0.06);
+        }
+        #kpi-counters {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 32px;
+            font-size: 15px;
+            font-weight: 500;
+            align-items: center;
+            justify-items: start;
         }
     </style>
 </head>
@@ -237,244 +352,12 @@
         <h1>ExtractMD</h1>
         <p class="subtitle">Extract and copy info as Markdown from YouTube, Hacker News, and more.</p>
     </div>
-    <button class="collapsible"><img src="images/settings.svg" class="section-icon" alt="Settings"> <span>General Settings</span></button>
-    <div class="container">
-        <div class="settings">
-            <div class="setting-item">
-                <span class="setting-label">Enable YouTube integration</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="enableYouTubeIntegration" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Enable Hacker News integration</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="enableHackerNewsIntegration" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Enable Article integration</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="enableArticleIntegration" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Jump to domain after copy</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="jumpToDomain">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item" style="flex-direction:column;align-items:flex-start;gap:4px;">
-                <span class="setting-label" style="font-size:12px;">Target domain/URL</span>
-                <input type="text" id="jumpToDomainUrl" placeholder="https://chat.openai.com/">
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Enable usage KPIs</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="showUsageKpi" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Close tab after extraction</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="closeTabAfterExtraction">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Download .md instead of copy to clipboard</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="downloadInsteadOfCopy">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Download if tokens exceed (thousands)</span>
-                <input type="number" id="downloadIfTokensExceed" min="0" step="1" style="width:80px;">
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Show token count in success notification</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="showTokenCountInNotification">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-    <button class="collapsible"><img src="images/youtube.svg" class="section-icon" alt="YouTube"> <span>YouTube Transcript Settings</span></button>
-    <div class="container">
-        <div class="settings">
-            <div class="setting-item">
-                <span class="setting-label">Include timestamps</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="includeTimestamps" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Add video title to transcript</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="addTitleToTranscript" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Add channel name to transcript</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="addChannelToTranscript" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Add video URL to transcript</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="addUrlToTranscript" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-    <button class="collapsible"><img src="images/hackernews.svg" class="section-icon" alt="Hacker News"> <span>HN Comments Settings</span></button>
-    <div class="container">
-        <div class="settings">
-            <div class="setting-item">
-                <span class="setting-label">Include author</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnIncludeAuthor" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include time</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnIncludeTime" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include replies (threaded)</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnIncludeReplies" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include page URL</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnIncludeUrl" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include item text (post body)</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnIncludeItemText" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-    <button class="collapsible"><img src="images/hackernews.svg" class="section-icon" alt="Article"> <span>HN News Settings</span></button>
-    <div class="container">
-        <div class="settings">
-            <div class="setting-item">
-                <span class="setting-label">Include title</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnNewsIncludeTitle" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include URL</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnNewsIncludeUrl" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include site</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnNewsIncludeSite" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include points</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnNewsIncludePoints" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include author</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnNewsIncludeAuthor" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include time</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnNewsIncludeTime" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include comments count</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hnNewsIncludeComments" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-    <button class="collapsible"><img src="images/article.svg" class="section-icon" alt="Article"> <span>Article Exporter</span></button>
-    <div class="container">
-        <div class="settings">
-            <div class="setting-item">
-                <span class="setting-label">Include images</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="articleExporterIncludeImages" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Only copy longest article</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="articleExporterOnlyLongest">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Show article info when found</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="articleExporterShowInfo" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Include page URL</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="articleExporterIncludeUrl" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-    </div>
+    <!-- Removed General Settings section -->
+    <!-- Remove all other settings sections and import/export buttons, keep only KPI section and Open Full Settings button -->
     <hr class="divider">
-    <div id="kpi-section" style="margin: 0 14px 10px 14px; display: flex; align-items: center; justify-content: space-between;">
-        <div id="kpi-counters" style="display: flex; gap: 16px; font-size: 13px; font-weight: 500;"></div>
-        <button id="clearKpiBtn" title="Clear usage counters" style="background: #f3f4f6; border: 1px solid #bfc6e0; border-radius: 6px; font-size: 12px; padding: 2px 8px; cursor: pointer; margin-left: 8px;">Clear</button>
-    </div>
-    <div style="display: flex; gap: 8px; margin: 14px 14px 10px 14px;">
-        <button id="exportSettingsBtn" class="action-button" style="flex:1;">Export Settings</button>
-        <button id="importSettingsBtn" class="action-button" style="flex:1;">Import Settings</button>
-        <input type="file" id="importSettingsFile" accept="application/json" style="display:none;" />
+    <div id="kpi-section">
+        <div id="kpi-counters"></div>
+        <!-- Removed Clear KPI button -->
     </div>
     <div style="margin: 0 14px 14px 14px;">
         <button id="openOptionsBtn" class="action-button" style="background:#6366f1;color:#fff;">Open Full Settings</button>
@@ -483,4 +366,4 @@
     <div class="footer-credit">Made with <span style="font-size:13px;">🤖</span> by <a href="https://github.com/miguelcorderocollar" target="_blank">miguelcorderocollar</a></div>
     <script src="popup.js"></script>
 </body>
-</html> 
+</html>
