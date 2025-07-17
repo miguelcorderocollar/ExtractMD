@@ -125,9 +125,9 @@
       --color-title: #ff6b6b;
       --color-link: #8b9cf6;
       --color-divider: #23272b;
-      --color-toggle-bg: #23272b;
+      --color-toggle-bg: #444851;
       --color-toggle-checked: #8b9cf6;
-      --color-toggle-slider: #23272b;
+      --color-toggle-slider: #fff;
       --color-input-bg: #23272b;
       --color-input-border: #444;
       --color-input-focus: #8b9cf6;
@@ -140,6 +140,9 @@
       --color-btn-secondary-hover-border: #ff6b6b;
       --color-footer: #aaa;
       --color-kpi-section-bg: #23272b;
+    }
+    body.dark-theme .toggle-switch .slider {
+      border: 1.5px solid #666;
     }
     .footer a {
       color: var(--color-link);
@@ -171,6 +174,26 @@
     body.dark-theme .svg-color {
       filter: invert(1) brightness(2);
       color: #f3f4f6;
+    }
+    /* All SVGs black in light mode, white in dark mode */
+    .section-title-icon, .kpi-logo {
+      color: #222;
+    }
+    body.dark-theme .section-title-icon, body.dark-theme .kpi-logo {
+      color: #fff;
+    }
+    /* Hacker News SVG: background path uses currentColor, 'Y' path uses card background */
+    .section-title-icon.hn-svg path:first-child,
+    .kpi-logo.hn-svg path:first-child {
+      fill: currentColor;
+    }
+    .section-title-icon.hn-svg path:last-child,
+    .kpi-logo.hn-svg path:last-child {
+      fill: var(--color-section-bg, #fff);
+    }
+    body.dark-theme .section-title-icon.hn-svg path:last-child,
+    body.dark-theme .kpi-logo.hn-svg path:last-child {
+      fill: var(--color-section-bg, #23272b);
     }
   </style>
 </head>
@@ -257,7 +280,7 @@
         </div>
       </div>
       <div class="settings-section" id="ytSection">
-        <div class="settings-title"><img src="images/youtube.svg" class="section-title-icon svg-color" alt="YouTube">YouTube Transcript Settings</div>
+        <div class="settings-title"><svg class="section-title-icon svg-color" height="24" width="24" viewBox="0 0 461.001 461.001" xmlns="http://www.w3.org/2000/svg"><g><path d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728c0,52.878,42.866,95.744,95.744,95.744h269.513c52.878,0,95.744-42.866,95.744-95.744V163.137C461.001,110.259,418.135,67.393,365.257,67.393z M300.506,237.056l-126.06,60.123c-3.359,1.602-7.239-0.847-7.239-4.568V168.607c0-3.774,3.982-6.22,7.348-4.514l126.06,63.881C304.363,229.873,304.298,235.248,300.506,237.056z"/></g></svg>YouTube Transcript Settings</div>
         <div class="setting-item">
           <span class="setting-label">Include timestamps</span>
           <label class="toggle-switch">
@@ -288,7 +311,7 @@
         </div>
       </div>
       <div class="settings-section" id="hnCommentsSection">
-        <div class="settings-title"><img src="images/hackernews.svg" class="section-title-icon svg-color" alt="Hacker News">Hacker News Comments Settings</div>
+        <div class="settings-title"><svg class="section-title-icon svg-color hn-svg" height="24" width="24" viewBox="4 4 188 188" xmlns="http://www.w3.org/2000/svg"><path d="m4 4h188v188h-188z"/><path d="m73.2521756 45.01 22.7478244 47.39130083 22.7478244-47.39130083h19.56569631l-34.32352071 64.48661468v41.49338532h-15.98v-41.49338532l-34.32352071-64.48661468z"/></svg>Hacker News Comments Settings</div>
         <div class="setting-item">
           <span class="setting-label">Include author</span>
           <label class="toggle-switch">
@@ -326,7 +349,7 @@
         </div>
       </div>
       <div class="settings-section" id="hnNewsSection">
-        <div class="settings-title"><img src="images/hackernews.svg" class="section-title-icon svg-color" alt="Hacker News">Hacker News News Settings</div>
+        <div class="settings-title"><svg class="section-title-icon svg-color hn-svg" height="24" width="24" viewBox="4 4 188 188" xmlns="http://www.w3.org/2000/svg"><path d="m4 4h188v188h-188z"/><path d="m73.2521756 45.01 22.7478244 47.39130083 22.7478244-47.39130083h19.56569631l-34.32352071 64.48661468v41.49338532h-15.98v-41.49338532l-34.32352071-64.48661468z"/></svg>Hacker News News Settings</div>
         <div class="setting-item">
           <span class="setting-label">Include title</span>
           <label class="toggle-switch">
@@ -378,7 +401,7 @@
         </div>
       </div>
       <div class="settings-section" id="articleSection">
-        <div class="settings-title"><img src="images/article.svg" class="section-title-icon svg-color" alt="Article">Article Exporter</div>
+        <div class="settings-title"><svg class="section-title-icon svg-color" height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="article"><g><path d="M20.5,22H4c-0.2,0-0.3,0-0.5,0C1.6,22,0,20.4,0,18.5V6h5V2h19v16.5C24,20.4,22.4,22,20.5,22z M6.7,20h13.8c0.8,0,1.5-0.7,1.5-1.5V4H7v14.5C7,19,6.9,19.5,6.7,20z M2,8v10.5C2,19.3,2.7,20,3.5,20S5,19.3,5,18.5V8H2z"/></g><g><rect x="15" y="6" width="5" height="6"/></g><g><rect x="9" y="6" width="4" height="2"/></g><g><rect x="9" y="10" width="4" height="2"/></g><g><rect x="9" y="14" width="11" height="2"/></g></g></svg>Article Exporter</div>
         <div class="setting-item">
           <span class="setting-label">Include images</span>
           <label class="toggle-switch">

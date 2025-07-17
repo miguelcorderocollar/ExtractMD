@@ -319,12 +319,17 @@
             color: #222;
         }
         body.dark-theme .kpi-logo {
-            color: initial !important;
-            filter: none !important;
+            color: #fff;
         }
-        body.dark-theme .kpi-logo[src$="article.svg"] {
-            color: #fff !important;
-            filter: invert(1) brightness(2) !important;
+        /* Hacker News SVG: background path uses currentColor, 'Y' path uses background color */
+        .kpi-logo.hn-svg path:first-child {
+            fill: currentColor;
+        }
+        .kpi-logo.hn-svg path:last-child {
+            fill: var(--color-section-bg, #fff);
+        }
+        body.dark-theme .kpi-logo.hn-svg path:last-child {
+            fill: var(--color-section-bg, #23272b);
         }
         #kpi-section {
             background: var(--color-kpi-section-bg);
