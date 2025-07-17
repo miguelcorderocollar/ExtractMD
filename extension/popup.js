@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // KPI elements
     const kpiSection = document.getElementById('kpi-section');
     const kpiCounters = document.getElementById('kpi-counters');
-    const clearKpiBtn = document.getElementById('clearKpiBtn');
     const statusDiv = document.getElementById('status');
 
     // Helper: Render KPI counters
@@ -46,14 +45,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     loadKpiCounters();
 
-    // Clear KPI counters
-    clearKpiBtn.addEventListener('click', function() {
-        chrome.storage.sync.set({ usageStats: { youtube: 0, articles: 0, hn_comments: 0, hn_news: 0 } }, function() {
-            loadKpiCounters();
-            showStatus('Usage counters cleared!', 'success');
-        });
-    });
-
     // Status message
     function showStatus(message, type) {
         statusDiv.textContent = message;
@@ -62,5 +53,39 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             statusDiv.style.display = 'none';
         }, 3000);
+    }
+
+    // --- Preview Markdown logic ---
+    const previewBtn = document.getElementById('previewMarkdownBtn');
+    const previewDiv = document.getElementById('markdownPreview');
+    if (previewBtn && previewDiv) {
+        previewBtn.addEventListener('click', function() {
+            console.log('[ExtractMD][Popup] Preview Markdown button clicked');
+            previewDiv.style.display = 'block';
+            previewDiv.textContent = 'Loading...';
+            // Get the active tab
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                console.log('[ExtractMD][Popup] chrome.tabs.query result:', tabs);
+                if (!tabs || !tabs[0]) {
+                    previewDiv.textContent = 'No active tab.';
+                    return;
+                }
+                chrome.tabs.sendMessage(tabs[0].id, { action: 'extractmd_get_markdown_preview' }, function(response) {
+                    if (chrome.runtime.lastError) {
+                        console.error('[ExtractMD][Popup] Error sending message:', chrome.runtime.lastError.message);
+                        previewDiv.textContent = 'Unable to get preview: ' + chrome.runtime.lastError.message;
+                        return;
+                    }
+                    console.log('[ExtractMD][Popup] Received response:', response);
+                    if (response && response.markdown) {
+                        previewDiv.textContent = response.markdown;
+                    } else {
+                        previewDiv.textContent = 'No Markdown available for preview on this page.';
+                    }
+                });
+            });
+        });
+    } else {
+        console.warn('[ExtractMD][Popup] Preview button or preview div not found in DOM');
     }
 }); 

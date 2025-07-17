@@ -311,6 +311,8 @@ function setupArticleMutationObserver() {
   articleObserver.observe(document.body, { childList: true, subtree: true });
 }
 
+export { extractArticleMarkdown };
+
 export function initArticleFeatures() {
   chrome.storage.sync.get({ enableArticleIntegration: true }, function(items) {
     if (items.enableArticleIntegration === false) return;
@@ -318,3 +320,5 @@ export function initArticleFeatures() {
     manageFloatingButtonForArticles();
   });
 } 
+
+// (Removed preview message listener; now handled in content.js) 

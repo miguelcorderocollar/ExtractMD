@@ -279,6 +279,8 @@ function extractHNNewsMarkdown(settings) {
   return md.trim();
 }
 
+export { extractHNCommentsMarkdown, extractHNNewsMarkdown };
+
 export function initHackerNewsFeatures() {
   console.debug('[ExtractMD] initHackerNewsFeatures called');
   chrome.storage.sync.get({ enableHackerNewsIntegration: true }, function(items) {
