@@ -42,6 +42,14 @@ function handleHNFloatingButtonClick() {
             copyToClipboard(md, true);
             setButtonSuccess(floatingButton);
             showSuccessNotificationWithTokens('HN comments copied to clipboard!', md);
+            // Side panel preview
+            chrome.storage.sync.get({ enableSidePanelPreview: false }, function(items) {
+              if (items.enableSidePanelPreview) {
+                import('./utils.js').then(utils => {
+                  utils.openSidePanelWithMarkdown(md);
+                });
+              }
+            });
           }
         });
         // Increment KPI counter for HN Comments only if enabled

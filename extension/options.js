@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     articleExporterShowInfo: document.getElementById('articleExporterShowInfo'),
     articleExporterIncludeUrl: document.getElementById('articleExporterIncludeUrl'),
     enableDarkTheme: document.getElementById('enableDarkTheme'),
+    enableSidePanelPreview: document.getElementById('enableSidePanelPreview'),
   };
 
   // Import/Export elements
@@ -78,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
     articleExporterShowInfo: true,
     articleExporterIncludeUrl: true,
     enableDarkTheme: false,
+    enableSidePanelPreview: false,
   }, function(items) {
     for (const key in settings) {
       if (!settings[key]) continue;
@@ -145,6 +147,39 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       document.body.classList.remove('dark-theme');
     }
+  }
+
+  // Add side panel preview setting
+  function createSidePanelPreviewSetting() {
+    const container = document.createElement('div');
+    container.style.margin = '16px 0';
+    const label = document.createElement('label');
+    label.textContent = 'Enable Side Panel Markdown Preview';
+    label.style.fontWeight = '600';
+    label.style.marginRight = '12px';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = 'enableSidePanelPreview';
+    label.appendChild(checkbox);
+    container.appendChild(label);
+    document.body.appendChild(container);
+
+    // Load setting
+    chrome.storage.sync.get({ enableSidePanelPreview: false }, function(items) {
+      checkbox.checked = !!items.enableSidePanelPreview;
+    });
+
+    // Save setting
+    checkbox.addEventListener('change', function() {
+      chrome.storage.sync.set({ enableSidePanelPreview: checkbox.checked });
+    });
+  }
+
+  // Call this function when options page loads
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', createSidePanelPreviewSetting);
+  } else {
+    createSidePanelPreviewSetting();
   }
 
   // Render KPI counters

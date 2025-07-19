@@ -98,6 +98,14 @@ async function waitForTranscriptAndCopy(settings = {}) {
         }
         copyToClipboard(transcriptText, userSettings.includeTimestamps);
         showSuccessNotificationWithTokens('Transcript copied to clipboard!', transcriptText);
+        // Side panel preview
+        chrome.storage.sync.get({ enableSidePanelPreview: false }, function(items) {
+          if (items.enableSidePanelPreview) {
+            import('./utils.js').then(utils => {
+              utils.openSidePanelWithMarkdown(transcriptText);
+            });
+          }
+        });
       }
     });
     // Increment KPI counter only if enabled

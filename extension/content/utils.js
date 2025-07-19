@@ -181,4 +181,12 @@ export function downloadMarkdownFile(markdown, title = '', extensionName = 'Extr
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }, 100);
+}
+
+/**
+ * Opens the Chrome side panel and sends markdown to be rendered.
+ * @param {string} markdown - The markdown string to render in the side panel.
+ */
+export function openSidePanelWithMarkdown(markdown) {
+  chrome.runtime.sendMessage({ action: 'OPEN_SIDE_PANEL_AND_RENDER', markdown });
 } 

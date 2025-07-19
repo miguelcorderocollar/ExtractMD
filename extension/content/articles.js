@@ -255,6 +255,14 @@ function manageFloatingButtonForArticles() {
                 const articleText = processedCount === 1 ? 'Article' : 'Articles';
                 showSuccessNotificationWithTokens(`${processedCount} ${articleText} copied as Markdown!`, md);
               }
+              // Side panel preview
+              chrome.storage.sync.get({ enableSidePanelPreview: false }, function(items) {
+                if (items.enableSidePanelPreview) {
+                  import('./utils.js').then(utils => {
+                    utils.openSidePanelWithMarkdown(md);
+                  });
+                }
+              });
             }
           });
           

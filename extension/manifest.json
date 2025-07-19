@@ -7,7 +7,8 @@
     "activeTab",
     "storage",
     "clipboardWrite",
-    "scripting"
+    "scripting",
+    "sidePanel"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -36,5 +37,8 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "options_page": "options.html"
+  "options_page": "options.html",
+  "side_panel": {
+    "default_path": "sidebar.html"
+  }
 } 

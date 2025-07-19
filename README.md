@@ -19,6 +19,31 @@ A Chrome extension that extracts and copies information as Markdown from YouTube
 | **Download .md Option** | Instantly download extracted Markdown as a .md file instead of copying to clipboard (configurable in settings) |
 | **Token-based Download** | Optionally download instead of copy if exported Markdown exceeds a configurable token threshold (uses GPT token count) |
 | **Token Count in Notification** | Optionally show the token count (GPT tokens) on a new line in the success notification after copying or downloading |
+| **Reliable Side Panel Updates** | Side panel always updates with the latest markdown for the current page whenever you click the extension button, even after navigating to a new page or video. |
+
+## Side Panel Markdown Preview (ExtractMD 2.0)
+
+ExtractMD 2.0 introduces a new feature: **Side Panel Markdown Preview**.
+
+- When enabled, clicking the floating button for any integration opens the Chrome side panel and renders the copied markdown with proper styling and a readable font.
+- **Now, the side panel reliably updates with the latest markdown for the current page whenever you click the extension button, even after navigating to a new page or video.**
+- The side panel uses `sidebar.html` and `sidebar.js` to display a live, nicely formatted preview of what was copied to the clipboard.
+- Markdown is rendered using [markdown-it](https://github.com/markdown-it/markdown-it) for high fidelity.
+- This feature can be enabled/disabled in the Options page.
+- Requires the following in your `manifest.json`:
+
+  ```json
+  "side_panel": {
+    "default_path": "sidebar.html"
+  }
+  ```
+
+### How it works
+1. When you extract/copy markdown, the extension sends the markdown to the side panel.
+2. The side panel opens and displays a rendered preview using a modern font and clean layout.
+3. You can review the formatted markdown before pasting or using it elsewhere.
+
+---
 
 ## Requirements
 

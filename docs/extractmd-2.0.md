@@ -22,6 +22,9 @@ The popup is now a focused command center for the most common, immediate actions
 - **Preview Markdown**: Show a preview of the content to be copied/downloaded.
 - **Extract & Paste**: If on a supported site, a button to extract and auto-paste into the current input box.
 
+### Side panel Features
+- **Side Panel Markdown Preview**: When enabled, clicking the floating button for any integration opens the Chrome side panel and renders the copied markdown (with proper styling and a readable font). This provides a live, nicely formatted preview of what was copied to the clipboard. (Requires manifest entry: `"side_panel": { "default_path": "sidebar.html" }`)
+
 #### Not Included
 - No detailed settings or configuration toggles.
 - No import/export (moved to options page).
@@ -34,6 +37,7 @@ The options page is a full-page interface, opened in a new tab, with ample space
 
 ### Features in the Options Page
 - **All Settings**: All checkboxes, toggles, and configuration options for extraction behavior, integrations, and appearance.
+- **Side Panel Preview Setting**: Enable or disable the side panel markdown preview feature. When enabled, the extension will open the side panel and render the copied markdown for review.
 - **Import/Export Settings**: Backup and restore your settings via JSON files.
 - **KPI Details**: View and reset detailed usage statistics.
 - **Advanced Features**: Any future advanced or rarely-used features.
