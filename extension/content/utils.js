@@ -8,7 +8,9 @@ export async function getSettings() {
       includeTimestamps: true,
       jumpToDomain: false,
       jumpToDomainUrl: 'https://chat.openai.com/',
-      closeTabAfterExtraction: false
+      closeTabAfterExtraction: false,
+      enableDomainExclusion: false,
+      excludedDomains: ''
     }, (settings) => {
       resolve(settings);
     });

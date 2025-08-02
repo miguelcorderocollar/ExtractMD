@@ -33,6 +33,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const enableArticleIntegrationCheckbox = document.getElementById('enableArticleIntegration');
     const downloadIfTokensExceedInput = document.getElementById('downloadIfTokensExceed');
     const showTokenCountInNotificationCheckbox = document.getElementById('showTokenCountInNotification');
+    const enableDomainExclusionCheckbox = document.getElementById('enableDomainExclusion');
+    const excludedDomainsInput = document.getElementById('excludedDomains');
+    const addCurrentDomainBtn = document.getElementById('addCurrentDomainBtn');
 
     // Import/Export elements
     const exportBtn = document.getElementById('exportSettingsBtn');
@@ -76,6 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
         enableHackerNewsIntegration: true,
         enableArticleIntegration: true,
         showTokenCountInNotification: false,
+        enableDomainExclusion: false,
+        excludedDomains: '',
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
@@ -107,6 +112,8 @@ document.addEventListener('DOMContentLoaded', function() {
         enableHackerNewsIntegrationCheckbox.checked = items.enableHackerNewsIntegration !== false;
         enableArticleIntegrationCheckbox.checked = items.enableArticleIntegration !== false;
         showTokenCountInNotificationCheckbox.checked = items.showTokenCountInNotification === true;
+        enableDomainExclusionCheckbox.checked = items.enableDomainExclusion;
+        excludedDomainsInput.value = items.excludedDomains || '';
         // Hide/show both the collapsible and container for integrations
         const collapsibles = document.querySelectorAll('.collapsible');
         const containers = document.querySelectorAll('.container');
@@ -132,6 +139,9 @@ document.addEventListener('DOMContentLoaded', function() {
           containers[4].style.display = show ? '' : 'none';
         }
         document.getElementById('kpi-section').style.display = items.enableUsageKpi === false ? 'none' : 'flex';
+        
+        // Update domain exclusion visibility
+        updateDomainExclusionVisibility();
     });
 
     // Save settings when changed
@@ -236,6 +246,58 @@ document.addEventListener('DOMContentLoaded', function() {
             updateIntegrationVisibility();
         });
     });
+
+    // Domain exclusion settings
+    enableDomainExclusionCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ enableDomainExclusion: enableDomainExclusionCheckbox.checked }, function() {
+            updateDomainExclusionVisibility();
+        });
+    });
+    
+    excludedDomainsInput.addEventListener('input', function() {
+        chrome.storage.sync.set({ excludedDomains: excludedDomainsInput.value });
+    });
+
+    // Add current domain to exclusion list
+    addCurrentDomainBtn.addEventListener('click', function() {
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            if (tabs[0] && tabs[0].url) {
+                const url = new URL(tabs[0].url);
+                const currentDomain = url.hostname;
+                const currentExcludedDomains = excludedDomainsInput.value.trim();
+                
+                if (currentExcludedDomains) {
+                    const domains = currentExcludedDomains.split(',').map(d => d.trim());
+                    if (!domains.includes(currentDomain)) {
+                        domains.push(currentDomain);
+                        excludedDomainsInput.value = domains.join(', ');
+                        chrome.storage.sync.set({ excludedDomains: excludedDomainsInput.value });
+                        showStatus('Domain added to exclusion list', 'success');
+                    } else {
+                        showStatus('Domain already in exclusion list', 'error');
+                    }
+                } else {
+                    excludedDomainsInput.value = currentDomain;
+                    chrome.storage.sync.set({ excludedDomains: currentDomain });
+                    showStatus('Domain added to exclusion list', 'success');
+                }
+            }
+        });
+    });
+
+    // Helper to update domain exclusion visibility
+    function updateDomainExclusionVisibility() {
+        const excludedDomainsContainer = excludedDomainsInput.parentElement;
+        const addCurrentDomainContainer = addCurrentDomainBtn.parentElement;
+        
+        if (enableDomainExclusionCheckbox.checked) {
+            excludedDomainsContainer.style.display = 'flex';
+            addCurrentDomainContainer.style.display = 'block';
+        } else {
+            excludedDomainsContainer.style.display = 'none';
+            addCurrentDomainContainer.style.display = 'none';
+        }
+    }
 
     // Helper to update integration visibility and preserve General Settings open state
     function updateIntegrationVisibility() {
