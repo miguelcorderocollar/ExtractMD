@@ -31,6 +31,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const enableYouTubeIntegrationCheckbox = document.getElementById('enableYouTubeIntegration');
     const enableHackerNewsIntegrationCheckbox = document.getElementById('enableHackerNewsIntegration');
     const enableArticleIntegrationCheckbox = document.getElementById('enableArticleIntegration');
+    const enablePageIntegrationCheckbox = document.getElementById('enablePageIntegration');
+    const pageIncludeImagesCheckbox = document.getElementById('pageIncludeImages');
+    const pageIncludeTablesCheckbox = document.getElementById('pageIncludeTables');
+    const pageIncludeLinksCheckbox = document.getElementById('pageIncludeLinks');
+    const pageOnlyMainSectionCheckbox = document.getElementById('pageOnlyMainSection');
+    const pageSimplifyAggressivelyCheckbox = document.getElementById('pageSimplifyAggressively');
+    const pageIncludeTitleCheckbox = document.getElementById('pageIncludeTitle');
+    const pageIncludeUrlCheckbox = document.getElementById('pageIncludeUrl');
     const downloadIfTokensExceedInput = document.getElementById('downloadIfTokensExceed');
     const showTokenCountInNotificationCheckbox = document.getElementById('showTokenCountInNotification');
 
@@ -65,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         articleExporterIncludeImages: true,
         articleExporterOnlyLongest: false,
         articleExporterShowInfo: true,
-        articleExporterIncludeUrl: true,
+                articleExporterIncludeUrl: true,
         hnIncludeUrl: true,
         hnIncludeItemText: true,
         enableUsageKpi: true,
@@ -75,10 +83,18 @@ document.addEventListener('DOMContentLoaded', function() {
         enableYouTubeIntegration: true,
         enableHackerNewsIntegration: true,
         enableArticleIntegration: true,
+        enablePageIntegration: true,
+        pageIncludeImages: true,
+        pageIncludeTables: true,
+        pageIncludeLinks: true,
+        pageOnlyMainSection: true,
+        pageSimplifyAggressively: true,
+        pageIncludeTitle: true,
+        pageIncludeUrl: true,
         showTokenCountInNotification: false,
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
-        addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
+addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
         addChannelToTranscriptCheckbox.checked = items.addChannelToTranscript;
         addUrlToTranscriptCheckbox.checked = items.addUrlToTranscript;
         jumpToDomainCheckbox.checked = items.jumpToDomain;
@@ -106,11 +122,19 @@ document.addEventListener('DOMContentLoaded', function() {
         enableYouTubeIntegrationCheckbox.checked = items.enableYouTubeIntegration !== false;
         enableHackerNewsIntegrationCheckbox.checked = items.enableHackerNewsIntegration !== false;
         enableArticleIntegrationCheckbox.checked = items.enableArticleIntegration !== false;
+        enablePageIntegrationCheckbox.checked = items.enablePageIntegration !== false;
+        pageIncludeImagesCheckbox.checked = items.pageIncludeImages !== false;
+        pageIncludeTablesCheckbox.checked = items.pageIncludeTables !== false;
+        pageIncludeLinksCheckbox.checked = items.pageIncludeLinks !== false;
+        pageOnlyMainSectionCheckbox.checked = items.pageOnlyMainSection !== false;
+        pageSimplifyAggressivelyCheckbox.checked = items.pageSimplifyAggressively !== false;
+        pageIncludeTitleCheckbox.checked = items.pageIncludeTitle !== false;
+        pageIncludeUrlCheckbox.checked = items.pageIncludeUrl !== false;
         showTokenCountInNotificationCheckbox.checked = items.showTokenCountInNotification === true;
         // Hide/show both the collapsible and container for integrations
         const collapsibles = document.querySelectorAll('.collapsible');
         const containers = document.querySelectorAll('.container');
-        // collapsibles/containers: 0=General, 1=YT, 2=HN Comments, 3=HN News, 4=Article
+        // collapsibles/containers: 0=General, 1=YT, 2=HN Comments, 3=HN News, 4=Article, 5=Page
         if (collapsibles[1] && containers[1]) {
           const show = items.enableYouTubeIntegration !== false;
           collapsibles[1].style.display = show ? '' : 'none';
@@ -130,6 +154,11 @@ document.addEventListener('DOMContentLoaded', function() {
           const show = items.enableArticleIntegration !== false;
           collapsibles[4].style.display = show ? '' : 'none';
           containers[4].style.display = show ? '' : 'none';
+        }
+        if (collapsibles[5] && containers[5]) {
+          const show = items.enablePageIntegration !== false;
+          collapsibles[5].style.display = show ? '' : 'none';
+          containers[5].style.display = show ? '' : 'none';
         }
         document.getElementById('kpi-section').style.display = items.enableUsageKpi === false ? 'none' : 'flex';
     });
@@ -198,6 +227,27 @@ document.addEventListener('DOMContentLoaded', function() {
     hnIncludeUrlCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ hnIncludeUrl: hnIncludeUrlCheckbox.checked });
     });
+    pageIncludeImagesCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ pageIncludeImages: pageIncludeImagesCheckbox.checked });
+    });
+    pageIncludeTablesCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ pageIncludeTables: pageIncludeTablesCheckbox.checked });
+    });
+    pageIncludeLinksCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ pageIncludeLinks: pageIncludeLinksCheckbox.checked });
+    });
+    pageOnlyMainSectionCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ pageOnlyMainSection: pageOnlyMainSectionCheckbox.checked });
+    });
+    pageSimplifyAggressivelyCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ pageSimplifyAggressively: pageSimplifyAggressivelyCheckbox.checked });
+    });
+    pageIncludeTitleCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ pageIncludeTitle: pageIncludeTitleCheckbox.checked });
+    });
+    pageIncludeUrlCheckbox.addEventListener('change', function() {
+        chrome.storage.sync.set({ pageIncludeUrl: pageIncludeUrlCheckbox.checked });
+    });
     hnIncludeItemTextCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ hnIncludeItemText: hnIncludeItemTextCheckbox.checked });
     });
@@ -231,49 +281,60 @@ document.addEventListener('DOMContentLoaded', function() {
             updateIntegrationVisibility();
         });
     });
-    enableArticleIntegrationCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ enableArticleIntegration: enableArticleIntegrationCheckbox.checked }, function() {
-            updateIntegrationVisibility();
+             enableArticleIntegrationCheckbox.addEventListener('change', function() {
+            chrome.storage.sync.set({ enableArticleIntegration: enableArticleIntegrationCheckbox.checked }, function() {
+                updateIntegrationVisibility();
+            });
         });
-    });
+        enablePageIntegrationCheckbox.addEventListener('change', function() {
+            chrome.storage.sync.set({ enablePageIntegration: enablePageIntegrationCheckbox.checked }, function() {
+                updateIntegrationVisibility();
+            });
+        });
 
-    // Helper to update integration visibility and preserve General Settings open state
-    function updateIntegrationVisibility() {
-        // Preserve General Settings open state
-        const generalOpen = containers[0].classList.contains('open');
-        chrome.storage.sync.get({
-            enableYouTubeIntegration: true,
-            enableHackerNewsIntegration: true,
-            enableArticleIntegration: true,
-        }, function(items) {
-            if (collapsibles[1] && containers[1]) {
-                const show = items.enableYouTubeIntegration !== false;
-                collapsibles[1].style.display = show ? '' : 'none';
-                containers[1].style.display = show ? '' : 'none';
-            }
-            if (collapsibles[2] && containers[2]) {
-                const show = items.enableHackerNewsIntegration !== false;
-                collapsibles[2].style.display = show ? '' : 'none';
-                containers[2].style.display = show ? '' : 'none';
-            }
-            if (collapsibles[3] && containers[3]) {
-                const show = items.enableHackerNewsIntegration !== false;
-                collapsibles[3].style.display = show ? '' : 'none';
-                containers[3].style.display = show ? '' : 'none';
-            }
-            if (collapsibles[4] && containers[4]) {
-                const show = items.enableArticleIntegration !== false;
-                collapsibles[4].style.display = show ? '' : 'none';
-                containers[4].style.display = show ? '' : 'none';
-            }
-            // Restore General Settings open state
-            if (generalOpen) {
-                containers[0].classList.add('open');
-            } else {
-                containers[0].classList.remove('open');
-            }
-        });
-    }
+        // Helper to update integration visibility and preserve General Settings open state
+        function updateIntegrationVisibility() {
+            // Preserve General Settings open state
+            const generalOpen = containers[0].classList.contains('open');
+            chrome.storage.sync.get({
+                enableYouTubeIntegration: true,
+                enableHackerNewsIntegration: true,
+                enableArticleIntegration: true,
+                enablePageIntegration: true,
+            }, function(items) {
+                if (collapsibles[1] && containers[1]) {
+                    const show = items.enableYouTubeIntegration !== false;
+                    collapsibles[1].style.display = show ? '' : 'none';
+                    containers[1].style.display = show ? '' : 'none';
+                }
+                if (collapsibles[2] && containers[2]) {
+                    const show = items.enableHackerNewsIntegration !== false;
+                    collapsibles[2].style.display = show ? '' : 'none';
+                    containers[2].style.display = show ? '' : 'none';
+                }
+                if (collapsibles[3] && containers[3]) {
+                    const show = items.enableHackerNewsIntegration !== false;
+                    collapsibles[3].style.display = show ? '' : 'none';
+                    containers[3].style.display = show ? '' : 'none';
+                }
+                if (collapsibles[4] && containers[4]) {
+                    const show = items.enableArticleIntegration !== false;
+                    collapsibles[4].style.display = show ? '' : 'none';
+                    containers[4].style.display = show ? '' : 'none';
+                }
+                if (collapsibles[5] && containers[5]) {
+                    const show = items.enablePageIntegration !== false;
+                    collapsibles[5].style.display = show ? '' : 'none';
+                    containers[5].style.display = show ? '' : 'none';
+                }
+                // Restore General Settings open state
+                if (generalOpen) {
+                    containers[0].classList.add('open');
+                } else {
+                    containers[0].classList.remove('open');
+                }
+            });
+        }
 
     // Status message
     function showStatus(message, type) {
@@ -358,14 +419,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Helper: Render KPI counters
-    function renderKpiCounters(stats) {
-        kpiCounters.innerHTML = `
-            <span title="YouTube transcript copies">YT: <b>${stats.youtube || 0}</b></span>
-            <span title="Article exports">Articles: <b>${stats.articles || 0}</b></span>
-            <span title="HN comments exports">HN Comments: <b>${stats.hn_comments || 0}</b></span>
-            <span title="HN news exports">HN News: <b>${stats.hn_news || 0}</b></span>
-        `;
-    }
+            function renderKpiCounters(stats) {
+            kpiCounters.innerHTML = `
+                <span title="YouTube transcript copies">YT: <b>${stats.youtube || 0}</b></span>
+                <span title="Article exports">Articles: <b>${stats.articles || 0}</b></span>
+                <span title="Page simplifications">Pages: <b>${stats.pages || 0}</b></span>
+                <span title="HN comments exports">HN Comments: <b>${stats.hn_comments || 0}</b></span>
+                <span title="HN news exports">HN News: <b>${stats.hn_news || 0}</b></span>
+            `;
+        }
 
     // Load and display KPI counters
     function loadKpiCounters() {
@@ -376,10 +438,10 @@ document.addEventListener('DOMContentLoaded', function() {
     loadKpiCounters();
 
     // Clear KPI counters
-    clearKpiBtn.addEventListener('click', function() {
-        chrome.storage.sync.set({ usageStats: { youtube: 0, articles: 0, hn_comments: 0, hn_news: 0 } }, function() {
-            loadKpiCounters();
-            showStatus('Usage counters cleared!', 'success');
+            clearKpiBtn.addEventListener('click', function() {
+            chrome.storage.sync.set({ usageStats: { youtube: 0, articles: 0, pages: 0, hn_comments: 0, hn_news: 0 } }, function() {
+                loadKpiCounters();
+                showStatus('Usage counters cleared!', 'success');
+            });
         });
-    });
 }); 

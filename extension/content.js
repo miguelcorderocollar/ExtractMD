@@ -3,6 +3,7 @@ import { copyToClipboard, showNotification, htmlToMarkdown, sleep, getSettings }
 import { initYouTubeFeatures } from './content/youtube.js';
 import { initHackerNewsFeatures } from './content/hackernews.js';
 import { initArticleFeatures } from './content/articles.js';
+import { initPageFeatures } from './content/page.js';
 
 function isHNNewsPage() {
   if (!window.location.hostname.includes('ycombinator.com')) return false;
@@ -17,9 +18,12 @@ function runInitForCurrentPage() {
   } else if (window.location.hostname.includes('ycombinator.com') && (window.location.pathname.startsWith('/item') || isHNNewsPage())) {
     console.debug('[ExtractMD] Initializing Hacker News features');
     initHackerNewsFeatures();
-  } else {
+  } else if (document.querySelector('article')) {
     console.debug('[ExtractMD] Initializing Article features');
     initArticleFeatures();
+  } else {
+    console.debug('[ExtractMD] Initializing Page features');
+    initPageFeatures();
   }
 }
 
