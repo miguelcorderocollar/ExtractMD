@@ -51,6 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const kpiSection = document.getElementById('kpi-section');
     const kpiCounters = document.getElementById('kpi-counters');
     const clearKpiBtn = document.getElementById('clearKpiBtn');
+    // Domain toggle elements
+    const domainToggleRow = document.getElementById('domainFloatingToggle');
+    const domainToggleCheckbox = document.getElementById('toggleFloatingButtonOnDomain');
 
     // Load saved settings
     chrome.storage.sync.get({
@@ -444,4 +447,38 @@ addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
                 showStatus('Usage counters cleared!', 'success');
             });
         });
+
+    // Domain-specific floating button toggle
+    function getHostnameFromUrl(url) {
+      try { return new URL(url).hostname; } catch { return ''; }
+    }
+    function loadDomainToggle() {
+      if (!domainToggleRow || !domainToggleCheckbox) return;
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tab = tabs && tabs[0];
+        const host = tab ? getHostnameFromUrl(tab.url || '') : '';
+        if (!host) {
+          domainToggleRow.style.display = 'none';
+          return;
+        }
+        chrome.storage.sync.get({ hiddenButtonsByDomain: {} }, (items) => {
+          const map = items.hiddenButtonsByDomain || {};
+          const hidden = !!map[host];
+          domainToggleCheckbox.checked = !hidden; // checkbox shows "show"
+          domainToggleRow.style.display = '';
+          domainToggleCheckbox.onchange = function() {
+            const nextHidden = !domainToggleCheckbox.checked;
+            const nextMap = { ...(items.hiddenButtonsByDomain || {}) };
+            if (nextHidden) nextMap[host] = true; else delete nextMap[host];
+            chrome.storage.sync.set({ hiddenButtonsByDomain: nextMap }, () => {
+              if (tab && tab.id) {
+                chrome.tabs.sendMessage(tab.id, { action: 'extractmd_refresh_fab' });
+              }
+              showStatus(nextHidden ? 'Floating button hidden on this site.' : 'Floating button shown on this site.', 'success');
+            });
+          };
+        });
+      });
+    }
+    loadDomainToggle();
 }); 

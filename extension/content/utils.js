@@ -182,3 +182,93 @@ export function downloadMarkdownFile(markdown, title = '', extensionName = 'Extr
     URL.revokeObjectURL(url);
   }, 100);
 } 
+
+export function getCurrentHostname() {
+  try { return window.location.hostname || ''; } catch { return ''; }
+}
+
+export function getHiddenButtonsByDomain(cb) {
+  chrome.storage.sync.get({ hiddenButtonsByDomain: {} }, (items) => {
+    cb(items.hiddenButtonsByDomain || {});
+  });
+}
+
+export function isFloatingButtonHiddenForCurrentDomain(cb) {
+  const host = getCurrentHostname();
+  getHiddenButtonsByDomain((map) => cb(!!map[host]));
+}
+
+export function setFloatingButtonHiddenForCurrentDomain(hidden, cb) {
+  const host = getCurrentHostname();
+  chrome.storage.sync.get({ hiddenButtonsByDomain: {} }, (items) => {
+    const map = items.hiddenButtonsByDomain || {};
+    if (hidden) map[host] = true; else delete map[host];
+    chrome.storage.sync.set({ hiddenButtonsByDomain: map }, cb);
+  });
+}
+
+export function attachHideAffordance(floatingButton) {
+  if (!floatingButton) return () => {};
+  let hoverTimer = null;
+  let badge = null;
+
+  const showBadge = () => {
+    if (badge) return;
+    badge = document.createElement('div');
+    badge.textContent = '×';
+    badge.title = 'Hide on this site (Ctrl+Shift+F to toggle)';
+    badge.style.cssText = `
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #f44336;
+      color: #fff;
+      font-size: 12px;
+      line-height: 18px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      z-index: 10001;
+    `;
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setFloatingButtonHiddenForCurrentDomain(true, () => {
+        if (floatingButton && floatingButton.parentNode) {
+          floatingButton.parentNode.removeChild(floatingButton);
+        }
+        showNotification('Floating button hidden on this site. Press Ctrl+Shift+F to show again.', 'success');
+      });
+    });
+    // Ensure button is positioned properly
+    if (!/position:\s*fixed/.test(floatingButton.style.cssText)) {
+      floatingButton.style.position = 'fixed';
+    }
+    floatingButton.appendChild(badge);
+  };
+
+  const hideBadge = () => {
+    if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
+    badge = null;
+  };
+
+  const onEnter = () => {
+    if (hoverTimer) clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(showBadge, 1000);
+  };
+  const onLeave = () => {
+    if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+    hideBadge();
+  };
+
+  floatingButton.addEventListener('mouseenter', onEnter);
+  floatingButton.addEventListener('mouseleave', onLeave);
+
+  return () => {
+    floatingButton.removeEventListener('mouseenter', onEnter);
+    floatingButton.removeEventListener('mouseleave', onLeave);
+    hideBadge();
+  };
+}

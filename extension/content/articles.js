@@ -1,6 +1,6 @@
 // Generic article extraction logic for ExtractMD extension
 
-import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens, isFloatingButtonHiddenForCurrentDomain, attachHideAffordance } from './utils.js';
 import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
@@ -162,6 +162,14 @@ function manageFloatingButtonForArticles() {
         if (settings.articleExporterShowInfo) {
           showArticleInfoNotification(articles, settings.articleExporterOnlyLongest);
         }
+      });
+      // Respect per-domain hidden state
+      isFloatingButtonHiddenForCurrentDomain((hidden) => {
+        if (hidden) {
+          if (floatingButton && floatingButton.parentNode) floatingButton.parentNode.removeChild(floatingButton);
+          return;
+        }
+        attachHideAffordance(floatingButton);
       });
       floatingButton.addEventListener('click', async () => {
         if (isProcessing) return;

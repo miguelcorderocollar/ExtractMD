@@ -5,6 +5,7 @@
   "description": "Extract and copy information as Markdown from YouTube, Hacker News, and more.",
   "permissions": [
     "activeTab",
+    "tabs",
     "storage",
     "clipboardWrite",
     "scripting"

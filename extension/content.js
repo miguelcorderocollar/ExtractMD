@@ -38,3 +38,49 @@ const observer = new MutationObserver(() => {
   }
 });
 observer.observe(document.body, { childList: true, subtree: true }); 
+
+// Global hotkey: Ctrl+Shift+F toggles floating button per-domain
+let __extractmdHotkeyAttached = false;
+function attachGlobalToggleHotkey() {
+  if (__extractmdHotkeyAttached) return;
+  __extractmdHotkeyAttached = true;
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && (e.key === 'F' || e.key === 'f')) {
+      e.preventDefault();
+      import('./content/utils.js').then((mod) => {
+        const { isFloatingButtonHiddenForCurrentDomain, setFloatingButtonHiddenForCurrentDomain, showNotification } = mod;
+        isFloatingButtonHiddenForCurrentDomain((hidden) => {
+          const next = !hidden;
+          setFloatingButtonHiddenForCurrentDomain(next, () => {
+            const btn = document.getElementById('yt-transcript-floating-button');
+            if (next) {
+              if (btn) btn.remove();
+              showNotification('Floating button hidden on this site.', 'success');
+            } else {
+              runInitForCurrentPage();
+              showNotification('Floating button shown on this site.', 'success');
+            }
+          });
+        });
+      }).catch(() => {})
+    }
+  }, { capture: true });
+}
+
+attachGlobalToggleHotkey();
+
+// Handle popup-triggered refresh of FAB
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg && msg.action === 'extractmd_refresh_fab') {
+    import('./content/utils.js').then(({ isFloatingButtonHiddenForCurrentDomain }) => {
+      const btn = document.getElementById('yt-transcript-floating-button');
+      isFloatingButtonHiddenForCurrentDomain((hidden) => {
+        if (hidden) {
+          if (btn) btn.remove();
+        } else {
+          if (!btn) runInitForCurrentPage();
+        }
+      });
+    });
+  }
+});

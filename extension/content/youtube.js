@@ -1,5 +1,5 @@
 // YouTube-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens, isFloatingButtonHiddenForCurrentDomain, attachHideAffordance } from './utils.js';
 import { encode } from 'gpt-tokenizer';
 
 let floatingButton = null;
@@ -266,7 +266,10 @@ function initializeFloatingButton() {
     console.debug('[ExtractMD] Floating button already exists (YouTube)');
     return;
   }
-  floatingButton = document.createElement('div');
+  // Respect per-domain hidden toggle
+  isFloatingButtonHiddenForCurrentDomain((hidden) => {
+    if (hidden) return;
+    floatingButton = document.createElement('div');
   floatingButton.id = 'yt-transcript-floating-button';
   floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
   floatingButton.style.cssText = `
@@ -327,6 +330,8 @@ function initializeFloatingButton() {
     }
   });
   document.body.appendChild(floatingButton);
+  attachHideAffordance(floatingButton);
   console.debug('[ExtractMD] Floating button created and added to DOM (YouTube)');
   updateButtonVisibility();
+  });
 } 

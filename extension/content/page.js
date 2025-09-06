@@ -1,6 +1,6 @@
 // Page simplifier extraction logic for ExtractMD extension
 
-import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens, isFloatingButtonHiddenForCurrentDomain, attachHideAffordance } from './utils.js';
 import { encode } from 'gpt-tokenizer';
 import { Readability } from '@mozilla/readability';
 
@@ -261,37 +261,42 @@ function manageFloatingButtonForPage() {
       if (floatingButton) floatingButton.remove();
       return;
     }
-    if (!floatingButton) {
-      floatingButton = document.createElement('div');
-      floatingButton.id = 'yt-transcript-floating-button';
-      floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
-      floatingButton.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: rgba(255, 255, 255, 0.95);
-        color: #222;
-        border: 1px solid #ccc;
-        border-radius: 50%;
-        width: 56px;
-        height: 56px;
-        cursor: pointer;
-        font-size: 24px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        user-select: none;
-        opacity: 1;
-      `;
-      floatingButton.addEventListener('mouseenter', () => {
-        floatingButton.style.background = '#f3f4f6';
-      });
-      floatingButton.addEventListener('mouseleave', () => {
-        floatingButton.style.background = 'rgba(255, 255, 255, 0.95)';
-      });
+    isFloatingButtonHiddenForCurrentDomain((hidden) => {
+      if (hidden) {
+        if (floatingButton) floatingButton.remove();
+        return;
+      }
+      if (!floatingButton) {
+        floatingButton = document.createElement('div');
+        floatingButton.id = 'yt-transcript-floating-button';
+        floatingButton.innerHTML = `<div class=\"button-emoji\">📝</div>`;
+        floatingButton.style.cssText = `
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: rgba(255, 255, 255, 0.95);
+          color: #222;
+          border: 1px solid #ccc;
+          border-radius: 50%;
+          width: 56px;
+          height: 56px;
+          cursor: pointer;
+          font-size: 24px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          z-index: 10000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+          user-select: none;
+          opacity: 1;
+        `;
+        floatingButton.addEventListener('mouseenter', () => {
+          floatingButton.style.background = '#f3f4f6';
+        });
+        floatingButton.addEventListener('mouseleave', () => {
+          floatingButton.style.background = 'rgba(255, 255, 255, 0.95)';
+        });
       floatingButton.addEventListener('click', async () => {
         if (isProcessing) return;
         isProcessing = true;
@@ -374,11 +379,13 @@ function manageFloatingButtonForPage() {
           }, 3000);
         }
       });
-      document.body.appendChild(floatingButton);
-      console.debug('[ExtractMD] Floating button created and added to DOM (Page)');
-    } else {
-      floatingButton.style.display = 'flex';
-    }
+        document.body.appendChild(floatingButton);
+        attachHideAffordance(floatingButton);
+        console.debug('[ExtractMD] Floating button created and added to DOM (Page)');
+      } else {
+        floatingButton.style.display = 'flex';
+      }
+    });
   });
 }
 

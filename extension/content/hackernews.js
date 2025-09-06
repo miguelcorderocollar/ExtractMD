@@ -1,5 +1,5 @@
 // Hacker News-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens, isFloatingButtonHiddenForCurrentDomain, attachHideAffordance } from './utils.js';
 import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
@@ -288,10 +288,12 @@ export function initHackerNewsFeatures() {
       console.debug('[ExtractMD] Floating button already exists (HN)');
       return;
     }
-    floatingButton = document.createElement('div');
-    floatingButton.id = 'yt-transcript-floating-button';
-    floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
-    floatingButton.style.cssText = `
+    isFloatingButtonHiddenForCurrentDomain((hidden) => {
+      if (hidden) return;
+      floatingButton = document.createElement('div');
+      floatingButton.id = 'yt-transcript-floating-button';
+      floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
+      floatingButton.style.cssText = `
       position: fixed;
       bottom: 20px;
       right: 20px;
@@ -313,25 +315,27 @@ export function initHackerNewsFeatures() {
       user-select: none;
       opacity: 0.7;
     `;
-    floatingButton.addEventListener('mouseenter', () => {
-      if (!isProcessing) {
-        floatingButton.style.transform = 'translateY(-2px) scale(1.1)';
-        floatingButton.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
-        floatingButton.style.opacity = '1';
-        floatingButton.style.background = 'rgba(255, 255, 255, 0.25)';
-      }
+      floatingButton.addEventListener('mouseenter', () => {
+        if (!isProcessing) {
+          floatingButton.style.transform = 'translateY(-2px) scale(1.1)';
+          floatingButton.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
+          floatingButton.style.opacity = '1';
+          floatingButton.style.background = 'rgba(255, 255, 255, 0.25)';
+        }
+      });
+      floatingButton.addEventListener('mouseleave', () => {
+        if (!isProcessing) {
+          floatingButton.style.transform = 'translateY(0) scale(1)';
+          floatingButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+          floatingButton.style.opacity = '0.7';
+          floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
+        }
+      });
+      floatingButton.addEventListener('click', handleHNFloatingButtonClick());
+      document.body.appendChild(floatingButton);
+      attachHideAffordance(floatingButton);
+      setButtonNormal(floatingButton);
+      console.debug('[ExtractMD] Floating button created and added to DOM (HN)');
     });
-    floatingButton.addEventListener('mouseleave', () => {
-      if (!isProcessing) {
-        floatingButton.style.transform = 'translateY(0) scale(1)';
-        floatingButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        floatingButton.style.opacity = '0.7';
-        floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
-      }
-    });
-    floatingButton.addEventListener('click', handleHNFloatingButtonClick());
-    document.body.appendChild(floatingButton);
-    setButtonNormal(floatingButton);
-    console.debug('[ExtractMD] Floating button created and added to DOM (HN)');
   });
 } 
