@@ -202,7 +202,13 @@ export function setFloatingButtonHiddenForCurrentDomain(hidden, cb) {
   const host = getCurrentHostname();
   chrome.storage.sync.get({ hiddenButtonsByDomain: {} }, (items) => {
     const map = items.hiddenButtonsByDomain || {};
-    if (hidden) map[host] = true; else delete map[host];
+    if (hidden) {
+      // Only store when hidden (disabled)
+      map[host] = true;
+    } else {
+      // Remove from storage when enabled (back to default)
+      delete map[host];
+    }
     chrome.storage.sync.set({ hiddenButtonsByDomain: map }, cb);
   });
 }
