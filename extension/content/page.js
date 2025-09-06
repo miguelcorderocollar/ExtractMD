@@ -2,6 +2,7 @@
 
 import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
 import { encode } from 'gpt-tokenizer';
+import { Readability } from '@mozilla/readability';
 
 let isProcessing = false;
 let pageObserver = null;
@@ -22,6 +23,18 @@ function getCandidateRoots() {
     '.blog-post',
     '.markdown-body',
     '.read__content',
+    // Additional common content containers
+    '.prose',
+    '.article',
+    '.story-body',
+    '.post-body',
+    '.entry',
+    '.content-area',
+    '.main-content',
+    '[data-testid*="content"]',
+    '[class*="article"]',
+    '[class*="post"]',
+    '[class*="entry"]',
   ];
   const candidates = new Set();
   selectors.forEach(sel => document.querySelectorAll(sel).forEach(el => candidates.add(el)));
@@ -43,6 +56,9 @@ function cloneAndClean(root, simplifyAggressively = true) {
     '.comments', '#comments', '.related', '.newsletter', '.subscribe', '.cookie', '.gdpr', '.modal', '.popover', '.tooltip',
     '[aria-hidden="true"]', '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]'
   ];
+  // Always remove our own floating button if present
+  const ownUiSelectors = ['#yt-transcript-floating-button'];
+  clone.querySelectorAll(ownUiSelectors.join(',')).forEach(el => el.remove());
   if (simplifyAggressively) {
     clone.querySelectorAll(removeSelectors.join(',')).forEach(el => el.remove());
   } else {
@@ -69,6 +85,19 @@ function chooseMainRoot(simplifyAggressively) {
     }
   });
   return best || document.body;
+}
+
+function getReadabilityRoot() {
+  try {
+    const cloned = document.cloneNode(true);
+    const reader = new Readability(cloned);
+    const article = reader.parse();
+    if (article && article.content) {
+      const parsed = new DOMParser().parseFromString(article.content, 'text/html');
+      return parsed && parsed.body ? parsed.body : null;
+    }
+  } catch {}
+  return null;
 }
 
 function nodeToMarkdown(node, opts) {
@@ -105,9 +134,20 @@ function nodeToMarkdown(node, opts) {
   if (tag === 'blockquote') {
     return `> ${node.textContent.trim()}\n\n`;
   }
-  if (tag === 'pre' || tag === 'code') {
-    const code = node.textContent;
-    return '```' + code + '```\n\n';
+  if (tag === 'hr') {
+    return '---\n\n';
+  }
+  if (tag === 'pre') {
+    const codeEl = node.querySelector('code');
+    const language = detectCodeLanguage(codeEl || node);
+    const code = codeEl ? codeEl.textContent : node.textContent;
+    const langBlock = language ? language : '';
+    return `\`\`\`${langBlock}\n${code}\n\`\`\`\n\n`;
+  }
+  if (tag === 'code') {
+    // Inline code formatting
+    const text = node.textContent;
+    return `\`${text}\``;
   }
   if ((tag === 'table' || tag === 'thead' || tag === 'tbody') && includeTables) {
     // Convert simple tables
@@ -159,6 +199,15 @@ function nodeToMarkdown(node, opts) {
   return Array.from(node.childNodes).map(n => nodeToMarkdown(n, opts)).join('');
 }
 
+function detectCodeLanguage(element) {
+  if (!element) return '';
+  const classes = element.className || '';
+  const match = classes.match(/language-([\w#+-]+)/i) || classes.match(/lang-([\w#+-]+)/i);
+  if (match) return match[1];
+  const data = element.getAttribute && (element.getAttribute('data-language') || element.getAttribute('data-lang'));
+  return data || '';
+}
+
 async function extractPageMarkdown(options) {
   const {
     pageIncludeImages,
@@ -175,7 +224,8 @@ async function extractPageMarkdown(options) {
 
   let root;
   if (pageOnlyMainSection !== false) {
-    root = chooseMainRoot(simplifyAggressively);
+    // Prefer Readability when extracting only the main section
+    root = getReadabilityRoot() || chooseMainRoot(simplifyAggressively);
   } else {
     root = document.body;
   }

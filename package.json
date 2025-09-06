@@ -26,6 +26,7 @@
     "esbuild": "^0.25.5"
   },
   "dependencies": {
+    "@mozilla/readability": "^0.6.0",
     "gpt-tokenizer": "^3.0.1"
   }
 }
