@@ -1,6 +1,6 @@
 // Page simplifier extraction logic for ExtractMD extension
 
-import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens, isFloatingButtonHiddenForCurrentDomain, attachHideAffordance } from './utils.js';
+import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens, isFloatingButtonHiddenForCurrentDomain, attachHideAffordance, debounce, removeFloatingButton, onHiddenToggle } from './utils.js';
 import { encode } from 'gpt-tokenizer';
 import { Readability } from '@mozilla/readability';
 
@@ -243,30 +243,36 @@ function hasArticleElements() {
 
 function manageFloatingButtonForPage() {
   let floatingButton = document.getElementById('yt-transcript-floating-button');
-  chrome.storage.sync.get({ enablePageIntegration: true, enableArticleIntegration: true }, function(settings) {
-    if (settings.enablePageIntegration === false) {
+  // Early exit if domain is hidden
+  isFloatingButtonHiddenForCurrentDomain((hidden) => {
+    if (hidden) {
       if (floatingButton) floatingButton.remove();
       return;
     }
-    // If article integration is enabled and there are <article> tags, prefer Article feature button
-    if (settings.enableArticleIntegration !== false && hasArticleElements()) {
-      if (floatingButton) floatingButton.style.display = 'none';
-      return;
-    }
-    // Determine if there is enough content to warrant showing the button
-    const mainRoot = chooseMainRoot(true);
-    const cleaned = cloneAndClean(mainRoot, true);
-    const len = textLengthOf(cleaned);
-    if (len < 200) {
-      if (floatingButton) floatingButton.remove();
-      return;
-    }
-    isFloatingButtonHiddenForCurrentDomain((hidden) => {
-      if (hidden) {
+    chrome.storage.sync.get({ enablePageIntegration: true, enableArticleIntegration: true }, function(settings) {
+      if (settings.enablePageIntegration === false) {
         if (floatingButton) floatingButton.remove();
         return;
       }
-      if (!floatingButton) {
+      // If article integration is enabled and there are <article> tags, prefer Article feature button
+      if (settings.enableArticleIntegration !== false && hasArticleElements()) {
+        if (floatingButton) floatingButton.style.display = 'none';
+        return;
+      }
+      // Determine if there is enough content to warrant showing the button
+      const mainRoot = chooseMainRoot(true);
+      const cleaned = cloneAndClean(mainRoot, true);
+      const len = textLengthOf(cleaned);
+      if (len < 200) {
+        if (floatingButton) floatingButton.remove();
+        return;
+      }
+      isFloatingButtonHiddenForCurrentDomain((hidden) => {
+        if (hidden) {
+          if (floatingButton) floatingButton.remove();
+          return;
+        }
+        if (!floatingButton) {
         floatingButton = document.createElement('div');
         floatingButton.id = 'yt-transcript-floating-button';
         floatingButton.innerHTML = `<div class=\"button-emoji\">📝</div>`;
@@ -382,17 +388,19 @@ function manageFloatingButtonForPage() {
         document.body.appendChild(floatingButton);
         attachHideAffordance(floatingButton);
         console.debug('[ExtractMD] Floating button created and added to DOM (Page)');
-      } else {
-        floatingButton.style.display = 'flex';
-      }
+        } else {
+          floatingButton.style.display = 'flex';
+        }
+      });
     });
   });
 }
 
 function setupPageMutationObserver() {
   if (pageObserver) return;
+  const debouncedManage = debounce(manageFloatingButtonForPage, 200);
   pageObserver = new MutationObserver(() => {
-    manageFloatingButtonForPage();
+    debouncedManage();
   });
   pageObserver.observe(document.body, { childList: true, subtree: true });
 }
@@ -400,7 +408,22 @@ function setupPageMutationObserver() {
 export function initPageFeatures() {
   chrome.storage.sync.get({ enablePageIntegration: true }, function(items) {
     if (items.enablePageIntegration === false) return;
-    setupPageMutationObserver();
-    manageFloatingButtonForPage();
+    isFloatingButtonHiddenForCurrentDomain((hidden) => {
+      if (hidden) {
+        removeFloatingButton();
+        return;
+      }
+      setupPageMutationObserver();
+      manageFloatingButtonForPage();
+    });
+    onHiddenToggle((hidden) => {
+      if (hidden) {
+        if (pageObserver) { pageObserver.disconnect(); pageObserver = null; }
+        removeFloatingButton();
+      } else {
+        if (!pageObserver) setupPageMutationObserver();
+        manageFloatingButtonForPage();
+      }
+    });
   });
 }

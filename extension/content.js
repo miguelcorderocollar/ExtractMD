@@ -1,5 +1,5 @@
 // Utility functions have been moved to './content/utils.js' and are now imported below.
-import { copyToClipboard, showNotification, htmlToMarkdown, sleep, getSettings } from './content/utils.js';
+import { copyToClipboard, showNotification, htmlToMarkdown, sleep, getSettings, isFloatingButtonHiddenForCurrentDomain, removeFloatingButton } from './content/utils.js';
 import { initYouTubeFeatures } from './content/youtube.js';
 import { initHackerNewsFeatures } from './content/hackernews.js';
 import { initArticleFeatures } from './content/articles.js';
@@ -12,19 +12,26 @@ function isHNNewsPage() {
 }
 
 function runInitForCurrentPage() {
-  if (window.location.hostname.includes('youtube.com') && window.location.pathname.includes('/watch')) {
-    console.debug('[ExtractMD] Initializing YouTube features');
-    initYouTubeFeatures();
-  } else if (window.location.hostname.includes('ycombinator.com') && (window.location.pathname.startsWith('/item') || isHNNewsPage())) {
-    console.debug('[ExtractMD] Initializing Hacker News features');
-    initHackerNewsFeatures();
-  } else if (document.querySelector('article')) {
-    console.debug('[ExtractMD] Initializing Article features');
-    initArticleFeatures();
-  } else {
-    console.debug('[ExtractMD] Initializing Page features');
-    initPageFeatures();
-  }
+  // Respect per-domain hidden toggle early
+  isFloatingButtonHiddenForCurrentDomain((hidden) => {
+    if (hidden) {
+      removeFloatingButton();
+      return;
+    }
+    if (window.location.hostname.includes('youtube.com') && window.location.pathname.includes('/watch')) {
+      console.debug('[ExtractMD] Initializing YouTube features');
+      initYouTubeFeatures();
+    } else if (window.location.hostname.includes('ycombinator.com') && (window.location.pathname.startsWith('/item') || isHNNewsPage())) {
+      console.debug('[ExtractMD] Initializing Hacker News features');
+      initHackerNewsFeatures();
+    } else if (document.querySelector('article')) {
+      console.debug('[ExtractMD] Initializing Article features');
+      initArticleFeatures();
+    } else {
+      console.debug('[ExtractMD] Initializing Page features');
+      initPageFeatures();
+    }
+  });
 }
 
 runInitForCurrentPage();

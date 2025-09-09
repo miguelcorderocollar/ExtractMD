@@ -1,10 +1,11 @@
 // Generic article extraction logic for ExtractMD extension
 
-import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens, isFloatingButtonHiddenForCurrentDomain, attachHideAffordance } from './utils.js';
+import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens, isFloatingButtonHiddenForCurrentDomain, attachHideAffordance, debounce, removeFloatingButton, onHiddenToggle } from './utils.js';
 import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
 let articleObserver = null;
+let articleManageTimer = null;
 
 async function extractArticleMarkdown(articleElem, includeImages) {
   function nodeToMarkdown(node) {
@@ -123,10 +124,17 @@ async function showArticleInfoNotification(articles, highlightLongest = false) {
 }
 
 function manageFloatingButtonForArticles() {
-  const articles = Array.from(document.querySelectorAll('article'));
-  let floatingButton = document.getElementById('yt-transcript-floating-button');
-  if (articles.length > 0) {
-    if (!floatingButton) {
+  isFloatingButtonHiddenForCurrentDomain((hidden) => {
+    const existing = document.getElementById('yt-transcript-floating-button');
+    if (hidden) {
+      if (existing) existing.remove();
+      return;
+    }
+
+    const articles = Array.from(document.querySelectorAll('article'));
+    let floatingButton = existing;
+    if (articles.length > 0) {
+      if (!floatingButton) {
       floatingButton = document.createElement('div');
       floatingButton.id = 'yt-transcript-floating-button';
       floatingButton.innerHTML = `<div class=\"button-emoji\">📝</div>`;
@@ -157,20 +165,13 @@ function manageFloatingButtonForArticles() {
       floatingButton.addEventListener('mouseleave', () => {
         floatingButton.style.background = 'rgba(255, 255, 255, 0.95)';
       });
-      // Show article info notification if setting is enabled
+      // Show article info notification if setting is enabled (only when not hidden)
       chrome.storage.sync.get({ articleExporterShowInfo: true, articleExporterOnlyLongest: false }, function(settings) {
         if (settings.articleExporterShowInfo) {
           showArticleInfoNotification(articles, settings.articleExporterOnlyLongest);
         }
       });
-      // Respect per-domain hidden state
-      isFloatingButtonHiddenForCurrentDomain((hidden) => {
-        if (hidden) {
-          if (floatingButton && floatingButton.parentNode) floatingButton.parentNode.removeChild(floatingButton);
-          return;
-        }
-        attachHideAffordance(floatingButton);
-      });
+      attachHideAffordance(floatingButton);
       floatingButton.addEventListener('click', async () => {
         if (isProcessing) return;
         isProcessing = true;
@@ -235,8 +236,8 @@ function manageFloatingButtonForArticles() {
               if (settings.articleExporterOnlyLongest && totalArticles > 1) {
                 showSuccessNotificationWithTokens(`1/${totalArticles} Articles downloaded as Markdown!`, md);
               } else {
-                const articleText = processedCount === 1 ? 'Article' : 'Articles';
-                showSuccessNotificationWithTokens(`${processedCount} ${articleText} downloaded as Markdown!`, md);
+                const articleText = totalArticles === 1 ? 'Article' : 'Articles';
+                showSuccessNotificationWithTokens(`${totalArticles} ${articleText} downloaded as Markdown!`, md);
               }
             } else {
               // Check token threshold
@@ -249,8 +250,8 @@ function manageFloatingButtonForArticles() {
                   if (settings.articleExporterOnlyLongest && totalArticles > 1) {
                     showSuccessNotificationWithTokens(`1/${totalArticles} Articles downloaded as Markdown! (token threshold)`, md);
                   } else {
-                    const articleText = processedCount === 1 ? 'Article' : 'Articles';
-                    showSuccessNotificationWithTokens(`${processedCount} ${articleText} downloaded as Markdown! (token threshold)`, md);
+                    const articleText = totalArticles === 1 ? 'Article' : 'Articles';
+                    showSuccessNotificationWithTokens(`${totalArticles} ${articleText} downloaded as Markdown! (token threshold)`, md);
                   }
                   return;
                 }
@@ -260,8 +261,8 @@ function manageFloatingButtonForArticles() {
               if (settings.articleExporterOnlyLongest && totalArticles > 1) {
                 showSuccessNotificationWithTokens(`1/${totalArticles} Articles copied as Markdown!`, md);
               } else {
-                const articleText = processedCount === 1 ? 'Article' : 'Articles';
-                showSuccessNotificationWithTokens(`${processedCount} ${articleText} copied as Markdown!`, md);
+                const articleText = totalArticles === 1 ? 'Article' : 'Articles';
+                showSuccessNotificationWithTokens(`${totalArticles} ${articleText} copied as Markdown!`, md);
               }
             }
           });
@@ -309,12 +310,14 @@ function manageFloatingButtonForArticles() {
       floatingButton.remove();
     }
   }
+  });
 }
 
 function setupArticleMutationObserver() {
   if (articleObserver) return;
+  const debouncedManage = debounce(manageFloatingButtonForArticles, 200);
   articleObserver = new MutationObserver(() => {
-    manageFloatingButtonForArticles();
+    debouncedManage();
   });
   articleObserver.observe(document.body, { childList: true, subtree: true });
 }
@@ -322,7 +325,23 @@ function setupArticleMutationObserver() {
 export function initArticleFeatures() {
   chrome.storage.sync.get({ enableArticleIntegration: true }, function(items) {
     if (items.enableArticleIntegration === false) return;
-    setupArticleMutationObserver();
-    manageFloatingButtonForArticles();
+    isFloatingButtonHiddenForCurrentDomain((hidden) => {
+      if (hidden) {
+        removeFloatingButton();
+        return;
+      }
+      setupArticleMutationObserver();
+      manageFloatingButtonForArticles();
+    });
+    // React to hidden toggle changes
+    onHiddenToggle((hidden) => {
+      if (hidden) {
+        if (articleObserver) { articleObserver.disconnect(); articleObserver = null; }
+        removeFloatingButton();
+      } else {
+        if (!articleObserver) setupArticleMutationObserver();
+        manageFloatingButtonForArticles();
+      }
+    });
   });
 } 

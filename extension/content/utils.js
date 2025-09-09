@@ -278,3 +278,30 @@ export function attachHideAffordance(floatingButton) {
     hideBadge();
   };
 }
+
+// Lightweight utilities to keep other modules clean
+export function debounce(fn, wait = 200) {
+  let timeoutId = null;
+  return function(...args) {
+    if (timeoutId) clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+      try { fn.apply(this, args); } catch {}
+    }, wait);
+  };
+}
+
+export function removeFloatingButton() {
+  try {
+    const btn = document.getElementById('yt-transcript-floating-button');
+    if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+  } catch {}
+}
+
+export function onHiddenToggle(handler) {
+  // Call handler with current hidden state when hiddenButtonsByDomain changes
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'sync' || !changes.hiddenButtonsByDomain) return;
+    isFloatingButtonHiddenForCurrentDomain((hidden) => handler(!!hidden));
+  });
+}
