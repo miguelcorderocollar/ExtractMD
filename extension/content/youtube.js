@@ -205,6 +205,13 @@ window.copyYouTubeTranscript = async function(settings = null) {
 
 export function initYouTubeFeatures() {
   console.debug('[ExtractMD] initYouTubeFeatures called');
+
+  // Only initialize YouTube features on watch pages
+  if (!(window.location.hostname.includes('youtube.com') && window.location.pathname.includes('/watch'))) {
+    console.debug('[ExtractMD] Not a YouTube watch page, skipping YouTube features initialization');
+    return;
+  }
+
   chrome.storage.sync.get({ enableYouTubeIntegration: true }, function(items) {
     if (items.enableYouTubeIntegration === false) return;
     // Ensure floating button is initialized after DOM is ready
