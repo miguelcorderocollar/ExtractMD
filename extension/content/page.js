@@ -243,6 +243,14 @@ function hasArticleElements() {
 
 function manageFloatingButtonForPage() {
   let floatingButton = document.getElementById('yt-transcript-floating-button');
+  // Early exit on YouTube pages (handled by YouTube module only)
+  try {
+    const host = window.location.hostname || '';
+    if (host.includes('youtube.com')) {
+      if (floatingButton) floatingButton.remove();
+      return;
+    }
+  } catch {}
   // Early exit if domain is hidden
   isFloatingButtonHiddenForCurrentDomain((hidden) => {
     if (hidden) {

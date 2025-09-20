@@ -5,6 +5,32 @@ import { encode } from 'gpt-tokenizer';
 let floatingButton = null;
 let isProcessing = false;
 let currentUrl = window.location.href;
+let playerObserver = null;
+let ytNavHandler = null;
+let ytNavHandlerAttached = false;
+let fullscreenHandlersAttached = false;
+
+function cleanupYouTubeFeatures() {
+  try {
+    if (playerObserver) {
+      playerObserver.disconnect();
+      playerObserver = null;
+    }
+  } catch {}
+  try {
+    if (floatingButton && floatingButton.parentNode) {
+      floatingButton.parentNode.removeChild(floatingButton);
+      floatingButton = null;
+    }
+  } catch {}
+  if (fullscreenHandlersAttached) {
+    document.removeEventListener('fullscreenchange', updateButtonVisibility);
+    document.removeEventListener('webkitfullscreenchange', updateButtonVisibility);
+    document.removeEventListener('mozfullscreenchange', updateButtonVisibility);
+    document.removeEventListener('MSFullscreenChange', updateButtonVisibility);
+    fullscreenHandlersAttached = false;
+  }
+}
 
 function isVideoFullscreen() {
   if (document.fullscreenElement || 
@@ -35,12 +61,31 @@ function updateButtonVisibility() {
 
 function startPlayerObserver() {
   const playerControls = document.querySelector('#movie_player');
+  if (playerObserver) {
+    try { playerObserver.disconnect(); } catch {}
+    playerObserver = null;
+  }
   if (playerControls) {
+    playerObserver = new MutationObserver(() => {
+      updateButtonVisibility();
+    });
     playerObserver.observe(playerControls, {
       attributes: true,
       subtree: true,
       attributeFilter: ['aria-pressed']
     });
+  }
+}
+
+function onYtNavigateFinish() {
+  const onWatch = (window.location.hostname.includes('youtube.com') && window.location.pathname.includes('/watch'));
+  if (onWatch) {
+    // Re-init UI and observers on watch pages
+    initializeFloatingButton();
+    startPlayerObserver();
+  } else {
+    // Clean up when navigating away from watch pages
+    cleanupYouTubeFeatures();
   }
 }
 
@@ -219,50 +264,29 @@ export function initYouTubeFeatures() {
       document.addEventListener('DOMContentLoaded', () => {
         console.debug('[ExtractMD] DOMContentLoaded for YouTube');
         initializeFloatingButton();
-      });
+        startPlayerObserver();
+      }, { once: true });
     } else {
       initializeFloatingButton();
+      startPlayerObserver();
     }
 
-    // Also initialize on YouTube navigation (SPA behavior)
-    let currentUrl = window.location.href;
-    const observer = new MutationObserver(() => {
-      if (window.location.href !== currentUrl) {
-        currentUrl = window.location.href;
-        if (floatingButton && floatingButton.parentNode) {
-          floatingButton.parentNode.removeChild(floatingButton);
-          floatingButton = null;
-        }
-        setTimeout(initializeFloatingButton, 1000);
-      }
-    });
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    // Attach fullscreen listeners once
+    if (!fullscreenHandlersAttached) {
+      document.addEventListener('fullscreenchange', updateButtonVisibility);
+      document.addEventListener('webkitfullscreenchange', updateButtonVisibility);
+      document.addEventListener('mozfullscreenchange', updateButtonVisibility);
+      document.addEventListener('MSFullscreenChange', updateButtonVisibility);
+      fullscreenHandlersAttached = true;
+    }
 
-    // Monitor for fullscreen changes
-    document.addEventListener('fullscreenchange', updateButtonVisibility);
-    document.addEventListener('webkitfullscreenchange', updateButtonVisibility);
-    document.addEventListener('mozfullscreenchange', updateButtonVisibility);
-    document.addEventListener('MSFullscreenChange', updateButtonVisibility);
-
-    // Monitor for YouTube player state changes (theater mode, fullscreen buttons)
-    const playerObserver = new MutationObserver(() => {
-      updateButtonVisibility();
-    });
-    startPlayerObserver();
-    // Also start player observer on YouTube navigation
-    const urlObserver = new MutationObserver(() => {
-      if (window.location.href !== currentUrl) {
-        currentUrl = window.location.href;
-        setTimeout(startPlayerObserver, 1000);
-      }
-    });
-    urlObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    // Use YouTube SPA navigation events instead of broad MutationObservers
+    if (!ytNavHandlerAttached) {
+      ytNavHandler = () => onYtNavigateFinish();
+      window.addEventListener('yt-navigate-finish', ytNavHandler);
+      window.addEventListener('yt-page-data-updated', ytNavHandler);
+      ytNavHandlerAttached = true;
+    }
   });
 }
 
