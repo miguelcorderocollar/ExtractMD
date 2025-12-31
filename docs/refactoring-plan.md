@@ -1,6 +1,6 @@
 # ExtractMD Codebase Refactoring Plan
 
-> **Note**: Phase 1 (Testing Infrastructure) has been completed. See [TESTING_SUMMARY.md](../TESTING_SUMMARY.md) for details.
+> **Note**: Phase 1 (Testing Infrastructure) has been completed. See [testing-summary.md](../testing-summary.md) for details.
 
 ## Current State Analysis
 
@@ -25,7 +25,7 @@
 
 ## Phase 1: Testing Infrastructure ✅ COMPLETED
 
-See [TESTING_SUMMARY.md](../TESTING_SUMMARY.md) for full details.
+See [testing-summary.md](../testing-summary.md) for full details.
 
 **Achievements:**
 - ✅ Vitest + Playwright configured
@@ -547,7 +547,7 @@ New for 2.0:
 
 - Each phase should be a separate branch and PR
 - Run full test suite after each phase
-- Update TESTING_SUMMARY.md with new tests
+- Update testing-summary.md with new tests
 - Consider adding integration tests for complex workflows
 - Document any breaking changes or migration notes
 

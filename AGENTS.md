@@ -17,5 +17,5 @@ Your goal is to transform ExtractMD from a collection of monolithic scripts into
 - **Extensibility:** Easily add new extractors (e.g., Reddit, Twitter).
 
 @docs/refactoring-plan.md
-@TESTING_SUMMARY.md
+@testing-summary.md
 
