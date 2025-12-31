@@ -33,6 +33,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const enableArticleIntegrationCheckbox = document.getElementById('enableArticleIntegration');
     const downloadIfTokensExceedInput = document.getElementById('downloadIfTokensExceed');
     const showTokenCountInNotificationCheckbox = document.getElementById('showTokenCountInNotification');
+    const ignoredDomainsTextarea = document.getElementById('ignoredDomains');
+    const ignoreCurrentDomainBtn = document.getElementById('ignoreCurrentDomainBtn');
+    const domainValidationError = document.getElementById('domainValidationError');
 
     // Import/Export elements
     const exportBtn = document.getElementById('exportSettingsBtn');
@@ -76,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         enableHackerNewsIntegration: true,
         enableArticleIntegration: true,
         showTokenCountInNotification: false,
+        ignoredDomains: '',
     }, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
@@ -107,6 +111,11 @@ document.addEventListener('DOMContentLoaded', function() {
         enableHackerNewsIntegrationCheckbox.checked = items.enableHackerNewsIntegration !== false;
         enableArticleIntegrationCheckbox.checked = items.enableArticleIntegration !== false;
         showTokenCountInNotificationCheckbox.checked = items.showTokenCountInNotification === true;
+        ignoredDomainsTextarea.value = items.ignoredDomains || '';
+        
+        // Update ignore button state on load
+        updateIgnoreButtonState();
+        
         // Hide/show both the collapsible and container for integrations
         const collapsibles = document.querySelectorAll('.collapsible');
         const containers = document.querySelectorAll('.container');
@@ -220,6 +229,105 @@ document.addEventListener('DOMContentLoaded', function() {
     showTokenCountInNotificationCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ showTokenCountInNotification: showTokenCountInNotificationCheckbox.checked });
     });
+
+    // Domain validation regex: allows domains, localhost, and IP addresses
+    const domainRegex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$|^localhost$|^(?:\d{1,3}\.){3}\d{1,3}$/i;
+
+    function validateDomains(text) {
+        const domains = text.split('\n').map(d => d.trim()).filter(d => d.length > 0);
+        for (const domain of domains) {
+            if (!domainRegex.test(domain)) return false;
+        }
+        return true;
+    }
+
+    ignoredDomainsTextarea.addEventListener('input', function() {
+        const value = ignoredDomainsTextarea.value;
+        const isValid = validateDomains(value);
+        
+        if (isValid || value.trim() === '') {
+            domainValidationError.style.display = 'none';
+            ignoredDomainsTextarea.style.borderColor = '#e0e3ef';
+            chrome.storage.sync.set({ ignoredDomains: value }, function() {
+                updateIgnoreButtonState();
+            });
+        } else {
+            domainValidationError.style.display = 'block';
+            ignoredDomainsTextarea.style.borderColor = '#dc2626';
+        }
+    });
+
+    function updateIgnoreButtonState() {
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            if (tabs[0] && tabs[0].url) {
+                try {
+                    const url = new URL(tabs[0].url);
+                    const domain = url.hostname;
+                    if (!domain) return;
+
+                    chrome.storage.sync.get({ ignoredDomains: '' }, function(items) {
+                        const currentDomains = items.ignoredDomains.split('\n').map(d => d.trim()).filter(d => d.length > 0);
+                        const isIgnored = currentDomains.includes(domain);
+                        
+                        if (isIgnored) {
+                            ignoreCurrentDomainBtn.innerHTML = '✅ Stop Ignoring';
+                            ignoreCurrentDomainBtn.style.background = '#f0fdf4';
+                            ignoreCurrentDomainBtn.style.color = '#166534';
+                            ignoreCurrentDomainBtn.style.borderColor = '#bbf7d0';
+                        } else {
+                            ignoreCurrentDomainBtn.innerHTML = '🚫 Ignore Current';
+                            ignoreCurrentDomainBtn.style.background = '#f3f4f6';
+                            ignoreCurrentDomainBtn.style.color = '#374151';
+                            ignoreCurrentDomainBtn.style.borderColor = '#bfc6e0';
+                        }
+                    });
+                } catch (e) {}
+            }
+        });
+    }
+
+    ignoreCurrentDomainBtn.addEventListener('click', function() {
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            if (tabs[0] && tabs[0].url) {
+                try {
+                    const url = new URL(tabs[0].url);
+                    const domain = url.hostname;
+                    
+                    if (!domain) {
+                        showStatus('Could not determine domain', 'error');
+                        return;
+                    }
+
+                    chrome.storage.sync.get({ ignoredDomains: '' }, function(items) {
+                        let currentDomains = items.ignoredDomains.split('\n').map(d => d.trim()).filter(d => d.length > 0);
+                        
+                        if (currentDomains.includes(domain)) {
+                            // Un-ignore (remove)
+                            currentDomains = currentDomains.filter(d => d !== domain);
+                            const newValue = currentDomains.join('\n');
+                            chrome.storage.sync.set({ ignoredDomains: newValue }, function() {
+                                ignoredDomainsTextarea.value = newValue;
+                                showStatus(`Removed ${domain} from ignored domains`, 'success');
+                                updateIgnoreButtonState();
+                            });
+                        } else {
+                            // Ignore (add)
+                            currentDomains.push(domain);
+                            const newValue = currentDomains.join('\n');
+                            chrome.storage.sync.set({ ignoredDomains: newValue }, function() {
+                                ignoredDomainsTextarea.value = newValue;
+                                showStatus(`Added ${domain} to ignored domains`, 'success');
+                                updateIgnoreButtonState();
+                            });
+                        }
+                    });
+                } catch (e) {
+                    showStatus('Invalid URL', 'error');
+                }
+            }
+        });
+    });
+
     // Integration enable/disable toggles (no reload, update UI in-place)
     enableYouTubeIntegrationCheckbox.addEventListener('change', function() {
         chrome.storage.sync.set({ enableYouTubeIntegration: enableYouTubeIntegrationCheckbox.checked }, function() {

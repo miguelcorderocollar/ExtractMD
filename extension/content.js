@@ -10,7 +10,22 @@ function isHNNewsPage() {
   return validPaths.includes(window.location.pathname);
 }
 
-function runInitForCurrentPage() {
+async function runInitForCurrentPage() {
+  const settings = await getSettings();
+  const ignoredDomains = (settings.ignoredDomains || '').split('\n').map(d => d.trim()).filter(d => d.length > 0);
+  
+  if (ignoredDomains.includes(window.location.hostname)) {
+    console.debug(`[ExtractMD] Domain ${window.location.hostname} is ignored, skipping initialization`);
+    // Clear any existing copy function if it was set before (e.g. during SPA navigation)
+    window.copyExtractMD = null;
+    // Remove any existing floating button
+    const existingButton = document.getElementById('yt-transcript-floating-button');
+    if (existingButton) {
+      existingButton.remove();
+    }
+    return;
+  }
+
   if (window.location.hostname.includes('youtube.com') && window.location.pathname.includes('/watch')) {
     console.debug('[ExtractMD] Initializing YouTube features');
     window.copyExtractMD = copyYouTubeTranscript;
