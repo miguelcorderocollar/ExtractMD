@@ -27,14 +27,25 @@ async function runInitForCurrentPage() {
     return;
   }
 
-  if (window.location.hostname.includes('youtube.com') && window.location.pathname.includes('/watch')) {
+  const isYouTubeDomain = window.location.hostname.includes('youtube.com');
+  const isHNDomain = window.location.hostname.includes('ycombinator.com');
+
+  if (isYouTubeDomain && window.location.pathname.includes('/watch')) {
     console.debug('[ExtractMD] Initializing YouTube features');
     window.copyExtractMD = copyYouTubeTranscript;
     initYouTubeFeatures();
-  } else if (window.location.hostname.includes('ycombinator.com') && (window.location.pathname.startsWith('/item') || isHNNewsPage())) {
+  } else if (isHNDomain && (window.location.pathname.startsWith('/item') || isHNNewsPage())) {
     console.debug('[ExtractMD] Initializing Hacker News features');
     window.copyExtractMD = () => performHNCopy(false);
     initHackerNewsFeatures();
+  } else if (isYouTubeDomain || isHNDomain) {
+    // On YouTube/HN but not a supported page - do nothing, don't fall back to universal
+    console.debug('[ExtractMD] On YouTube/HN domain but not a supported page, skipping extraction');
+    window.copyExtractMD = null;
+    const existingButton = document.getElementById('extractmd-floating-button');
+    if (existingButton) {
+      existingButton.remove();
+    }
   } else {
     // Check for articles with substantial content
     const articles = document.querySelectorAll('article');

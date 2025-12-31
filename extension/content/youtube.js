@@ -87,7 +87,7 @@ async function waitForTranscriptAndCopy(settings = {}) {
     showNotification('❌ Transcript not found or not available for this video. Please check if the video has a transcript. If this persists, contact the developer.', 'error', true);
     throw new Error('Transcript failed to load within timeout period.');
   }
-  let transcriptText = extractTranscriptText();
+  let transcriptText = extractTranscriptText(settings.includeTimestamps !== false);
   let metaMd = '';
   if (settings.addTitleToTranscript || settings.addChannelToTranscript || settings.addUrlToTranscript) {
     let title = '';
@@ -130,7 +130,8 @@ async function waitForTranscriptAndCopy(settings = {}) {
                     return;
                 }
             }
-            copyToClipboard(transcriptText, userSettings.includeTimestamps);
+            // Timestamps already handled in extractTranscriptText, so pass true to avoid re-processing
+            copyToClipboard(transcriptText, true);
             showSuccessNotificationWithTokens('Transcript copied to clipboard!', transcriptText);
         }
     });
@@ -145,7 +146,7 @@ async function waitForTranscriptAndCopy(settings = {}) {
   }
 }
 
-function extractTranscriptText() {
+function extractTranscriptText(includeTimestamps = true) {
   const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
   const sections = document.querySelectorAll('ytd-transcript-section-header-renderer');
   let transcript = '';
@@ -160,7 +161,7 @@ function extractTranscriptText() {
       const timestamp = element.querySelector('.segment-timestamp')?.textContent?.trim();
       const text = element.querySelector('.segment-text')?.textContent?.trim();
       if (text) {
-        if (timestamp) {
+        if (includeTimestamps && timestamp) {
           transcript += `[${timestamp}] ${text}\n`;
         } else {
           transcript += `${text}\n`;
