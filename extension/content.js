@@ -43,6 +43,33 @@ async function runInitForCurrentPage() {
 
 runInitForCurrentPage();
 
+// Listen for messages from popup/background
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'extractMD') {
+    const forceDownload = message.forceDownload === true;
+    
+    // Set the force download flag before calling extract
+    if (forceDownload) {
+      window.__extractmd_force_download = true;
+    }
+    
+    if (window.copyExtractMD) {
+      window.copyExtractMD();
+      sendResponse({ success: true });
+    } else {
+      sendResponse({ success: false, error: 'No extraction function available' });
+    }
+    
+    // Clear the flag after a short delay
+    if (forceDownload) {
+      setTimeout(() => {
+        window.__extractmd_force_download = false;
+      }, 100);
+    }
+  }
+  return true; // Keep message channel open for async response
+});
+
 // Listen for keyboard shortcut Ctrl+Shift+C
 document.addEventListener('keydown', (e) => {
   // Check for Ctrl+Shift+C (or Cmd+Shift+C on Mac)

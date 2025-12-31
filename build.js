@@ -23,3 +23,15 @@ esbuild.build({
   logLevel: 'info',
   // minify: true, // enable for production
 }).catch(() => process.exit(1));
+
+// Options page bundle
+esbuild.build({
+  entryPoints: ['extension/options/index.js'],
+  bundle: true,
+  outfile: 'extension/dist/options.js',
+  format: 'iife',
+  sourcemap: true,
+  target: ['chrome58'],
+  logLevel: 'info',
+  // minify: true, // enable for production
+}).catch(() => process.exit(1));

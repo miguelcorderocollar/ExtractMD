@@ -19,40 +19,23 @@ test.describe('ExtractMD Popup', () => {
     await context?.close();
   });
 
-  test('popup opens and displays settings', async () => {
+  test('popup opens and displays quick actions', async () => {
     const page = await context.newPage();
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     
     // Check that main elements are present
     await expect(page.locator('text=ExtractMD')).toBeVisible();
-    await expect(page.locator('text=General Settings')).toBeVisible();
-    await expect(page.locator('#includeTimestamps')).toBeVisible();
+    await expect(page.locator('#extractNowBtn')).toBeVisible();
+    await expect(page.locator('#downloadBtn')).toBeVisible();
+    await expect(page.locator('#openSettingsBtn')).toBeVisible();
   });
 
-  test('can toggle a setting', async () => {
+  test('displays Extract Now button', async () => {
     const page = await context.newPage();
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     
-    const checkbox = page.locator('#includeTimestamps');
-    const initialState = await checkbox.isChecked();
-    
-    await checkbox.click();
-    
-    // Wait a bit for setting to save
-    await page.waitForTimeout(100);
-    
-    // Reload popup
-    await page.reload();
-    
-    // Check if state persisted
-    const newState = await checkbox.isChecked();
-    expect(newState).toBe(!initialState);
-    
-    // Reset to initial state
-    if (newState !== initialState) {
-      await checkbox.click();
-      await page.waitForTimeout(100);
-    }
+    const extractBtn = page.locator('#extractNowBtn');
+    await expect(extractBtn).toContainText('Extract Now');
   });
 
   test('displays KPI counters', async () => {
@@ -63,8 +46,26 @@ test.describe('ExtractMD Popup', () => {
     await expect(kpiSection).toBeVisible();
     
     const kpiCounters = page.locator('#kpi-counters');
-    await expect(kpiCounters).toContainText('YT:');
-    await expect(kpiCounters).toContainText('Articles:');
+    await expect(kpiCounters).toBeVisible();
+  });
+
+  test('displays domain toggle section', async () => {
+    const page = await context.newPage();
+    await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    
+    const domainSection = page.locator('.domain-section');
+    await expect(domainSection).toBeVisible();
+    
+    const toggleBtn = page.locator('#toggleDomainBtn');
+    await expect(toggleBtn).toBeVisible();
+  });
+
+  test('settings button is visible', async () => {
+    const page = await context.newPage();
+    await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    
+    const settingsBtn = page.locator('#openSettingsBtn');
+    await expect(settingsBtn).toBeVisible();
+    await expect(settingsBtn).toContainText('Settings');
   });
 });
-

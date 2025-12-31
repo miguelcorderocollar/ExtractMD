@@ -16,7 +16,7 @@ import { encode } from 'gpt-tokenizer';
  * @returns {Promise<{action: string, tokens: number}>} Result object with action taken and token count
  */
 export async function handleCopyOrDownload(markdown, { title, kpiType, successMessage, onSuccess }) {
-  // Get settings for copy/download behavior
+  // Get user settings for copy/download behavior
   const settings = await new Promise(resolve => {
     chrome.storage.sync.get({
       downloadInsteadOfCopy: false,
@@ -31,7 +31,10 @@ export async function handleCopyOrDownload(markdown, { title, kpiType, successMe
   let action = 'copy';
   let message = successMessage || 'Copied to clipboard!';
 
-  // Determine action: force download, token threshold download, or copy
+  // Determine action:
+  // 1. User setting: downloadInsteadOfCopy
+  // 2. Token threshold exceeded
+  // 3. Default: copy to clipboard
   if (settings.downloadInsteadOfCopy) {
     action = 'download';
     message = successMessage || 'Downloaded as .md!';
@@ -65,6 +68,21 @@ export async function handleCopyOrDownload(markdown, { title, kpiType, successMe
     setTimeout(() => closeCurrentTab(), 500);
   }
 
+  // Store last extraction info for popup display
+  try {
+    chrome.storage.local.set({
+      lastExtraction: {
+        type: kpiType,
+        timestamp: Date.now(),
+        title: title || 'Untitled',
+        success: true,
+        downloaded: action === 'download' || action === 'download-threshold'
+      }
+    });
+  } catch (e) {
+    console.debug('[ExtractMD] Could not store lastExtraction:', e);
+  }
+
   // Call success callback if provided
   if (onSuccess) {
     onSuccess();
@@ -72,4 +90,3 @@ export async function handleCopyOrDownload(markdown, { title, kpiType, successMe
 
   return { action, tokens };
 }
-
