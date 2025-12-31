@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { saveSetting, DEFAULTS } from '../popup.js';
+import { saveSetting, DEFAULTS } from '../../extension/popup.js';
 import { resetMockStorage } from './setup.js';
 
 describe('storage patterns (saveSetting)', () => {

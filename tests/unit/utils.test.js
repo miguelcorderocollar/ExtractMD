@@ -8,7 +8,7 @@ import {
   setButtonSuccess,
   setButtonError,
   setButtonNormal
-} from '../content/utils.js';
+} from '../../extension/content/utils.js';
 import { resetMockStorage } from './setup.js';
 
 describe('utils.js', () => {

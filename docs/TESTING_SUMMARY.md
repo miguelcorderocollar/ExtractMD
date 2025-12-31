@@ -18,7 +18,7 @@ Successfully implemented a comprehensive testing infrastructure for the ExtractM
 
 ### 2. Unit Tests Created ✅
 
-#### Utils Tests (`extension/__tests__/utils.test.js`)
+#### Utils Tests (`tests/unit/utils.test.js`)
 - ✅ getSettings returns defaults and stored values
 - ✅ copyToClipboard with/without timestamps
 - ✅ htmlToMarkdown conversion
@@ -26,7 +26,7 @@ Successfully implemented a comprehensive testing infrastructure for the ExtractM
 - ✅ Button state functions (loading, success, error, normal)
 - **12 tests passing**
 
-#### Markdown Conversion Tests (`extension/__tests__/markdown.test.js`)
+#### Markdown Conversion Tests (`tests/unit/markdown.test.js`)
 - ✅ Headers (h1-h6) conversion
 - ✅ Paragraphs with inline formatting
 - ✅ Unordered and ordered lists
@@ -36,13 +36,13 @@ Successfully implemented a comprehensive testing infrastructure for the ExtractM
 - **8 tests passing**
 - **Bug fixed**: List items weren't separated by newlines
 
-#### Storage Tests (`extension/__tests__/storage.test.js`)
+#### Storage Tests (`tests/unit/storage.test.js`)
 - ✅ saveSetting stores when different from default
 - ✅ saveSetting removes when matches default
 - ✅ Unknown keys saved for future compatibility
 - **3 tests passing**
 
-#### Popup Tests (`extension/__tests__/popup/`)
+#### Popup Tests (`tests/unit/popup/`)
 - **settings.test.js**: DEFAULTS object validation (2 tests)
 - **validation.test.js**: Domain validation regex (6 tests)
 - **kpi.test.js**: Time formatting and calculation (6 tests)
@@ -88,13 +88,13 @@ Current coverage (unit tests only):
 - ✅ Updated `package.json` with test scripts
 
 ### Unit Tests
-- ✅ `extension/__tests__/setup.js` - Chrome API mocks
-- ✅ `extension/__tests__/utils.test.js`
-- ✅ `extension/__tests__/markdown.test.js`
-- ✅ `extension/__tests__/storage.test.js`
-- ✅ `extension/__tests__/popup/settings.test.js`
-- ✅ `extension/__tests__/popup/validation.test.js`
-- ✅ `extension/__tests__/popup/kpi.test.js`
+- ✅ `tests/unit/setup.js` - Chrome API mocks
+- ✅ `tests/unit/utils.test.js`
+- ✅ `tests/unit/markdown.test.js`
+- ✅ `tests/unit/storage.test.js`
+- ✅ `tests/unit/popup/settings.test.js`
+- ✅ `tests/unit/popup/validation.test.js`
+- ✅ `tests/unit/popup/kpi.test.js`
 
 ### E2E Tests
 - ✅ `tests/e2e/helpers/extension.js`

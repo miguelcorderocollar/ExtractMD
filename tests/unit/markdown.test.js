@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { nodeToMarkdown } from '../content/articles.js';
+import { nodeToMarkdown } from '../../extension/content/articles.js';
 
 describe('nodeToMarkdown (DOM-based)', () => {
   const createNode = (html) => {

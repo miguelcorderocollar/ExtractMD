@@ -10,12 +10,13 @@
 | `popup.html` | 496 | Inline CSS (~230 lines), not reusable |
 | `youtube.js` | 334 | Floating button code duplicated |
 | `hackernews.js` | 352 | Floating button code duplicated |
-| `articles.js` | 339 | Floating button code duplicated |
+| `articles.js` | 340 | Floating button code duplicated |
 | `utils.js` | 185 | Good separation, but missing shared defaults |
 
 **Key Problems:**
-- ✅ ~~No tests exist~~ **COMPLETED: 37 unit tests + E2E infrastructure**
-- `DEFAULTS` object duplicated across popup.js and individual content scripts
+- ✅ ~~No tests exist~~ **COMPLETED: 37 unit tests + E2E infrastructure (Unit tests in tests/unit/)**
+- `DEFAULTS` object exists in `popup.js` but is duplicated across individual content scripts
+- `saveSetting()` exists in `popup.js` but is not shared
 - Floating button creation (~50 lines) copy-pasted 3 times
 - Copy/download/KPI logic repeated in each content module
 - popup.js handles 6+ distinct responsibilities
@@ -37,7 +38,7 @@ See [TESTING_SUMMARY.md](../TESTING_SUMMARY.md) for full details.
 
 ## Phase 2: Shared Defaults and Storage Module
 
-Create a single source of truth for defaults that both popup and content scripts use.
+Create a single source of truth for defaults that both popup and content scripts use. Currently, `popup.js` has its own `DEFAULTS` and `saveSetting`, while content scripts define defaults inline.
 
 ### New File: `extension/shared/defaults.js`
 
@@ -161,11 +162,14 @@ function pick(obj, keys) {
 ```
 
 **Migration Steps:**
-1. Create the shared modules
-2. Update imports in popup.js to use shared DEFAULTS
-3. Update imports in content scripts to use shared getSettings
-4. Remove duplicate DEFAULTS from popup.js
-5. Run tests to verify no regressions
+1. Create the `extension/shared/` directory
+2. Create the shared modules
+3. Update imports in popup.js to use shared DEFAULTS
+4. Update imports in content scripts to use shared getSettings
+5. Remove duplicate DEFAULTS from popup.js
+6. Run tests to verify no regressions
+
+*Note: Content scripts use ES modules and are bundled via esbuild. Shared modules will work correctly with the existing build system.*
 
 ---
 
@@ -420,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 ### Build Configuration Update
 
-Update `build.js` to bundle popup modules:
+**Prerequisite**: Ensure `extension/dist/` exists. Update `build.js` to bundle popup modules:
 
 ```javascript
 const esbuild = require('esbuild');
@@ -519,7 +523,7 @@ New for 2.0:
 **Recommended approach:** 
 1. ✅ Phase 1 completed - testing infrastructure in place
 2. 🔜 Start Phase 2 - extract shared defaults/storage (write tests first)
-3. Then continue with Phases 3-4 (components with tests)
+3. Then continue with Phases 3-4 (components with tests; these can be done in parallel)
 4. Finally Phase 5 (popup refactor with comprehensive tests)
 5. Phases 6-7 when ready for 2.0
 

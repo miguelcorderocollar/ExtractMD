@@ -4,12 +4,12 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    include: ['extension/__tests__/**/*.test.js'],
-    setupFiles: ['extension/__tests__/setup.js'],
+    include: ['tests/unit/**/*.test.js'],
+    setupFiles: ['tests/unit/setup.js'],
     coverage: {
       provider: 'v8',
       include: ['extension/**/*.js'],
-      exclude: ['extension/dist/**', 'extension/__tests__/**']
+      exclude: ['extension/dist/**', 'tests/unit/**']
     }
   }
 });
