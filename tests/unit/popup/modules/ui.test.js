@@ -21,26 +21,24 @@ describe('popup/ui module', () => {
       showStatus('Success!', 'success');
       
       expect(statusDiv.textContent).toBe('Success!');
-      expect(statusDiv.className).toBe('status success');
-      expect(statusDiv.style.display).toBe('block');
+      expect(statusDiv.className).toBe('status-toast visible success');
     });
 
     it('displays error message', () => {
       showStatus('Error!', 'error');
       
       expect(statusDiv.textContent).toBe('Error!');
-      expect(statusDiv.className).toBe('status error');
-      expect(statusDiv.style.display).toBe('block');
+      expect(statusDiv.className).toBe('status-toast visible error');
     });
 
-    it('hides after 3 seconds', () => {
+    it('hides after 3 seconds by removing visible class', () => {
       showStatus('Test', 'success');
       
-      expect(statusDiv.style.display).toBe('block');
+      expect(statusDiv.classList.contains('visible')).toBe(true);
       
       vi.advanceTimersByTime(3000);
       
-      expect(statusDiv.style.display).toBe('none');
+      expect(statusDiv.classList.contains('visible')).toBe(false);
     });
 
     it('handles missing status element gracefully', () => {
@@ -51,4 +49,3 @@ describe('popup/ui module', () => {
     });
   });
 });
-

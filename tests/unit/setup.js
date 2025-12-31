@@ -3,6 +3,9 @@ import { vi } from 'vitest';
 // Mock chrome.storage.sync
 const mockStorage = {};
 
+// Mock chrome.storage.local
+const mockLocalStorage = {};
+
 global.chrome = {
   storage: {
     sync: {
@@ -41,6 +44,46 @@ global.chrome = {
         if (callback) callback();
         return Promise.resolve();
       })
+    },
+    local: {
+      get: vi.fn((keys, callback) => {
+        const result = {};
+        let defaults = {};
+        
+        if (typeof keys === 'string') {
+          defaults = { [keys]: undefined };
+        } else if (Array.isArray(keys)) {
+          keys.forEach(k => defaults[k] = undefined);
+        } else {
+          defaults = keys || {};
+        }
+
+        for (const key of Object.keys(defaults)) {
+          result[key] = mockLocalStorage[key] !== undefined ? mockLocalStorage[key] : defaults[key];
+        }
+        
+        if (callback) callback(result);
+        return Promise.resolve(result);
+      }),
+      set: vi.fn((items, callback) => {
+        Object.assign(mockLocalStorage, items);
+        if (callback) callback();
+        return Promise.resolve();
+      }),
+      remove: vi.fn((keys, callback) => {
+        const keysArr = Array.isArray(keys) ? keys : [keys];
+        keysArr.forEach(k => delete mockLocalStorage[k]);
+        if (callback) callback();
+        return Promise.resolve();
+      }),
+      clear: vi.fn((callback) => {
+        Object.keys(mockLocalStorage).forEach(k => delete mockLocalStorage[k]);
+        if (callback) callback();
+        return Promise.resolve();
+      })
+    },
+    onChanged: {
+      addListener: vi.fn()
     }
   },
   runtime: {
@@ -77,5 +120,6 @@ global.chrome = {
 // Helper to reset storage between tests
 export function resetMockStorage() {
   Object.keys(mockStorage).forEach(key => delete mockStorage[key]);
+  Object.keys(mockLocalStorage).forEach(key => delete mockLocalStorage[key]);
 }
 

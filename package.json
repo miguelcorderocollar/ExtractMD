@@ -14,6 +14,7 @@
     "test:e2e": "playwright test",
     "test:all": "npm run test:run && npm run test:e2e",
     "build": "node build.js",
+    "build:prod": "node build.js --production",
     "watch": "esbuild extension/content.js --bundle --outfile=extension/dist/content.js --format=iife --sourcemap --watch"
   },
   "repository": {

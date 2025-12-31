@@ -1,48 +1,86 @@
-# ExtractMD 2.0: UI/UX Redesign Documentation
+# ExtractMD 2.0: UI/UX Redesign Plan
 
-## Overview
-ExtractMD 2.0 introduces a modern, streamlined user experience by splitting configuration and quick actions into two distinct areas:
-
-- **Popup**: For fast, in-context actions and status.
-- **Options Page**: For all settings, customization, and advanced features.
-
----
-
-## Popup (Quick Actions & Status)
-The popup is now a focused command center for the most common, immediate actions. It is designed for speed and clarity, with minimal clutter.
-
-### Features in the Popup
-- **Extract/Copy Now**: One-click extraction and copying of content (transcript, article, comments) from the current tab, using saved settings.
-- **Download as Markdown**: Option to download the extracted content as a `.md` file.
-- **Open in Target Domain**: If enabled, a button to open the extracted content in a configured site (e.g., ChatGPT, Notion, etc.).
-- **Last Extraction Status**: Displays a brief message about the last extraction (success, error, what was copied, etc.).
-- **KPI Counters**: Shows a summary of usage statistics (e.g., number of extractions, articles exported, etc.), with a button to view details or reset counters.
-- **Settings Button**: Opens the full options page in a new tab.
-- **About/Help**: Link to documentation or a help page.
-- **Preview Markdown**: Show a preview of the content to be copied/downloaded.
-- **Extract & Paste**: If on a supported site, a button to extract and auto-paste into the current input box.
-
-#### Not Included
-- No detailed settings or configuration toggles.
-- No import/export (moved to options page).
-- No "Switch Mode/Quick Switch" or "Pin Last Extraction" features.
+## Goal
+Split the extension into two distinct interfaces:
+- **Popup**: Quick actions only (extract, domain toggle, status)
+- **Options Page**: All settings and configuration
 
 ---
 
-## Options Page (Full Settings)
-The options page is a full-page interface, opened in a new tab, with ample space for all configuration and advanced features.
+## Popup Features
+- Extract Now button ✅ (implemented)
+- Disable/Enable on Current Domain toggle ✅ (implemented)
+- Open Target Domain button ✅ (implemented, shows when configured)
+- Last Extraction Status display ✅ (implemented)
+- KPI Summary ✅ (implemented)
+- Settings button → opens options page ✅ (implemented)
 
-### Features in the Options Page
-- **All Settings**: All checkboxes, toggles, and configuration options for extraction behavior, integrations, and appearance.
-- **Import/Export Settings**: Backup and restore your settings via JSON files.
-- **KPI Details**: View and reset detailed usage statistics.
-- **Advanced Features**: Any future advanced or rarely-used features.
-- **Help/Documentation**: Links to guides, FAQs, and support.
+## Options Page Features
+- All settings (YouTube, HN, Articles, General) ✅ (implemented)
+- Import/Export ✅ (implemented)
+- KPI Details with clear button ✅ (implemented)
+- Help/About section
 
 ---
 
-## Rationale
-- **Popup**: Fast, actionable, and minimal—ideal for in-the-moment use.
-- **Options Page**: Spacious, organized, and comprehensive—ideal for setup and customization.
+## Implementation Plan
 
-This separation ensures a clean, user-friendly experience for both new and advanced users. 
+### Phase 1: Options Page (Foundation) ✅ COMPLETED
+Create the options page and migrate settings from popup.
+
+**Tasks:**
+1. Create `options.html` with all settings UI ✅
+2. Create `options/` module folder with settings logic ✅
+3. Register options page in `manifest.json` ✅
+4. Add "Open Settings" button to popup ✅
+5. Update tests ✅
+
+**Result:** Options page works with all settings.
+
+---
+
+### Phase 2: Popup Redesign ✅ COMPLETED
+Strip settings from popup, add action buttons.
+
+**Tasks:**
+1. Remove settings accordions from popup ✅
+2. Add "Extract Now" button (triggers `copyExtractMD()`) ✅
+3. Add "Open Target Domain" button (if enabled) ✅
+4. Keep domain ignore toggle ✅
+5. Keep KPI summary ✅
+6. Add last extraction status display ✅
+7. Update popup CSS for new layout ✅
+8. Update tests ✅
+
+**Result:** Clean popup with quick actions, settings in options page.
+
+---
+
+### Phase 3: New Features (Future)
+Add features that don't exist yet.
+
+- **Download from Popup**: One-click download button in popup
+- **Preview Markdown**: Preview before copy/download
+- **Extract & Paste**: Auto-paste into input boxes on supported sites
+- **Enhanced KPI Dashboard**: Charts and detailed stats in options page
+- **Help Page**: Documentation and FAQs
+
+---
+
+## Feature Status
+
+| Feature | Current Status |
+|---------|----------------|
+| Extract via keyboard shortcut | ✅ Works |
+| Extract via floating button | ✅ Works |
+| Extract via popup button | ✅ Works |
+| Download as .md | ✅ Works (via settings) |
+| Domain ignore toggle | ✅ Works |
+| KPI counters | ✅ Works |
+| Jump to target domain | ✅ Works (auto) |
+| Manual target domain button | ✅ Works |
+| Options page | ✅ Works |
+| Last extraction status in popup | ✅ Works |
+| Download button in popup | ❌ Future |
+| Preview markdown | ❌ Future |
+| Extract & paste | ❌ Future |
