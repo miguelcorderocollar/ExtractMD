@@ -6,8 +6,8 @@ import { updateIgnoreButtonState } from './domainIgnore.js';
 import { applyInitialIntegrationVisibility, updateIntegrationVisibility } from './integrationVisibility.js';
 
 /**
- * Mapping of setting keys to their DOM element IDs
- * Format: { settingKey: { id: 'elementId', type: 'checkbox' | 'text' | 'number' } }
+ * Mapping of setting keys to their DOM element IDs and types
+ * Web Components use setting-id attribute, regular elements use id
  */
 const SETTING_ELEMENTS = {
     // YouTube settings
@@ -65,29 +65,81 @@ const SETTING_ELEMENTS = {
 };
 
 /**
+ * Find a setting element by its setting-id or id
+ * Supports both Web Components and regular elements
+ * @param {string} settingId - The setting ID to find
+ * @returns {Element|null}
+ */
+function findSettingElement(settingId) {
+    // First try to find a Web Component by setting-id attribute
+    let element = document.querySelector(`[setting-id="${settingId}"]`);
+    
+    // Fall back to regular id lookup
+    if (!element) {
+        element = document.getElementById(settingId);
+    }
+    
+    return element;
+}
+
+/**
+ * Check if an element is a Web Component (custom element)
+ * @param {Element} element 
+ * @returns {boolean}
+ */
+function isWebComponent(element) {
+    return element && element.tagName && element.tagName.includes('-');
+}
+
+/**
+ * Get the input element from a Web Component or return the element itself
+ * @param {Element} element 
+ * @returns {Element}
+ */
+function getInputElement(element) {
+    if (isWebComponent(element)) {
+        // Try to get the inner input/select element
+        const inner = element.querySelector('input, select, textarea');
+        return inner || element;
+    }
+    return element;
+}
+
+/**
  * Load settings from storage and populate form elements
  */
 export function loadSettings() {
     chrome.storage.sync.get(DEFAULTS, function(items) {
         for (const [key, config] of Object.entries(SETTING_ELEMENTS)) {
-            const element = document.getElementById(config.id);
+            const element = findSettingElement(config.id);
             if (!element) continue;
             
             const value = items[key];
             
             if (config.type === 'checkbox') {
-                // Handle invertDefault for boolean settings that default to true
-                if (config.invertDefault) {
-                    element.checked = value !== false;
+                const checkedValue = config.invertDefault ? value !== false : value;
+                
+                if (isWebComponent(element)) {
+                    // For Web Components, set the checked property
+                    element.checked = checkedValue;
                 } else {
-                    element.checked = value;
+                    element.checked = checkedValue;
                 }
             } else if (config.type === 'text' || config.type === 'textarea') {
-                element.value = value || '';
+                if (isWebComponent(element)) {
+                    element.value = value || '';
+                } else {
+                    element.value = value || '';
+                }
             } else if (config.type === 'number') {
-                element.value = value || '';
+                const inputEl = getInputElement(element);
+                inputEl.value = value || '';
             } else if (config.type === 'select') {
-                element.value = value || '';
+                if (isWebComponent(element)) {
+                    element.value = value || 'auto';
+                } else {
+                    element.value = value || '';
+                }
             }
         }
         
@@ -110,18 +162,29 @@ export function loadSettings() {
  */
 export function attachSettingHandlers() {
     for (const [key, config] of Object.entries(SETTING_ELEMENTS)) {
-        const element = document.getElementById(config.id);
+        const element = findSettingElement(config.id);
         if (!element) continue;
         
         if (config.type === 'checkbox') {
-            element.addEventListener('change', function() {
-                saveSetting(key, element.checked);
+            // Handle both Web Components and regular checkboxes
+            element.addEventListener('change', function(e) {
+                // Get the checked value (Web Component provides it in detail, or from the input)
+                let checked;
+                if (e.detail && typeof e.detail.checked !== 'undefined') {
+                    checked = e.detail.checked;
+                } else if (isWebComponent(element)) {
+                    checked = element.checked;
+                } else {
+                    checked = element.checked;
+                }
+                
+                saveSetting(key, checked);
                 
                 // Special handling for KPI visibility
                 if (key === 'enableUsageKpi') {
                     const kpiSection = document.getElementById('kpi-section');
                     if (kpiSection) {
-                        kpiSection.style.display = element.checked ? 'flex' : 'none';
+                        kpiSection.style.display = checked ? 'flex' : 'none';
                     }
                 }
                 
@@ -136,33 +199,51 @@ export function attachSettingHandlers() {
         } else if (config.type === 'text' || config.type === 'textarea') {
             // Text inputs are handled separately (domain validation, etc.)
             if (key === 'jumpToDomainUrl' || key === 'universalCustomSelector') {
-                element.addEventListener('input', function() {
-                    saveSetting(key, element.value);
+                const inputEl = getInputElement(element);
+                inputEl.addEventListener('input', function() {
+                    saveSetting(key, inputEl.value);
                 });
             }
             // ignoredDomains is handled by domainIgnore.js
         } else if (config.type === 'number') {
-            element.addEventListener('input', function() {
-                let val = parseInt(element.value, 10);
+            // Handle both Web Components and regular number inputs
+            element.addEventListener('change', function(e) {
+                let val;
+                if (e.detail && typeof e.detail.value !== 'undefined') {
+                    val = parseInt(e.detail.value, 10);
+                } else {
+                    const inputEl = getInputElement(element);
+                    val = parseInt(inputEl.value, 10);
+                }
                 if (isNaN(val) || val < 0) val = 0;
                 saveSetting(key, val);
             });
         } else if (config.type === 'select') {
-            element.addEventListener('change', function() {
-                saveSetting(key, element.value);
+            element.addEventListener('change', function(e) {
+                let value;
+                if (e.detail && typeof e.detail.value !== 'undefined') {
+                    value = e.detail.value;
+                } else if (isWebComponent(element)) {
+                    value = element.value;
+                } else {
+                    value = element.value;
+                }
+                
+                saveSetting(key, value);
                 
                 // Special handling for content mode selector visibility
                 if (key === 'universalContentMode') {
-                    updateCustomSelectorVisibility(element.value);
+                    updateCustomSelectorVisibility(value);
                 }
             });
         }
     }
     
     // Initialize custom selector visibility
-    const contentModeSelect = document.getElementById('universalContentMode');
-    if (contentModeSelect) {
-        updateCustomSelectorVisibility(contentModeSelect.value);
+    const contentModeEl = findSettingElement('universalContentMode');
+    if (contentModeEl) {
+        const value = isWebComponent(contentModeEl) ? contentModeEl.value : contentModeEl.value;
+        updateCustomSelectorVisibility(value || 'auto');
     }
 }
 
@@ -197,4 +278,3 @@ export function initializeSettings() {
     loadSettings();
     attachSettingHandlers();
 }
-

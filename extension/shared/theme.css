@@ -277,6 +277,29 @@ body {
   border-color: var(--accent);
 }
 
+/* Select Inputs */
+.input-select {
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  min-width: 160px;
+}
+
+.input-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.input-select:hover {
+  border-color: var(--border-strong);
+}
+
 /* Textarea */
 .input-textarea {
   width: 100%;
@@ -288,7 +311,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   resize: vertical;
-  min-height: 80px;
+  min-height: 160px;
   transition: var(--transition-fast);
 }
 
