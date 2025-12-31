@@ -5,6 +5,146 @@ import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
 let articleObserver = null;
+let floatingButton = null;
+
+// Shared copy logic
+export async function performArticleCopy(updateButton = false) {
+  if (isProcessing) return;
+  isProcessing = true;
+  const button = updateButton ? floatingButton : null;
+  if (button) setButtonLoading(button);
+  
+  try {
+    const settings = await new Promise(resolve => {
+      chrome.storage.sync.get({ 
+        articleExporterIncludeImages: true,
+        articleExporterOnlyLongest: false,
+        articleExporterShowInfo: true,
+        articleExporterIncludeUrl: true,
+        downloadInsteadOfCopy: false,
+        downloadIfTokensExceed: 0
+      }, resolve);
+    });
+    const currentArticles = Array.from(document.querySelectorAll('article'));
+    let md = '';
+    let totalArticles = currentArticles.length;
+    
+    // If only longest article is enabled and there are multiple articles
+    if (settings.articleExporterOnlyLongest && currentArticles.length > 1) {
+      // Find the longest article by text content length
+      const articleLengths = await Promise.all(currentArticles.map(async (article, index) => {
+        const articleMd = await extractArticleMarkdown(article, settings.articleExporterIncludeImages);
+        return { index, length: articleMd.length, article, markdown: articleMd };
+      }));
+      
+      // Sort by length (descending) and take the longest
+      articleLengths.sort((a, b) => b.length - a.length);
+      const longestArticle = articleLengths[0];
+      md = longestArticle.markdown;
+      
+      // Add URL if setting is enabled
+      if (settings.articleExporterIncludeUrl) {
+        const pageUrl = window.location.href;
+        const pageTitle = document.title || 'Article';
+        md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
+      }
+    } else {
+      // Process all articles as before
+      if (currentArticles.length === 1) {
+        md = await extractArticleMarkdown(currentArticles[0], settings.articleExporterIncludeImages);
+      } else {
+        const mdArr = await Promise.all(currentArticles.map((a, i) => extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(md => `## Article ${i+1}\n\n${md}`)));
+        md = mdArr.join('\n\n---\n\n');
+      }
+    }
+    
+    // Add URL if setting is enabled
+    if (settings.articleExporterIncludeUrl && !(settings.articleExporterOnlyLongest && currentArticles.length > 1)) {
+      const pageUrl = window.location.href;
+      const pageTitle = document.title || 'Article';
+      md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
+    }
+    
+    chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
+      const processedCount = settings.articleExporterOnlyLongest && totalArticles > 1 ? 1 : totalArticles;
+      if (items.downloadInsteadOfCopy) {
+        downloadMarkdownFile(md, document.title, 'ExtractMD');
+        if (button) setButtonSuccess(button);
+        if (settings.articleExporterOnlyLongest && totalArticles > 1) {
+          showSuccessNotificationWithTokens(`1/${totalArticles} Articles downloaded as Markdown!`, md);
+        } else {
+          const articleText = processedCount === 1 ? 'Article' : 'Articles';
+          showSuccessNotificationWithTokens(`${processedCount} ${articleText} downloaded as Markdown!`, md);
+        }
+      } else {
+        // Check token threshold
+        let threshold = parseInt(items.downloadIfTokensExceed, 10);
+        if (!isNaN(threshold) && threshold > 0) {
+          const tokens = encode(md).length;
+          if (tokens >= threshold * 1000) {
+            downloadMarkdownFile(md, document.title, 'ExtractMD');
+            if (button) setButtonSuccess(button);
+            if (settings.articleExporterOnlyLongest && totalArticles > 1) {
+              showSuccessNotificationWithTokens(`1/${totalArticles} Articles downloaded as Markdown! (token threshold)`, md);
+            } else {
+              const articleText = processedCount === 1 ? 'Article' : 'Articles';
+              showSuccessNotificationWithTokens(`${processedCount} ${articleText} downloaded as Markdown! (token threshold)`, md);
+            }
+            return;
+          }
+        }
+        copyToClipboard(md, true);
+        if (button) setButtonSuccess(button);
+        if (settings.articleExporterOnlyLongest && totalArticles > 1) {
+          showSuccessNotificationWithTokens(`1/${totalArticles} Articles copied as Markdown!`, md);
+        } else {
+          const articleText = processedCount === 1 ? 'Article' : 'Articles';
+          showSuccessNotificationWithTokens(`${processedCount} ${articleText} copied as Markdown!`, md);
+        }
+      }
+    });
+    
+    // Increment KPI counter only if enabled
+    chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
+      if (items.enableUsageKpi !== false) {
+        const stats = items.usageStats || {};
+        stats.articles = (stats.articles || 0) + 1;
+        chrome.storage.sync.set({ usageStats: stats });
+      }
+    });
+    
+    // Check global jumpToDomain setting
+    const globalSettings = await getSettings();
+    if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
+      chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
+    }
+    // Close tab after extraction if setting is enabled
+    if (globalSettings.closeTabAfterExtraction) {
+      setTimeout(() => {
+        closeCurrentTab();
+      }, 500);
+    }
+    if (button) {
+      setTimeout(() => {
+        setButtonNormal(button);
+        isProcessing = false;
+      }, 2000);
+    } else {
+      isProcessing = false;
+    }
+  } catch (e) {
+    if (button) {
+      setButtonError(button);
+      setTimeout(() => {
+        setButtonNormal(button);
+        isProcessing = false;
+      }, 3000);
+    } else {
+      isProcessing = false;
+    }
+    showNotification('Failed to copy article(s).', 'error');
+  }
+}
 
 async function extractArticleMarkdown(articleElem, includeImages) {
   function nodeToMarkdown(node) {
@@ -124,7 +264,7 @@ async function showArticleInfoNotification(articles, highlightLongest = false) {
 
 function manageFloatingButtonForArticles() {
   const articles = Array.from(document.querySelectorAll('article'));
-  let floatingButton = document.getElementById('yt-transcript-floating-button');
+  floatingButton = document.getElementById('yt-transcript-floating-button');
   if (articles.length > 0) {
     if (!floatingButton) {
       floatingButton = document.createElement('div');
@@ -164,132 +304,7 @@ function manageFloatingButtonForArticles() {
         }
       });
       floatingButton.addEventListener('click', async () => {
-        if (isProcessing) return;
-        isProcessing = true;
-        setButtonLoading(floatingButton);
-        try {
-          const settings = await new Promise(resolve => {
-            chrome.storage.sync.get({ 
-              articleExporterIncludeImages: true,
-              articleExporterOnlyLongest: false,
-              articleExporterShowInfo: true,
-              articleExporterIncludeUrl: true,
-              downloadInsteadOfCopy: false,
-              downloadIfTokensExceed: 0
-            }, resolve);
-          });
-          const currentArticles = Array.from(document.querySelectorAll('article'));
-          let md = '';
-          let articlesToProcess = currentArticles;
-          let totalArticles = currentArticles.length;
-          
-          // If only longest article is enabled and there are multiple articles
-          if (settings.articleExporterOnlyLongest && currentArticles.length > 1) {
-            // Find the longest article by text content length
-            const articleLengths = await Promise.all(currentArticles.map(async (article, index) => {
-              const articleMd = await extractArticleMarkdown(article, settings.articleExporterIncludeImages);
-              return { index, length: articleMd.length, article, markdown: articleMd };
-            }));
-            
-            // Sort by length (descending) and take the longest
-            articleLengths.sort((a, b) => b.length - a.length);
-            const longestArticle = articleLengths[0];
-            articlesToProcess = [longestArticle.article];
-            md = longestArticle.markdown;
-            
-            // Add URL if setting is enabled
-            if (settings.articleExporterIncludeUrl) {
-              const pageUrl = window.location.href;
-              const pageTitle = document.title || 'Article';
-              md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
-            }
-          } else {
-            // Process all articles as before
-            if (currentArticles.length === 1) {
-              md = await extractArticleMarkdown(currentArticles[0], settings.articleExporterIncludeImages);
-            } else {
-              const mdArr = await Promise.all(currentArticles.map((a, i) => extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(md => `## Article ${i+1}\n\n${md}`)));
-              md = mdArr.join('\n\n---\n\n');
-            }
-          }
-          
-          // Add URL if setting is enabled
-          if (settings.articleExporterIncludeUrl) {
-            const pageUrl = window.location.href;
-            const pageTitle = document.title || 'Article';
-            md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
-          }
-          
-          chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
-            if (items.downloadInsteadOfCopy) {
-              downloadMarkdownFile(md, document.title, 'ExtractMD');
-              setButtonSuccess(floatingButton);
-              if (settings.articleExporterOnlyLongest && totalArticles > 1) {
-                showSuccessNotificationWithTokens(`1/${totalArticles} Articles downloaded as Markdown!`, md);
-              } else {
-                const articleText = processedCount === 1 ? 'Article' : 'Articles';
-                showSuccessNotificationWithTokens(`${processedCount} ${articleText} downloaded as Markdown!`, md);
-              }
-            } else {
-              // Check token threshold
-              let threshold = parseInt(items.downloadIfTokensExceed, 10);
-              if (!isNaN(threshold) && threshold > 0) {
-                const tokens = encode(md).length;
-                if (tokens >= threshold * 1000) {
-                  downloadMarkdownFile(md, document.title, 'ExtractMD');
-                  setButtonSuccess(floatingButton);
-                  if (settings.articleExporterOnlyLongest && totalArticles > 1) {
-                    showSuccessNotificationWithTokens(`1/${totalArticles} Articles downloaded as Markdown! (token threshold)`, md);
-                  } else {
-                    const articleText = processedCount === 1 ? 'Article' : 'Articles';
-                    showSuccessNotificationWithTokens(`${processedCount} ${articleText} downloaded as Markdown! (token threshold)`, md);
-                  }
-                  return;
-                }
-              }
-              copyToClipboard(md, true);
-              setButtonSuccess(floatingButton);
-              if (settings.articleExporterOnlyLongest && totalArticles > 1) {
-                showSuccessNotificationWithTokens(`1/${totalArticles} Articles copied as Markdown!`, md);
-              } else {
-                const articleText = processedCount === 1 ? 'Article' : 'Articles';
-                showSuccessNotificationWithTokens(`${processedCount} ${articleText} copied as Markdown!`, md);
-              }
-            }
-          });
-          
-          // Increment KPI counter only if enabled
-          chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
-            if (items.enableUsageKpi !== false) {
-              const stats = items.usageStats || {};
-              stats.articles = (stats.articles || 0) + 1;
-              chrome.storage.sync.set({ usageStats: stats });
-            }
-          });
-          
-          // Check global jumpToDomain setting
-          const globalSettings = await getSettings();
-          if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
-            chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
-          }
-          // Close tab after extraction if setting is enabled
-          if (globalSettings.closeTabAfterExtraction) {
-            setTimeout(() => {
-              closeCurrentTab();
-            }, 500); // Wait 500ms after showing the notification
-          }
-          setTimeout(() => {
-            setButtonNormal(floatingButton);
-            isProcessing = false;
-          }, 2000);
-        } catch (e) {
-          setButtonError(floatingButton);
-          showNotification('Failed to copy article(s).', 'error');
-          setTimeout(() => {
-            setButtonNormal(floatingButton);
-            isProcessing = false;
-          }, 3000);
-        }
+        await performArticleCopy(true);
       });
       document.body.appendChild(floatingButton);
       console.debug('[ExtractMD] Floating button created and added to DOM (Article)');

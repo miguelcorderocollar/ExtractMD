@@ -40,4 +40,34 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     chrome.tabs.remove(sender.tab.id);
     sendResponse({ success: true });
   }
-}); 
+});
+
+// Handle keyboard shortcut command
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command === 'copy-content') {
+    try {
+      // Get the active tab
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab || !tab.id) return;
+
+      // Execute script to trigger copy
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: triggerCopy
+      });
+    } catch (error) {
+      console.error('Error executing copy command:', error);
+    }
+  }
+});
+
+// Function that will be injected into the page to trigger copy
+function triggerCopy() {
+  // Try to call the unified copy function
+  if (window.copyExtractMD) {
+    window.copyExtractMD();
+  } else if (window.copyYouTubeTranscript) {
+    // Fallback to YouTube function for backward compatibility
+    window.copyYouTubeTranscript();
+  }
+} 

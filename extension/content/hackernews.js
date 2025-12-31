@@ -5,134 +5,149 @@ import { encode } from 'gpt-tokenizer';
 let isProcessing = false;
 let floatingButton = null;
 
-function handleHNFloatingButtonClick() {
-  return async function() {
-    try {
-      isProcessing = true;
-      setButtonLoading(floatingButton);
-      let md = '';
-      if (isHNItemPage()) {
-        const settings = await new Promise(resolve => {
-          chrome.storage.sync.get({
-            hnIncludeAuthor: true,
-            hnIncludeTime: true,
-            hnIncludeReplies: true,
-            hnIncludeUrl: true,
-            hnIncludeItemText: true
-          }, resolve);
-        });
-        md = extractHNCommentsMarkdown(settings);
-        chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
-          if (items.downloadInsteadOfCopy) {
-            downloadMarkdownFile(md, document.title, 'ExtractMD');
-            setButtonSuccess(floatingButton);
-            showSuccessNotificationWithTokens('HN comments downloaded as .md!', md);
-          } else {
-            // Check token threshold
-            let threshold = parseInt(items.downloadIfTokensExceed, 10);
-            if (!isNaN(threshold) && threshold > 0) {
-              const tokens = encode(md).length;
-              if (tokens >= threshold * 1000) {
-                downloadMarkdownFile(md, document.title, 'ExtractMD');
-                setButtonSuccess(floatingButton);
-                showSuccessNotificationWithTokens('HN comments downloaded as .md (token threshold)!', md);
-                return;
-              }
+// Shared copy logic
+export async function performHNCopy(updateButton = false) {
+  if (isProcessing) return;
+  isProcessing = true;
+  if (updateButton && floatingButton) setButtonLoading(floatingButton);
+  
+  try {
+    let md = '';
+    if (isHNItemPage()) {
+      const settings = await new Promise(resolve => {
+        chrome.storage.sync.get({
+          hnIncludeAuthor: true,
+          hnIncludeTime: true,
+          hnIncludeReplies: true,
+          hnIncludeUrl: true,
+          hnIncludeItemText: true
+        }, resolve);
+      });
+      md = extractHNCommentsMarkdown(settings);
+      chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
+        if (items.downloadInsteadOfCopy) {
+          downloadMarkdownFile(md, document.title, 'ExtractMD');
+          if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+          showSuccessNotificationWithTokens('HN comments downloaded as .md!', md);
+        } else {
+          // Check token threshold
+          let threshold = parseInt(items.downloadIfTokensExceed, 10);
+          if (!isNaN(threshold) && threshold > 0) {
+            const tokens = encode(md).length;
+            if (tokens >= threshold * 1000) {
+              downloadMarkdownFile(md, document.title, 'ExtractMD');
+              if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+              showSuccessNotificationWithTokens('HN comments downloaded as .md (token threshold)!', md);
+              return;
             }
-            copyToClipboard(md, true);
-            setButtonSuccess(floatingButton);
-            showSuccessNotificationWithTokens('HN comments copied to clipboard!', md);
           }
-        });
-        // Increment KPI counter for HN Comments only if enabled
-        chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
-          if (items.enableUsageKpi !== false) {
-            const stats = items.usageStats || {};
-            stats.hn_comments = (stats.hn_comments || 0) + 1;
-            chrome.storage.sync.set({ usageStats: stats });
-          }
-        });
-        // Check global jumpToDomain setting
-        const globalSettings = await getSettings();
-        if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
-          chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
+          copyToClipboard(md, true);
+          if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+          showSuccessNotificationWithTokens('HN comments copied to clipboard!', md);
         }
-        // Close tab after extraction if setting is enabled
-        if (globalSettings.closeTabAfterExtraction) {
-          setTimeout(() => {
-            closeCurrentTab();
-          }, 500); // Wait 500ms after showing the notification
+      });
+      // Increment KPI counter for HN Comments only if enabled
+      chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
+        if (items.enableUsageKpi !== false) {
+          const stats = items.usageStats || {};
+          stats.hn_comments = (stats.hn_comments || 0) + 1;
+          chrome.storage.sync.set({ usageStats: stats });
         }
-      } else if (isHNNewsPage()) {
-        const settings = await new Promise(resolve => {
-          chrome.storage.sync.get({
-            hnNewsIncludeTitle: true,
-            hnNewsIncludeUrl: true,
-            hnNewsIncludeSite: true,
-            hnNewsIncludePoints: true,
-            hnNewsIncludeAuthor: true,
-            hnNewsIncludeTime: true,
-            hnNewsIncludeComments: true
-          }, resolve);
-        });
-        md = extractHNNewsMarkdown(settings);
-        chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
-          if (items.downloadInsteadOfCopy) {
-            downloadMarkdownFile(md, document.title, 'ExtractMD');
-            setButtonSuccess(floatingButton);
-            showSuccessNotificationWithTokens('HN news downloaded as .md!', md);
-          } else {
-            // Check token threshold
-            let threshold = parseInt(items.downloadIfTokensExceed, 10);
-            if (!isNaN(threshold) && threshold > 0) {
-              const tokens = encode(md).length;
-              if (tokens >= threshold * 1000) {
-                downloadMarkdownFile(md, document.title, 'ExtractMD');
-                setButtonSuccess(floatingButton);
-                showSuccessNotificationWithTokens('HN news downloaded as .md (token threshold)!', md);
-                return;
-              }
-            }
-            copyToClipboard(md, true);
-            setButtonSuccess(floatingButton);
-            showSuccessNotificationWithTokens('HN news copied to clipboard!', md);
-          }
-        });
-        // Increment KPI counter for HN News only if enabled
-        chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
-          if (items.enableUsageKpi !== false) {
-            const stats = items.usageStats || {};
-            stats.hn_news = (stats.hn_news || 0) + 1;
-            chrome.storage.sync.set({ usageStats: stats });
-          }
-        });
-        // Check global jumpToDomain setting
-        const globalSettings = await getSettings();
-        if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
-          chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
-        }
-        // Close tab after extraction if setting is enabled
-        if (globalSettings.closeTabAfterExtraction) {
-          setTimeout(() => {
-            closeCurrentTab();
-          }, 500); // Wait 500ms after showing the notification
-        }
-      } else {
-        setButtonError(floatingButton);
-        showNotification('Not a supported HN page.', 'error');
+      });
+      // Check global jumpToDomain setting
+      const globalSettings = await getSettings();
+      if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
+        chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
       }
+      // Close tab after extraction if setting is enabled
+      if (globalSettings.closeTabAfterExtraction) {
+        setTimeout(() => {
+          closeCurrentTab();
+        }, 500);
+      }
+    } else if (isHNNewsPage()) {
+      const settings = await new Promise(resolve => {
+        chrome.storage.sync.get({
+          hnNewsIncludeTitle: true,
+          hnNewsIncludeUrl: true,
+          hnNewsIncludeSite: true,
+          hnNewsIncludePoints: true,
+          hnNewsIncludeAuthor: true,
+          hnNewsIncludeTime: true,
+          hnNewsIncludeComments: true
+        }, resolve);
+      });
+      md = extractHNNewsMarkdown(settings);
+      chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
+        if (items.downloadInsteadOfCopy) {
+          downloadMarkdownFile(md, document.title, 'ExtractMD');
+          if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+          showSuccessNotificationWithTokens('HN news downloaded as .md!', md);
+        } else {
+          // Check token threshold
+          let threshold = parseInt(items.downloadIfTokensExceed, 10);
+          if (!isNaN(threshold) && threshold > 0) {
+            const tokens = encode(md).length;
+            if (tokens >= threshold * 1000) {
+              downloadMarkdownFile(md, document.title, 'ExtractMD');
+              if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+              showSuccessNotificationWithTokens('HN news downloaded as .md (token threshold)!', md);
+              return;
+            }
+          }
+          copyToClipboard(md, true);
+          if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+          showSuccessNotificationWithTokens('HN news copied to clipboard!', md);
+        }
+      });
+      // Increment KPI counter for HN News only if enabled
+      chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
+        if (items.enableUsageKpi !== false) {
+          const stats = items.usageStats || {};
+          stats.hn_news = (stats.hn_news || 0) + 1;
+          chrome.storage.sync.set({ usageStats: stats });
+        }
+      });
+      // Check global jumpToDomain setting
+      const globalSettings = await getSettings();
+      if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
+        chrome.runtime.sendMessage({ action: 'openNewTab', url: globalSettings.jumpToDomainUrl });
+      }
+      // Close tab after extraction if setting is enabled
+      if (globalSettings.closeTabAfterExtraction) {
+        setTimeout(() => {
+          closeCurrentTab();
+        }, 500);
+      }
+    } else {
+      if (updateButton && floatingButton) setButtonError(floatingButton);
+      showNotification('Not a supported HN page.', 'error');
+    }
+    if (updateButton && floatingButton) {
       setTimeout(() => {
         setButtonNormal(floatingButton);
         isProcessing = false;
       }, 2000);
-    } catch (error) {
+    } else {
+      isProcessing = false;
+    }
+  } catch (error) {
+    if (updateButton && floatingButton) {
       setButtonError(floatingButton);
-      showNotification('Failed to copy HN content.', 'error');
       setTimeout(() => {
         setButtonNormal(floatingButton);
         isProcessing = false;
       }, 3000);
+    } else {
+      isProcessing = false;
     }
+    showNotification('Failed to copy HN content.', 'error');
+  }
+}
+
+function handleHNFloatingButtonClick() {
+  return async function() {
+    await performHNCopy(true);
   };
 }
 
