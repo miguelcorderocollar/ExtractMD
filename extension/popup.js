@@ -365,6 +365,46 @@ document.addEventListener('DOMContentLoaded', function() {
             <span title="HN comments exports">HN Comments: <b>${stats.hn_comments || 0}</b></span>
             <span title="HN news exports">HN News: <b>${stats.hn_news || 0}</b></span>
         `;
+
+        // Calculate time saved
+        const estimates = {
+            youtube: 60,    
+            articles: 30,   
+            hn_comments: 40, 
+            hn_news: 20   
+        };
+
+        const totalSeconds = 
+            (stats.youtube || 0) * estimates.youtube +
+            (stats.articles || 0) * estimates.articles +
+            (stats.hn_comments || 0) * estimates.hn_comments +
+            (stats.hn_news || 0) * estimates.hn_news;
+
+        const timeSavedElement = document.getElementById('kpi-time-saved');
+        if (totalSeconds > 0) {
+            timeSavedElement.style.display = 'block';
+            timeSavedElement.innerHTML = `Estimated time saved: ~<b>${formatTimeSaved(totalSeconds)}</b>`;
+        } else {
+            timeSavedElement.style.display = 'none';
+        }
+    }
+
+    // Helper: Format time saved
+    function formatTimeSaved(totalSeconds) {
+        if (totalSeconds < 60) return `${totalSeconds}s`;
+        
+        const minutes = totalSeconds / 60;
+        if (minutes < 60) {
+            return `${Math.round(minutes)}m`;
+        }
+        
+        const hours = minutes / 60;
+        if (hours < 24) {
+            return `${hours.toFixed(1).replace('.0', '')}h`;
+        }
+        
+        const days = hours / 24;
+        return `${days.toFixed(1).replace('.0', '')}d`;
     }
 
     // Load and display KPI counters
