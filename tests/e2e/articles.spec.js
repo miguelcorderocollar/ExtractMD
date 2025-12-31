@@ -25,7 +25,7 @@ test.describe('ExtractMD Articles', () => {
     // Wait for extension content script to load and create button
     await page.waitForTimeout(1000);
     
-    const button = page.locator('#yt-transcript-floating-button');
+    const button = page.locator('#extractmd-floating-button');
     await expect(button).toBeVisible();
   });
 
@@ -36,7 +36,7 @@ test.describe('ExtractMD Articles', () => {
     
     await page.waitForTimeout(1000);
     
-    const button = page.locator('#yt-transcript-floating-button');
+    const button = page.locator('#extractmd-floating-button');
     await expect(button).toBeVisible();
   });
 
@@ -50,7 +50,7 @@ test.describe('ExtractMD Articles', () => {
     
     await page.waitForTimeout(1000);
     
-    const button = page.locator('#yt-transcript-floating-button');
+    const button = page.locator('#extractmd-floating-button');
     await button.click();
     
     // Wait for copy operation

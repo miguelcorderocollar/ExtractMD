@@ -11,7 +11,7 @@ describe('FloatingButton component', () => {
 
   afterEach(() => {
     // Clean up any buttons
-    const buttons = document.querySelectorAll('#yt-transcript-floating-button');
+    const buttons = document.querySelectorAll('#extractmd-floating-button');
     buttons.forEach(b => b.remove());
     container.remove();
   });
@@ -23,7 +23,7 @@ describe('FloatingButton component', () => {
       
       expect(controller).not.toBeNull();
       expect(controller.element).toBeDefined();
-      expect(controller.element.id).toBe('yt-transcript-floating-button');
+      expect(controller.element.id).toBe('extractmd-floating-button');
       expect(controller.element.innerHTML).toContain('📝');
     });
 
@@ -70,7 +70,7 @@ describe('FloatingButton component', () => {
       // Verify button is created with correct structure
       expect(controller).not.toBeNull();
       expect(controller.element.tagName).toBe('DIV');
-      expect(controller.element.id).toBe('yt-transcript-floating-button');
+      expect(controller.element.id).toBe('extractmd-floating-button');
     });
   });
 
@@ -82,7 +82,7 @@ describe('FloatingButton component', () => {
       // Verify button is created with correct structure
       expect(controller).not.toBeNull();
       expect(controller.element.tagName).toBe('DIV');
-      expect(controller.element.id).toBe('yt-transcript-floating-button');
+      expect(controller.element.id).toBe('extractmd-floating-button');
     });
   });
 

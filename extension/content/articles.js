@@ -264,7 +264,7 @@ async function showArticleInfoNotification(articles, highlightLongest = false) {
 
 function manageFloatingButtonForArticles() {
   const articles = Array.from(document.querySelectorAll('article'));
-  const existingButton = document.getElementById('yt-transcript-floating-button');
+  const existingButton = document.getElementById('extractmd-floating-button');
   
   if (articles.length > 0) {
     if (!existingButton) {

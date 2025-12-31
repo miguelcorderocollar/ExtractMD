@@ -3,6 +3,7 @@ import { copyToClipboard, showNotification, htmlToMarkdown, sleep, getSettings }
 import { initYouTubeFeatures, copyYouTubeTranscript } from './content/youtube.js';
 import { initHackerNewsFeatures, performHNCopy } from './content/hackernews.js';
 import { initArticleFeatures, performArticleCopy } from './content/articles.js';
+import { initUniversalFeatures, performUniversalCopy } from './content/universal.js';
 
 function isHNNewsPage() {
   if (!window.location.hostname.includes('ycombinator.com')) return false;
@@ -19,7 +20,7 @@ async function runInitForCurrentPage() {
     // Clear any existing copy function if it was set before (e.g. during SPA navigation)
     window.copyExtractMD = null;
     // Remove any existing floating button
-    const existingButton = document.getElementById('yt-transcript-floating-button');
+    const existingButton = document.getElementById('extractmd-floating-button');
     if (existingButton) {
       existingButton.remove();
     }
@@ -35,9 +36,23 @@ async function runInitForCurrentPage() {
     window.copyExtractMD = () => performHNCopy(false);
     initHackerNewsFeatures();
   } else {
-    console.debug('[ExtractMD] Initializing Article features');
-    window.copyExtractMD = () => performArticleCopy(false);
-    initArticleFeatures();
+    // Check for articles with substantial content
+    const articles = document.querySelectorAll('article');
+    const hasArticles = articles.length > 0 && Array.from(articles).some(a => (a.textContent?.length || 0) > 500);
+    
+    if (hasArticles && settings.enableArticleIntegration !== false) {
+      console.debug('[ExtractMD] Initializing Article features');
+      window.copyExtractMD = () => performArticleCopy(false);
+      initArticleFeatures();
+    } else if (settings.enableUniversalIntegration !== false) {
+      // Universal fallback
+      console.debug('[ExtractMD] Initializing Universal features');
+      window.copyExtractMD = () => performUniversalCopy(false);
+      initUniversalFeatures();
+    } else {
+      console.debug('[ExtractMD] No extraction module available for this page');
+      window.copyExtractMD = null;
+    }
   }
 }
 

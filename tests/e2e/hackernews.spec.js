@@ -64,7 +64,7 @@ test.describe('ExtractMD Hacker News - Real Site', () => {
     
     await page.waitForTimeout(2000);
     
-    const button = page.locator('#yt-transcript-floating-button');
+    const button = page.locator('#extractmd-floating-button');
     await expect(button).toBeVisible();
     
     await context.close();

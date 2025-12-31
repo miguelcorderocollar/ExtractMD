@@ -186,7 +186,7 @@ export function createFloatingButton({
   emoji = '📝'
 }) {
   const button = document.createElement('div');
-  button.id = 'yt-transcript-floating-button';
+  button.id = 'extractmd-floating-button';
   button.innerHTML = `<div class="button-emoji">${emoji}</div>`;
   
   // Variant-specific styles

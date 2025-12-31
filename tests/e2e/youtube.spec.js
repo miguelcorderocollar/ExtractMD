@@ -19,7 +19,7 @@ test.describe('ExtractMD YouTube', () => {
     await page.waitForTimeout(3000);
     
     // Check if floating button appears
-    const button = page.locator('#yt-transcript-floating-button');
+    const button = page.locator('#extractmd-floating-button');
     await expect(button).toBeVisible({ timeout: 10000 });
     
     // Grant clipboard permissions

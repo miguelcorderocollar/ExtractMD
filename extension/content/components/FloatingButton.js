@@ -7,14 +7,14 @@
  * @param {Function} options.onClick - Click handler function
  * @param {string} [options.variant='dark'] - Visual variant: 'dark' (glassmorphism) or 'light' (solid white)
  * @param {string} [options.emoji='📝'] - Emoji to display in the button
- * @param {string} [options.id='yt-transcript-floating-button'] - DOM element ID
+ * @param {string} [options.id='extractmd-floating-button'] - DOM element ID
  * @returns {Object} Button controller with element and state methods
  */
 export function createFloatingButton({
   onClick,
   variant = 'dark',
   emoji = '📝',
-  id = 'yt-transcript-floating-button'
+  id = 'extractmd-floating-button'
 }) {
   // Check if button already exists
   const existing = document.getElementById(id);
