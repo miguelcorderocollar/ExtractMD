@@ -16,6 +16,19 @@ Your goal is to transform ExtractMD from a collection of monolithic scripts into
 - **Options Page:** Comprehensive settings management.
 - **Extensibility:** Easily add new extractors (e.g., Reddit, Twitter).
 
-@docs/refactoring-plan.md
-@testing-summary.md
+@docs/testing-overview.md
+
+## Pull Request Workflow
+
+When the user says **"create PR"**, automatically:
+
+1. **Check branch & commits**: Run `git branch --show-current`, `git log main..HEAD --oneline`, and `git diff main..HEAD --stat`
+2. **Generate title**: Use conventional commit format based on the primary change type (e.g., `refactor:`, `feat:`, `fix:`)
+3. **Generate body**: Create a concise description with:
+   - One-sentence summary
+   - `## Changes` section with bullet points of key modifications
+   - `## Benefits` section (if applicable)
+4. **Create PR**: Run `gh pr create --title "<title>" --body "<body>"`
+
+No user input required—infer everything from git history and file changes.
 
