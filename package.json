@@ -2,12 +2,17 @@
   "name": "extractMD",
   "version": "1.0.0",
   "description": "A Chrome extension that extracts and copies information as Markdown from YouTube, Hacker News, and articles, with a beautiful floating button and rich settings.",
+  "type": "module",
   "main": "index.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:all": "npm run test:run && npm run test:e2e",
     "build": "node build.js",
     "watch": "esbuild extension/content.js --bundle --outfile=extension/dist/content.js --format=iife --sourcemap --watch"
   },
@@ -23,7 +28,12 @@
   },
   "homepage": "https://github.com/miguelcorderocollar/yt-transcript-extension#readme",
   "devDependencies": {
-    "esbuild": "^0.25.5"
+    "@playwright/test": "^1.57.0",
+    "@vitest/coverage-v8": "^4.0.16",
+    "esbuild": "^0.25.5",
+    "jsdom": "^27.4.0",
+    "playwright": "^1.57.0",
+    "vitest": "^4.0.16"
   },
   "dependencies": {
     "gpt-tokenizer": "^3.0.1"

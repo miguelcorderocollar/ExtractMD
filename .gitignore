@@ -2,3 +2,5 @@
 node_modules/
 dist/
 extension/dist/
+test-results/
+coverage/

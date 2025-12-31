@@ -1,18 +1,19 @@
 // Generic article extraction logic for ExtractMD extension
 
-import { copyToClipboard, showNotification, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { copyToClipboard, showNotification, getSettings, closeCurrentTab, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { incrementKpi } from '../shared/storage.js';
+import { createFloatingButton } from './components/FloatingButton.js';
 import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
 let articleObserver = null;
-let floatingButton = null;
+let floatingButtonController = null;
 
 // Shared copy logic
 export async function performArticleCopy(updateButton = false) {
   if (isProcessing) return;
   isProcessing = true;
-  const button = updateButton ? floatingButton : null;
-  if (button) setButtonLoading(button);
+  if (updateButton && floatingButtonController) floatingButtonController.setLoading();
   
   try {
     const settings = await new Promise(resolve => {
@@ -69,7 +70,7 @@ export async function performArticleCopy(updateButton = false) {
       const processedCount = settings.articleExporterOnlyLongest && totalArticles > 1 ? 1 : totalArticles;
       if (items.downloadInsteadOfCopy) {
         downloadMarkdownFile(md, document.title, 'ExtractMD');
-        if (button) setButtonSuccess(button);
+        if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
         if (settings.articleExporterOnlyLongest && totalArticles > 1) {
           showSuccessNotificationWithTokens(`1/${totalArticles} Articles downloaded as Markdown!`, md);
         } else {
@@ -83,7 +84,7 @@ export async function performArticleCopy(updateButton = false) {
           const tokens = encode(md).length;
           if (tokens >= threshold * 1000) {
             downloadMarkdownFile(md, document.title, 'ExtractMD');
-            if (button) setButtonSuccess(button);
+            if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
             if (settings.articleExporterOnlyLongest && totalArticles > 1) {
               showSuccessNotificationWithTokens(`1/${totalArticles} Articles downloaded as Markdown! (token threshold)`, md);
             } else {
@@ -94,7 +95,7 @@ export async function performArticleCopy(updateButton = false) {
           }
         }
         copyToClipboard(md, true);
-        if (button) setButtonSuccess(button);
+        if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
         if (settings.articleExporterOnlyLongest && totalArticles > 1) {
           showSuccessNotificationWithTokens(`1/${totalArticles} Articles copied as Markdown!`, md);
         } else {
@@ -104,14 +105,8 @@ export async function performArticleCopy(updateButton = false) {
       }
     });
     
-    // Increment KPI counter only if enabled
-    chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
-      if (items.enableUsageKpi !== false) {
-        const stats = items.usageStats || {};
-        stats.articles = (stats.articles || 0) + 1;
-        chrome.storage.sync.set({ usageStats: stats });
-      }
-    });
+    // Increment KPI counter
+    incrementKpi('articles');
     
     // Check global jumpToDomain setting
     const globalSettings = await getSettings();
@@ -124,19 +119,19 @@ export async function performArticleCopy(updateButton = false) {
         closeCurrentTab();
       }, 500);
     }
-    if (button) {
+    if (updateButton && floatingButtonController) {
       setTimeout(() => {
-        setButtonNormal(button);
+        floatingButtonController.setNormal();
         isProcessing = false;
       }, 2000);
     } else {
       isProcessing = false;
     }
   } catch (e) {
-    if (button) {
-      setButtonError(button);
+    if (updateButton && floatingButtonController) {
+      floatingButtonController.setError();
       setTimeout(() => {
-        setButtonNormal(button);
+        floatingButtonController.setNormal();
         isProcessing = false;
       }, 3000);
     } else {
@@ -146,55 +141,56 @@ export async function performArticleCopy(updateButton = false) {
   }
 }
 
-async function extractArticleMarkdown(articleElem, includeImages) {
-  function nodeToMarkdown(node) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      return node.textContent;
-    }
-    if (node.nodeType !== Node.ELEMENT_NODE) {
-      return '';
-    }
-    const tag = node.tagName.toLowerCase();
-    // Skip SVG and other non-markdown elements to avoid attribute errors
-    if (tag === 'svg' || tag === 'script' || tag === 'style' || tag === 'noscript') {
-      return '';
-    }
-    if (tag === 'h1') return `# ${node.textContent.trim()}\n\n`;
-    if (tag === 'h2') return `## ${node.textContent.trim()}\n\n`;
-    if (tag === 'h3') return `### ${node.textContent.trim()}\n\n`;
-    if (tag === 'h4') return `#### ${node.textContent.trim()}\n\n`;
-    if (tag === 'h5') return `##### ${node.textContent.trim()}\n\n`;
-    if (tag === 'h6') return `###### ${node.textContent.trim()}\n\n`;
-    if (tag === 'p') return `${Array.from(node.childNodes).map(nodeToMarkdown).join('')}\n\n`;
-    if (tag === 'ul') return `\n${Array.from(node.children).map(li => `- ${nodeToMarkdown(li)}`).join('')}\n`;
-    if (tag === 'ol') return `\n${Array.from(node.children).map((li, i) => `${i+1}. ${nodeToMarkdown(li)}`).join('')}\n`;
-    if (tag === 'li') return `${Array.from(node.childNodes).map(nodeToMarkdown).join('')}`;
-    if (tag === 'strong' || tag === 'b') return `**${node.textContent}**`;
-    if (tag === 'em' || tag === 'i') return `*${node.textContent}*`;
-    if (tag === 'blockquote') return `> ${node.textContent}\n\n`;
-    if (tag === 'code') return '```' + node.textContent + '```';
-    if (tag === 'pre') return '```' + node.textContent + '```';
-    if (tag === 'img' && includeImages) {
-      const alt = node.getAttribute('alt') || '';
-      let src = node.getAttribute('src') || '';
-      if (src) {
-        if (!src.match(/^https?:\/\//)) {
-          if (src.startsWith('/')) {
-            src = window.location.origin + src;
-          } else {
-            const base = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
-            src = base + src;
-          }
-        }
-        return `![${alt}](${src})\n\n`;
-      }
-    }
-    return Array.from(node.childNodes).map(nodeToMarkdown).join('');
+export function nodeToMarkdown(node, includeImages) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent;
   }
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return '';
+  }
+  const tag = node.tagName.toLowerCase();
+  // Skip SVG and other non-markdown elements to avoid attribute errors
+  if (tag === 'svg' || tag === 'script' || tag === 'style' || tag === 'noscript') {
+    return '';
+  }
+  if (tag === 'h1') return `# ${node.textContent.trim()}\n\n`;
+  if (tag === 'h2') return `## ${node.textContent.trim()}\n\n`;
+  if (tag === 'h3') return `### ${node.textContent.trim()}\n\n`;
+  if (tag === 'h4') return `#### ${node.textContent.trim()}\n\n`;
+  if (tag === 'h5') return `##### ${node.textContent.trim()}\n\n`;
+  if (tag === 'h6') return `###### ${node.textContent.trim()}\n\n`;
+  if (tag === 'p') return `${Array.from(node.childNodes).map(n => nodeToMarkdown(n, includeImages)).join('')}\n\n`;
+  if (tag === 'ul') return `\n${Array.from(node.children).map(li => `- ${nodeToMarkdown(li, includeImages)}`).join('\n')}\n`;
+  if (tag === 'ol') return `\n${Array.from(node.children).map((li, i) => `${i+1}. ${nodeToMarkdown(li, includeImages)}`).join('\n')}\n`;
+  if (tag === 'li') return `${Array.from(node.childNodes).map(n => nodeToMarkdown(n, includeImages)).join('')}`;
+  if (tag === 'strong' || tag === 'b') return `**${node.textContent}**`;
+  if (tag === 'em' || tag === 'i') return `*${node.textContent}*`;
+  if (tag === 'blockquote') return `> ${node.textContent}\n\n`;
+  if (tag === 'code') return '```' + node.textContent + '```';
+  if (tag === 'pre') return '```' + node.textContent + '```';
+  if (tag === 'img' && includeImages) {
+    const alt = node.getAttribute('alt') || '';
+    let src = node.getAttribute('src') || '';
+    if (src) {
+      if (!src.match(/^https?:\/\//)) {
+        if (src.startsWith('/')) {
+          src = window.location.origin + src;
+        } else {
+          const base = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
+          src = base + src;
+        }
+      }
+      return `![${alt}](${src})\n\n`;
+    }
+  }
+  return Array.from(node.childNodes).map(n => nodeToMarkdown(n, includeImages)).join('');
+}
+
+export async function extractArticleMarkdown(articleElem, includeImages) {
   let markdown = '';
   const children = Array.from(articleElem.childNodes);
   children.forEach(child => {
-    const md = nodeToMarkdown(child);
+    const md = nodeToMarkdown(child, includeImages);
     if (md && md.trim()) {
       markdown += md;
     }
@@ -268,56 +264,36 @@ async function showArticleInfoNotification(articles, highlightLongest = false) {
 
 function manageFloatingButtonForArticles() {
   const articles = Array.from(document.querySelectorAll('article'));
-  floatingButton = document.getElementById('yt-transcript-floating-button');
+  const existingButton = document.getElementById('yt-transcript-floating-button');
+  
   if (articles.length > 0) {
-    if (!floatingButton) {
-      floatingButton = document.createElement('div');
-      floatingButton.id = 'yt-transcript-floating-button';
-      floatingButton.innerHTML = `<div class=\"button-emoji\">📝</div>`;
-      floatingButton.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: rgba(255, 255, 255, 0.95);
-        color: #222;
-        border: 1px solid #ccc;
-        border-radius: 50%;
-        width: 56px;
-        height: 56px;
-        cursor: pointer;
-        font-size: 24px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        user-select: none;
-        opacity: 1;
-      `;
-      floatingButton.addEventListener('mouseenter', () => {
-        floatingButton.style.background = '#f3f4f6';
-      });
-      floatingButton.addEventListener('mouseleave', () => {
-        floatingButton.style.background = 'rgba(255, 255, 255, 0.95)';
-      });
-      // Show article info notification if setting is enabled
-      chrome.storage.sync.get({ articleExporterShowInfo: true, articleExporterOnlyLongest: false }, function(settings) {
-        if (settings.articleExporterShowInfo) {
-          showArticleInfoNotification(articles, settings.articleExporterOnlyLongest);
+    if (!existingButton) {
+      floatingButtonController = createFloatingButton({
+        variant: 'light',
+        emoji: '📝',
+        onClick: async () => {
+          await performArticleCopy(true);
         }
       });
-      floatingButton.addEventListener('click', async () => {
-        await performArticleCopy(true);
-      });
-      document.body.appendChild(floatingButton);
-      console.debug('[ExtractMD] Floating button created and added to DOM (Article)');
-    } else {
-      floatingButton.style.display = 'flex';
+      
+      if (floatingButtonController) {
+        floatingButtonController.appendTo(document.body);
+        console.debug('[ExtractMD] Floating button created and added to DOM (Article)');
+        
+        // Show article info notification if setting is enabled
+        chrome.storage.sync.get({ articleExporterShowInfo: true, articleExporterOnlyLongest: false }, function(settings) {
+          if (settings.articleExporterShowInfo) {
+            showArticleInfoNotification(articles, settings.articleExporterOnlyLongest);
+          }
+        });
+      }
+    } else if (floatingButtonController) {
+      floatingButtonController.show();
     }
   } else {
-    if (floatingButton) {
-      floatingButton.remove();
+    if (floatingButtonController) {
+      floatingButtonController.remove();
+      floatingButtonController = null;
     }
   }
 }
