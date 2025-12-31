@@ -1,6 +1,9 @@
 // ExtractMD Options Page - Main Entry Point
 // This module imports and initializes all options page functionality
 
+// Import Web Components (self-registering)
+import '../shared/components/index.js';
+
 import { initializeSettings } from './settings.js';
 import { initializeNavigation } from './navigation.js';
 import { initializeKpi } from './kpi.js';

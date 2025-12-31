@@ -96,57 +96,15 @@
                     <p>Enable or disable integrations and manage ignored domains</p>
                 </div>
                 
-                <div class="settings-group">
-                    <h3 class="group-title">Integrations</h3>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">YouTube Integration</span>
-                            <span class="setting-desc">Extract transcripts from YouTube videos</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="enableYouTubeIntegration" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Hacker News Integration</span>
-                            <span class="setting-desc">Extract comments and news from HN</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="enableHackerNewsIntegration" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Article Integration</span>
-                            <span class="setting-desc">Extract articles from any webpage</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="enableArticleIntegration" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Universal Integration</span>
-                            <span class="setting-desc">Fallback extraction for any webpage</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="enableUniversalIntegration" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
+                <setting-group title="Integrations">
+                    <setting-toggle setting-id="enableYouTubeIntegration" label="YouTube Integration" description="Extract transcripts from YouTube videos" checked></setting-toggle>
+                    <setting-toggle setting-id="enableHackerNewsIntegration" label="Hacker News Integration" description="Extract comments and news from HN" checked></setting-toggle>
+                    <setting-toggle setting-id="enableArticleIntegration" label="Article Integration" description="Extract articles from any webpage" checked></setting-toggle>
+                    <setting-toggle setting-id="enableUniversalIntegration" label="Universal Integration" description="Fallback extraction for any webpage" checked></setting-toggle>
+                </setting-group>
                 
                 <div class="settings-group">
                     <h3 class="group-title">Ignored Domains</h3>
-                    
                     <div class="setting-block">
                         <div class="setting-block-header">
                             <span class="setting-desc">ExtractMD will not activate on these domains</span>
@@ -171,53 +129,12 @@
                     <p>Configure how video transcripts are extracted</p>
                 </div>
                 
-                <div class="settings-group">
-                    <h3 class="group-title">Transcript Content</h3>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Timestamps</span>
-                            <span class="setting-desc">Add time markers to transcript lines</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="includeTimestamps" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Video Title</span>
-                            <span class="setting-desc">Add the video title as a header</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="addTitleToTranscript" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Channel Name</span>
-                            <span class="setting-desc">Add the channel name to the output</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="addChannelToTranscript" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Video URL</span>
-                            <span class="setting-desc">Add a link back to the video</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="addUrlToTranscript" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
+                <setting-group title="Transcript Content">
+                    <setting-toggle setting-id="includeTimestamps" label="Include Timestamps" description="Add time markers to transcript lines" checked></setting-toggle>
+                    <setting-toggle setting-id="addTitleToTranscript" label="Include Video Title" description="Add the video title as a header" checked></setting-toggle>
+                    <setting-toggle setting-id="addChannelToTranscript" label="Include Channel Name" description="Add the channel name to the output" checked></setting-toggle>
+                    <setting-toggle setting-id="addUrlToTranscript" label="Include Video URL" description="Add a link back to the video" checked></setting-toggle>
+                </setting-group>
             </section>
 
             <!-- Hacker News Section -->
@@ -227,145 +144,23 @@
                     <p>Configure comment threads and news feed extraction</p>
                 </div>
                 
-                <div class="settings-group">
-                    <h3 class="group-title">Comments Page</h3>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Author</span>
-                            <span class="setting-desc">Show username for each comment</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnIncludeAuthor" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Time</span>
-                            <span class="setting-desc">Show when comments were posted</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnIncludeTime" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Replies</span>
-                            <span class="setting-desc">Extract threaded reply structure</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnIncludeReplies" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Page URL</span>
-                            <span class="setting-desc">Add link to the HN discussion</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnIncludeUrl" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Post Body</span>
-                            <span class="setting-desc">Extract the original post text</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnIncludeItemText" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
+                <setting-group title="Comments Page">
+                    <setting-toggle setting-id="hnIncludeAuthor" label="Include Author" description="Show username for each comment" checked></setting-toggle>
+                    <setting-toggle setting-id="hnIncludeTime" label="Include Time" description="Show when comments were posted" checked></setting-toggle>
+                    <setting-toggle setting-id="hnIncludeReplies" label="Include Replies" description="Extract threaded reply structure" checked></setting-toggle>
+                    <setting-toggle setting-id="hnIncludeUrl" label="Include Page URL" description="Add link to the HN discussion" checked></setting-toggle>
+                    <setting-toggle setting-id="hnIncludeItemText" label="Include Post Body" description="Extract the original post text" checked></setting-toggle>
+                </setting-group>
                 
-                <div class="settings-group">
-                    <h3 class="group-title">News Feed</h3>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Title</span>
-                            <span class="setting-desc">Show the story title</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnNewsIncludeTitle" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include URL</span>
-                            <span class="setting-desc">Link to the external article</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnNewsIncludeUrl" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Site</span>
-                            <span class="setting-desc">Show the domain name</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnNewsIncludeSite" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Points</span>
-                            <span class="setting-desc">Show the upvote count</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnNewsIncludePoints" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Author</span>
-                            <span class="setting-desc">Show who submitted the story</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnNewsIncludeAuthor" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Time</span>
-                            <span class="setting-desc">Show submission time</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnNewsIncludeTime" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Comment Count</span>
-                            <span class="setting-desc">Show number of comments</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="hnNewsIncludeComments" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
+                <setting-group title="News Feed">
+                    <setting-toggle setting-id="hnNewsIncludeTitle" label="Include Title" description="Show the story title" checked></setting-toggle>
+                    <setting-toggle setting-id="hnNewsIncludeUrl" label="Include URL" description="Link to the external article" checked></setting-toggle>
+                    <setting-toggle setting-id="hnNewsIncludeSite" label="Include Site" description="Show the domain name" checked></setting-toggle>
+                    <setting-toggle setting-id="hnNewsIncludePoints" label="Include Points" description="Show the upvote count" checked></setting-toggle>
+                    <setting-toggle setting-id="hnNewsIncludeAuthor" label="Include Author" description="Show who submitted the story" checked></setting-toggle>
+                    <setting-toggle setting-id="hnNewsIncludeTime" label="Include Time" description="Show submission time" checked></setting-toggle>
+                    <setting-toggle setting-id="hnNewsIncludeComments" label="Include Comment Count" description="Show number of comments" checked></setting-toggle>
+                </setting-group>
             </section>
 
             <!-- Articles Section -->
@@ -375,53 +170,12 @@
                     <p>Configure how web articles are extracted</p>
                 </div>
                 
-                <div class="settings-group">
-                    <h3 class="group-title">Content Options</h3>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Images</span>
-                            <span class="setting-desc">Add image markdown with alt text</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="articleExporterIncludeImages" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Only Longest Article</span>
-                            <span class="setting-desc">Skip sidebars and extract main content only</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="articleExporterOnlyLongest">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Show Info Notification</span>
-                            <span class="setting-desc">Display article details when found</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="articleExporterShowInfo" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Page URL</span>
-                            <span class="setting-desc">Add source link to the article</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="articleExporterIncludeUrl" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
+                <setting-group title="Content Options">
+                    <setting-toggle setting-id="articleExporterIncludeImages" label="Include Images" description="Add image markdown with alt text" checked></setting-toggle>
+                    <setting-toggle setting-id="articleExporterOnlyLongest" label="Only Longest Article" description="Skip sidebars and extract main content only"></setting-toggle>
+                    <setting-toggle setting-id="articleExporterShowInfo" label="Show Info Notification" description="Display article details when found" checked></setting-toggle>
+                    <setting-toggle setting-id="articleExporterIncludeUrl" label="Include Page URL" description="Add source link to the article" checked></setting-toggle>
+                </setting-group>
             </section>
 
             <!-- Universal Section -->
@@ -431,21 +185,17 @@
                     <p>Configure fallback extraction for any webpage</p>
                 </div>
                 
-                <div class="settings-group">
-                    <h3 class="group-title">Content Detection</h3>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Content Mode</span>
-                            <span class="setting-desc">How to detect the main content area</span>
-                        </div>
-                        <select id="universalContentMode" class="input-select">
-                            <option value="auto">Auto (Smart Detection)</option>
-                            <option value="main">Main Element Only</option>
-                            <option value="full">Full Page</option>
-                            <option value="selector">Custom Selector</option>
-                        </select>
-                    </div>
+                <setting-group title="Content Detection">
+                    <setting-select 
+                        setting-id="universalContentMode" 
+                        label="Content Mode" 
+                        description="How to detect the main content area"
+                        value="auto">
+                        <option value="auto">Auto (Smart Detection)</option>
+                        <option value="main">Main Element Only</option>
+                        <option value="full">Full Page</option>
+                        <option value="selector">Custom Selector</option>
+                    </setting-select>
                     
                     <div class="setting-row" id="customSelectorRow" style="display: none;">
                         <div class="setting-info">
@@ -455,65 +205,15 @@
                         <input type="text" id="universalCustomSelector" class="input-text" placeholder=".article-content">
                     </div>
                     
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Strip Navigation</span>
-                            <span class="setting-desc">Remove nav, header, footer, and sidebar elements</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="universalStripNav" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
+                    <setting-toggle setting-id="universalStripNav" label="Strip Navigation" description="Remove nav, header, footer, and sidebar elements" checked></setting-toggle>
+                </setting-group>
                 
-                <div class="settings-group">
-                    <h3 class="group-title">Content Options</h3>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Images</span>
-                            <span class="setting-desc">Convert images to markdown format</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="universalIncludeImages" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Links</span>
-                            <span class="setting-desc">Preserve hyperlinks in markdown</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="universalIncludeLinks" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Preserve Code Blocks</span>
-                            <span class="setting-desc">Format code with syntax highlighting hints</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="universalPreserveCodeBlocks" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Include Page URL</span>
-                            <span class="setting-desc">Add source link header to output</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="universalIncludeUrl" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
+                <setting-group title="Content Options">
+                    <setting-toggle setting-id="universalIncludeImages" label="Include Images" description="Convert images to markdown format" checked></setting-toggle>
+                    <setting-toggle setting-id="universalIncludeLinks" label="Include Links" description="Preserve hyperlinks in markdown" checked></setting-toggle>
+                    <setting-toggle setting-id="universalPreserveCodeBlocks" label="Preserve Code Blocks" description="Format code with syntax highlighting hints" checked></setting-toggle>
+                    <setting-toggle setting-id="universalIncludeUrl" label="Include Page URL" description="Add source link header to output" checked></setting-toggle>
+                </setting-group>
             </section>
 
             <!-- Workflow Section -->
@@ -523,19 +223,8 @@
                     <p>Automate your extraction workflow</p>
                 </div>
                 
-                <div class="settings-group">
-                    <h3 class="group-title">After Extraction</h3>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Jump to Target Domain</span>
-                            <span class="setting-desc">Automatically open a URL after copying</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="jumpToDomain">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
+                <setting-group title="After Extraction">
+                    <setting-toggle setting-id="jumpToDomain" label="Jump to Target Domain" description="Automatically open a URL after copying"></setting-toggle>
                     
                     <div class="setting-block">
                         <label class="setting-label-sm">Target URL</label>
@@ -547,66 +236,28 @@
                         >
                     </div>
                     
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Close Tab After Extraction</span>
-                            <span class="setting-desc">Automatically close the source tab</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="closeTabAfterExtraction">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
+                    <setting-toggle setting-id="closeTabAfterExtraction" label="Close Tab After Extraction" description="Automatically close the source tab"></setting-toggle>
+                </setting-group>
                 
-                <div class="settings-group">
-                    <h3 class="group-title">Output Mode</h3>
+                <setting-group title="Output Mode">
+                    <setting-toggle setting-id="downloadInsteadOfCopy" label="Download as .md File" description="Save to file instead of clipboard"></setting-toggle>
                     
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Download as .md File</span>
-                            <span class="setting-desc">Save to file instead of clipboard</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="downloadInsteadOfCopy">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
+                    <setting-input 
+                        setting-id="downloadIfTokensExceed" 
+                        label="Download if Tokens Exceed" 
+                        description="Auto-download large extractions (thousands)"
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="0">
+                    </setting-input>
                     
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Download if Tokens Exceed</span>
-                            <span class="setting-desc">Auto-download large extractions (thousands)</span>
-                        </div>
-                        <input type="number" id="downloadIfTokensExceed" class="input-number" min="0" step="1" placeholder="0">
-                    </div>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Show Token Count</span>
-                            <span class="setting-desc">Display token count in notification</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="showTokenCountInNotification">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
+                    <setting-toggle setting-id="showTokenCountInNotification" label="Show Token Count" description="Display token count in notification"></setting-toggle>
+                </setting-group>
                 
-                <div class="settings-group">
-                    <h3 class="group-title">Display</h3>
-                    
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-label">Show Usage KPIs</span>
-                            <span class="setting-desc">Track extraction statistics</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="showUsageKpi" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
+                <setting-group title="Display">
+                    <setting-toggle setting-id="showUsageKpi" label="Show Usage KPIs" description="Track extraction statistics" checked></setting-toggle>
+                </setting-group>
             </section>
 
             <!-- Data Section -->
