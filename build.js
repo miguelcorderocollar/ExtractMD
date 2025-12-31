@@ -1,4 +1,4 @@
-const esbuild = require('esbuild');
+import esbuild from 'esbuild';
 
 // Content script bundle
 esbuild.build({
