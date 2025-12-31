@@ -1,15 +1,17 @@
 // Hacker News-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { copyToClipboard, showNotification, htmlToMarkdown, getSettings, closeCurrentTab, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { incrementKpi } from '../shared/storage.js';
+import { createFloatingButton } from './components/FloatingButton.js';
 import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
-let floatingButton = null;
+let floatingButtonController = null;
 
 // Shared copy logic
 export async function performHNCopy(updateButton = false) {
   if (isProcessing) return;
   isProcessing = true;
-  if (updateButton && floatingButton) setButtonLoading(floatingButton);
+  if (updateButton && floatingButtonController) floatingButtonController.setLoading();
   
   try {
     let md = '';
@@ -27,7 +29,7 @@ export async function performHNCopy(updateButton = false) {
       chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
         if (items.downloadInsteadOfCopy) {
           downloadMarkdownFile(md, document.title, 'ExtractMD');
-          if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+          if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
           showSuccessNotificationWithTokens('HN comments downloaded as .md!', md);
         } else {
           // Check token threshold
@@ -36,24 +38,18 @@ export async function performHNCopy(updateButton = false) {
             const tokens = encode(md).length;
             if (tokens >= threshold * 1000) {
               downloadMarkdownFile(md, document.title, 'ExtractMD');
-              if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+              if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
               showSuccessNotificationWithTokens('HN comments downloaded as .md (token threshold)!', md);
               return;
             }
           }
           copyToClipboard(md, true);
-          if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+          if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
           showSuccessNotificationWithTokens('HN comments copied to clipboard!', md);
         }
       });
-      // Increment KPI counter for HN Comments only if enabled
-      chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
-        if (items.enableUsageKpi !== false) {
-          const stats = items.usageStats || {};
-          stats.hn_comments = (stats.hn_comments || 0) + 1;
-          chrome.storage.sync.set({ usageStats: stats });
-        }
-      });
+      // Increment KPI counter for HN Comments
+      incrementKpi('hn_comments');
       // Check global jumpToDomain setting
       const globalSettings = await getSettings();
       if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
@@ -81,7 +77,7 @@ export async function performHNCopy(updateButton = false) {
       chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
         if (items.downloadInsteadOfCopy) {
           downloadMarkdownFile(md, document.title, 'ExtractMD');
-          if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+          if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
           showSuccessNotificationWithTokens('HN news downloaded as .md!', md);
         } else {
           // Check token threshold
@@ -90,24 +86,18 @@ export async function performHNCopy(updateButton = false) {
             const tokens = encode(md).length;
             if (tokens >= threshold * 1000) {
               downloadMarkdownFile(md, document.title, 'ExtractMD');
-              if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+              if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
               showSuccessNotificationWithTokens('HN news downloaded as .md (token threshold)!', md);
               return;
             }
           }
           copyToClipboard(md, true);
-          if (updateButton && floatingButton) setButtonSuccess(floatingButton);
+          if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
           showSuccessNotificationWithTokens('HN news copied to clipboard!', md);
         }
       });
-      // Increment KPI counter for HN News only if enabled
-      chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
-        if (items.enableUsageKpi !== false) {
-          const stats = items.usageStats || {};
-          stats.hn_news = (stats.hn_news || 0) + 1;
-          chrome.storage.sync.set({ usageStats: stats });
-        }
-      });
+      // Increment KPI counter for HN News
+      incrementKpi('hn_news');
       // Check global jumpToDomain setting
       const globalSettings = await getSettings();
       if (globalSettings.jumpToDomain && globalSettings.jumpToDomainUrl) {
@@ -120,22 +110,22 @@ export async function performHNCopy(updateButton = false) {
         }, 500);
       }
     } else {
-      if (updateButton && floatingButton) setButtonError(floatingButton);
+      if (updateButton && floatingButtonController) floatingButtonController.setError();
       showNotification('Not a supported HN page.', 'error');
     }
-    if (updateButton && floatingButton) {
+    if (updateButton && floatingButtonController) {
       setTimeout(() => {
-        setButtonNormal(floatingButton);
+        floatingButtonController.setNormal();
         isProcessing = false;
       }, 2000);
     } else {
       isProcessing = false;
     }
   } catch (error) {
-    if (updateButton && floatingButton) {
-      setButtonError(floatingButton);
+    if (updateButton && floatingButtonController) {
+      floatingButtonController.setError();
       setTimeout(() => {
-        setButtonNormal(floatingButton);
+        floatingButtonController.setNormal();
         isProcessing = false;
       }, 3000);
     } else {
@@ -143,12 +133,6 @@ export async function performHNCopy(updateButton = false) {
     }
     showNotification('Failed to copy HN content.', 'error');
   }
-}
-
-function handleHNFloatingButtonClick() {
-  return async function() {
-    await performHNCopy(true);
-  };
 }
 
 function isHNItemPage() {
@@ -303,50 +287,18 @@ export function initHackerNewsFeatures() {
       console.debug('[ExtractMD] Floating button already exists (HN)');
       return;
     }
-    floatingButton = document.createElement('div');
-    floatingButton.id = 'yt-transcript-floating-button';
-    floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
-    floatingButton.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      color: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      width: 56px;
-      height: 56px;
-      cursor: pointer;
-      font-size: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      user-select: none;
-      opacity: 0.7;
-    `;
-    floatingButton.addEventListener('mouseenter', () => {
-      if (!isProcessing) {
-        floatingButton.style.transform = 'translateY(-2px) scale(1.1)';
-        floatingButton.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
-        floatingButton.style.opacity = '1';
-        floatingButton.style.background = 'rgba(255, 255, 255, 0.25)';
+    
+    floatingButtonController = createFloatingButton({
+      variant: 'dark',
+      emoji: '📝',
+      onClick: async () => {
+        await performHNCopy(true);
       }
     });
-    floatingButton.addEventListener('mouseleave', () => {
-      if (!isProcessing) {
-        floatingButton.style.transform = 'translateY(0) scale(1)';
-        floatingButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        floatingButton.style.opacity = '0.7';
-        floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
-      }
-    });
-    floatingButton.addEventListener('click', handleHNFloatingButtonClick());
-    document.body.appendChild(floatingButton);
-    setButtonNormal(floatingButton);
-    console.debug('[ExtractMD] Floating button created and added to DOM (HN)');
+    
+    if (floatingButtonController) {
+      floatingButtonController.appendTo(document.body);
+      console.debug('[ExtractMD] Floating button created and added to DOM (HN)');
+    }
   });
 } 

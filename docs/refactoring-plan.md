@@ -513,19 +513,21 @@ New for 2.0:
 | Phase | Status | Priority | Risk | Effort |
 |-------|--------|----------|------|--------|
 | 1. Testing Infrastructure | ✅ DONE | High | Low | Medium |
-| 2. Shared Defaults/Storage | 🔜 NEXT | High | Low | Low |
-| 3. Floating Button Component | 📋 PLANNED | Medium | Low | Low |
-| 4. Copy Handler | 📋 PLANNED | Medium | Low | Low |
+| 2. Shared Defaults/Storage | ✅ DONE | High | Low | Low |
+| 3. Floating Button Component | ✅ DONE | Medium | Low | Low |
+| 4. Copy Handler | ✅ DONE | Medium | Low | Low |
 | 5. popup.js Refactor | 📋 PLANNED | High | Medium | High |
-| 6. Extract CSS | 📋 PLANNED | Low | Low | Low |
-| 7. ExtractMD 2.0 Prep | 📋 FUTURE | Low | Low | Low |
+| 6. Extract CSS | ✅ DONE | Low | Low | Low |
+| 7. ExtractMD 2.0 Prep | 📋 PLANNED | Low | Low | Low |
 
-**Recommended approach:** 
-1. ✅ Phase 1 completed - testing infrastructure in place
-2. 🔜 Start Phase 2 - extract shared defaults/storage (write tests first)
-3. Then continue with Phases 3-4 (components with tests; these can be done in parallel)
-4. Finally Phase 5 (popup refactor with comprehensive tests)
-5. Phases 6-7 when ready for 2.0
+**Progress Summary:**
+- ✅ Phase 1: Testing infrastructure - 72 unit tests passing
+- ✅ Phase 2: Shared modules created (`shared/defaults.js`, `shared/storage.js`)
+- ✅ Phase 3: FloatingButton component created and integrated
+- ✅ Phase 4: Copy handler created with tests
+- ✅ Phase 6: CSS extracted to `popup.css` with CSS variables
+- 📋 Phase 5: popup.js refactor pending (595 lines → modules)
+- 📋 Phase 7: 2.0 preparation pending
 
 ---
 

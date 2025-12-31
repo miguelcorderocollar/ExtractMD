@@ -1,55 +1,11 @@
 // Popup script for ExtractMD settings, import/export
 
-// Centralized defaults - single source of truth
-export const DEFAULTS = {
-    includeTimestamps: true,
-    addTitleToTranscript: true,
-    addChannelToTranscript: true,
-    addUrlToTranscript: true,
-    jumpToDomain: false,
-    jumpToDomainUrl: 'https://chat.openai.com/',
-    hnIncludeAuthor: true,
-    hnIncludeTime: true,
-    hnIncludeReplies: true,
-    hnNewsIncludeTitle: true,
-    hnNewsIncludeUrl: true,
-    hnNewsIncludeSite: true,
-    hnNewsIncludePoints: true,
-    hnNewsIncludeAuthor: true,
-    hnNewsIncludeTime: true,
-    hnNewsIncludeComments: true,
-    articleExporterIncludeImages: true,
-    articleExporterOnlyLongest: false,
-    articleExporterShowInfo: true,
-    articleExporterIncludeUrl: true,
-    hnIncludeUrl: true,
-    hnIncludeItemText: true,
-    enableUsageKpi: true,
-    closeTabAfterExtraction: false,
-    downloadInsteadOfCopy: false,
-    downloadIfTokensExceed: 0,
-    enableYouTubeIntegration: true,
-    enableHackerNewsIntegration: true,
-    enableArticleIntegration: true,
-    showTokenCountInNotification: false,
-    ignoredDomains: ''
-};
+// Import shared modules - single source of truth
+import { DEFAULTS, SETTING_SCHEMA } from './shared/defaults.js';
+import { saveSetting } from './shared/storage.js';
 
-// Helper: Save setting only if it differs from default, remove if it matches
-export function saveSetting(key, value) {
-    if (key in DEFAULTS) {
-        if (JSON.stringify(value) === JSON.stringify(DEFAULTS[key])) {
-            // Value matches default, remove from storage to save space
-            chrome.storage.sync.remove(key);
-        } else {
-            // Value differs from default, save it
-            chrome.storage.sync.set({ [key]: value });
-        }
-    } else {
-        // Unknown key, save it anyway (future compatibility)
-        chrome.storage.sync.set({ [key]: value });
-    }
-}
+// Re-export for backwards compatibility with existing tests
+export { DEFAULTS, saveSetting };
 
 document.addEventListener('DOMContentLoaded', function() {
     // Clean up orphaned/legacy data from storage on popup load

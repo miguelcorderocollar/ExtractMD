@@ -1,19 +1,11 @@
 // Utility functions for ExtractMD extension
 
 import { encode } from 'gpt-tokenizer';
+import { getSettings as getSettingsFromStorage } from '../shared/storage.js';
 
+// Re-export getSettings from shared storage module
 export async function getSettings() {
-  return new Promise((resolve) => {
-    chrome.storage.sync.get({
-      includeTimestamps: true,
-      jumpToDomain: false,
-      jumpToDomainUrl: 'https://chat.openai.com/',
-      closeTabAfterExtraction: false,
-      ignoredDomains: ''
-    }, (settings) => {
-      resolve(settings);
-    });
-  });
+  return getSettingsFromStorage();
 }
 
 export async function copyToClipboard(text, includeTimestamps) {

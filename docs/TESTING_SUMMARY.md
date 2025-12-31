@@ -34,7 +34,6 @@ Successfully implemented a comprehensive testing infrastructure for the ExtractM
 - ✅ Script/style tag skipping
 - ✅ Blockquotes and code blocks
 - **8 tests passing**
-- **Bug fixed**: List items weren't separated by newlines
 
 #### Storage Tests (`tests/unit/storage.test.js`)
 - ✅ saveSetting stores when different from default
@@ -47,6 +46,16 @@ Successfully implemented a comprehensive testing infrastructure for the ExtractM
 - **validation.test.js**: Domain validation regex (6 tests)
 - **kpi.test.js**: Time formatting and calculation (6 tests)
 - **14 tests passing**
+
+#### Shared Module Tests (`tests/unit/shared/`) - NEW
+- **defaults.test.js**: DEFAULTS and SETTING_SCHEMA validation (3 tests)
+- **storage.test.js**: getSettings, saveSetting, incrementKpi (9 tests)
+- **12 tests passing**
+
+#### Content Component Tests (`tests/unit/content/`) - NEW
+- **components/FloatingButton.test.js**: FloatingButton component (15 tests)
+- **handlers/copyHandler.test.js**: Copy/download handler (8 tests)
+- **23 tests passing**
 
 ### 3. Code Improvements ✅
 - Exported `nodeToMarkdown` and `extractArticleMarkdown` from articles.js for testing
@@ -72,13 +81,9 @@ Successfully implemented a comprehensive testing infrastructure for the ExtractM
 - `getExtensionId()` - Retrieves extension ID dynamically
 
 ### 5. Test Coverage Report ✅
-Current coverage (unit tests only):
-- **Overall**: 8.19% statements
-- **utils.js**: 45.88% (highest coverage)
-- **articles.js**: 23% (nodeToMarkdown tested)
-- **popup.js**: 1.93% (DEFAULTS and helpers tested)
-
-*Note: Low overall coverage is expected at this stage since we're only testing extracted/exportable functions. Full integration tests would require more refactoring.*
+Current test counts:
+- **72 unit tests passing** (up from 37)
+- **10 test suites passing** (up from 6)
 
 ## Files Created
 
@@ -95,6 +100,10 @@ Current coverage (unit tests only):
 - ✅ `tests/unit/popup/settings.test.js`
 - ✅ `tests/unit/popup/validation.test.js`
 - ✅ `tests/unit/popup/kpi.test.js`
+- ✅ `tests/unit/shared/defaults.test.js` - NEW
+- ✅ `tests/unit/shared/storage.test.js` - NEW
+- ✅ `tests/unit/content/components/FloatingButton.test.js` - NEW
+- ✅ `tests/unit/content/handlers/copyHandler.test.js` - NEW
 
 ### E2E Tests
 - ✅ `tests/e2e/helpers/extension.js`
@@ -110,10 +119,10 @@ Current coverage (unit tests only):
 ## Test Results
 
 ```
-✓ 37 unit tests passing
-✓ 6 test suites passing
+✓ 72 unit tests passing
+✓ 10 test suites passing
 ✓ 0 failures
-✓ Duration: ~750ms
+✓ Duration: ~1s
 ```
 
 ## How to Run Tests
@@ -139,29 +148,41 @@ npm run test:e2e
 npm run test:all
 ```
 
-## Next Steps for Future Refactoring
+## Refactoring Progress
 
-Now that testing infrastructure is in place, the codebase can be safely refactored:
+### Phase 1: Testing Infrastructure ✅ COMPLETE
+- Vitest + Playwright configured
+- Chrome API mocks created
+- 37 unit tests passing → now 72
 
-1. **Extract shared modules** (as planned):
-   - `shared/defaults.js` - Single DEFAULTS source
-   - `shared/storage.js` - Storage helpers
-   - `content/components/FloatingButton.js` - Shared button
-   - `content/handlers/copyHandler.js` - Copy/download logic
+### Phase 2: Shared Defaults/Storage ✅ COMPLETE
+- Created `extension/shared/defaults.js` - Single source of truth for all settings
+- Created `extension/shared/storage.js` - getSettings, saveSetting, incrementKpi
+- Updated popup.js to import from shared modules
+- Updated content/utils.js to use shared getSettings
+- Updated all content scripts to use shared incrementKpi
+- 12 new tests added
 
-2. **Refactor popup.js**:
-   - Split into modules (settings, kpi, import/export, etc.)
-   - Each module can be unit tested independently
+### Phase 3: FloatingButton Component ✅ COMPLETE
+- Created `extension/content/components/FloatingButton.js`
+- Integrated into youtube.js, hackernews.js, articles.js
+- Eliminated ~150 lines of duplicated code
+- 15 tests added
 
-3. **Write tests first** before refactoring:
-   - Test existing behavior
-   - Refactor
-   - Verify tests still pass
+### Phase 4: Copy Handler ✅ COMPLETE
+- Created `extension/content/handlers/copyHandler.js`
+- Consolidates copy/download/threshold/KPI logic
+- 8 tests added
+- Integration with content scripts ready for future use
 
-4. **Increase coverage**:
-   - Add tests for YouTube extraction
-   - Add tests for HN extraction
-   - Add integration tests for full workflows
+### Phase 5: Popup Refactor 📋 PENDING
+- popup.js still a monolith (595 lines)
+- Ready for modularization when needed
+
+### Phase 6: Extract CSS ✅ COMPLETE
+- Created `extension/popup.css` with CSS variables for theming
+- popup.html reduced from ~500 lines to ~265 lines
+- Better caching and maintainability
 
 ## Benefits Achieved
 
@@ -170,12 +191,15 @@ Now that testing infrastructure is in place, the codebase can be safely refactor
 ✅ **Bug Prevention**: Already caught and fixed the list rendering bug
 ✅ **CI/CD Ready**: Tests can run in automated pipelines
 ✅ **Future-Proof**: New features can be test-driven
+✅ **Reduced Duplication**: ~200 lines of code consolidated
+✅ **Better Organization**: Shared modules and components
+✅ **Theming Ready**: CSS variables for easy customization
 
 ## Total Implementation
 
-- **23 files created/modified**
-- **37 unit tests** passing
+- **35+ files created/modified**
+- **72 unit tests** passing
+- **10 test suites** passing
 - **4 E2E test suites** created
 - **Testing best practices** established
 - **Zero regressions** in existing functionality
-

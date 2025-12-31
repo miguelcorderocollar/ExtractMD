@@ -1,8 +1,10 @@
 // YouTube-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, setButtonLoading, setButtonSuccess, setButtonError, setButtonNormal, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { incrementKpi } from '../shared/storage.js';
+import { createFloatingButton } from './components/FloatingButton.js';
 import { encode } from 'gpt-tokenizer';
 
-let floatingButton = null;
+let floatingButtonController = null;
 let isProcessing = false;
 let currentUrl = window.location.href;
 
@@ -25,11 +27,11 @@ function isVideoFullscreen() {
 }
 
 function updateButtonVisibility() {
-  if (!floatingButton) return;
+  if (!floatingButtonController) return;
   if (isVideoFullscreen()) {
-    floatingButton.style.display = 'none';
+    floatingButtonController.hide();
   } else {
-    floatingButton.style.display = 'flex';
+    floatingButtonController.show();
   }
 }
 
@@ -132,14 +134,8 @@ async function waitForTranscriptAndCopy(settings = {}) {
             showSuccessNotificationWithTokens('Transcript copied to clipboard!', transcriptText);
         }
     });
-  // Increment KPI counter only if enabled
-  chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
-    if (items.enableUsageKpi !== false) {
-      const stats = items.usageStats || {};
-      stats.youtube = (stats.youtube || 0) + 1;
-      chrome.storage.sync.set({ usageStats: stats });
-    }
-  });
+  // Increment KPI counter
+  incrementKpi('youtube');
   
   // Close tab after extraction if setting is enabled
   if (userSettings.closeTabAfterExtraction) {
@@ -224,9 +220,9 @@ export function initYouTubeFeatures() {
     const observer = new MutationObserver(() => {
       if (window.location.href !== currentUrl) {
         currentUrl = window.location.href;
-        if (floatingButton && floatingButton.parentNode) {
-          floatingButton.parentNode.removeChild(floatingButton);
-          floatingButton = null;
+        if (floatingButtonController) {
+          floatingButtonController.remove();
+          floatingButtonController = null;
         }
         setTimeout(initializeFloatingButton, 1000);
       }
@@ -268,67 +264,34 @@ function initializeFloatingButton() {
     console.debug('[ExtractMD] Floating button already exists (YouTube)');
     return;
   }
-  floatingButton = document.createElement('div');
-  floatingButton.id = 'yt-transcript-floating-button';
-  floatingButton.innerHTML = `<div class="button-emoji">📝</div>`;
-  floatingButton.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    color: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    cursor: pointer;
-    font-size: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    user-select: none;
-    opacity: 0.7;
-  `;
-  floatingButton.addEventListener('mouseenter', () => {
-    if (!isProcessing) {
-      floatingButton.style.transform = 'translateY(-2px) scale(1.1)';
-      floatingButton.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
-      floatingButton.style.opacity = '1';
-      floatingButton.style.background = 'rgba(255, 255, 255, 0.25)';
+  
+  floatingButtonController = createFloatingButton({
+    variant: 'dark',
+    emoji: '📝',
+    onClick: async () => {
+      if (isProcessing) return;
+      isProcessing = true;
+      floatingButtonController.setLoading();
+      try {
+        await window.copyYouTubeTranscript();
+        floatingButtonController.setSuccess();
+        setTimeout(() => {
+          floatingButtonController.setNormal();
+          isProcessing = false;
+        }, 2000);
+      } catch (error) {
+        floatingButtonController.setError();
+        setTimeout(() => {
+          floatingButtonController.setNormal();
+          isProcessing = false;
+        }, 3000);
+      }
     }
   });
-  floatingButton.addEventListener('mouseleave', () => {
-    if (!isProcessing) {
-      floatingButton.style.transform = 'translateY(0) scale(1)';
-      floatingButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-      floatingButton.style.opacity = '0.7';
-      floatingButton.style.background = 'rgba(255, 255, 255, 0.15)';
-    }
-  });
-  floatingButton.addEventListener('click', async () => {
-    if (isProcessing) return;
-    isProcessing = true;
-    setButtonLoading(floatingButton);
-    try {
-      await window.copyYouTubeTranscript();
-      setButtonSuccess(floatingButton);
-      setTimeout(() => {
-        setButtonNormal(floatingButton);
-        isProcessing = false;
-      }, 2000);
-    } catch (error) {
-      setButtonError(floatingButton);
-      setTimeout(() => {
-        setButtonNormal(floatingButton);
-        isProcessing = false;
-      }, 3000);
-    }
-  });
-  document.body.appendChild(floatingButton);
-  console.debug('[ExtractMD] Floating button created and added to DOM (YouTube)');
-  updateButtonVisibility();
+  
+  if (floatingButtonController) {
+    floatingButtonController.appendTo(document.body);
+    console.debug('[ExtractMD] Floating button created and added to DOM (YouTube)');
+    updateButtonVisibility();
+  }
 } 
