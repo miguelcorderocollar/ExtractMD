@@ -1,6 +1,66 @@
 // Popup script for ExtractMD settings, import/export
 
+// Centralized defaults - single source of truth
+const DEFAULTS = {
+    includeTimestamps: true,
+    addTitleToTranscript: true,
+    addChannelToTranscript: true,
+    addUrlToTranscript: true,
+    jumpToDomain: false,
+    jumpToDomainUrl: 'https://chat.openai.com/',
+    hnIncludeAuthor: true,
+    hnIncludeTime: true,
+    hnIncludeReplies: true,
+    hnNewsIncludeTitle: true,
+    hnNewsIncludeUrl: true,
+    hnNewsIncludeSite: true,
+    hnNewsIncludePoints: true,
+    hnNewsIncludeAuthor: true,
+    hnNewsIncludeTime: true,
+    hnNewsIncludeComments: true,
+    articleExporterIncludeImages: true,
+    articleExporterOnlyLongest: false,
+    articleExporterShowInfo: true,
+    articleExporterIncludeUrl: true,
+    hnIncludeUrl: true,
+    hnIncludeItemText: true,
+    enableUsageKpi: true,
+    closeTabAfterExtraction: false,
+    downloadInsteadOfCopy: false,
+    downloadIfTokensExceed: 0,
+    enableYouTubeIntegration: true,
+    enableHackerNewsIntegration: true,
+    enableArticleIntegration: true,
+    showTokenCountInNotification: false,
+    ignoredDomains: ''
+};
+
+// Helper: Save setting only if it differs from default, remove if it matches
+function saveSetting(key, value) {
+    if (key in DEFAULTS) {
+        if (JSON.stringify(value) === JSON.stringify(DEFAULTS[key])) {
+            // Value matches default, remove from storage to save space
+            chrome.storage.sync.remove(key);
+        } else {
+            // Value differs from default, save it
+            chrome.storage.sync.set({ [key]: value });
+        }
+    } else {
+        // Unknown key, save it anyway (future compatibility)
+        chrome.storage.sync.set({ [key]: value });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Clean up orphaned/legacy data from storage on popup load
+    chrome.storage.sync.get(['hiddenButtonsByDomain'], function(result) {
+        if (result.hiddenButtonsByDomain) {
+            chrome.storage.sync.remove('hiddenButtonsByDomain', function() {
+                console.debug('[ExtractMD] Cleaned up orphaned hiddenButtonsByDomain data');
+            });
+        }
+    });
+
     // Settings elements
     const includeTimestampsCheckbox = document.getElementById('includeTimestamps');
     const addTitleToTranscriptCheckbox = document.getElementById('addTitleToTranscript');
@@ -48,39 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearKpiBtn = document.getElementById('clearKpiBtn');
 
     // Load saved settings
-    chrome.storage.sync.get({
-        includeTimestamps: true,
-        addTitleToTranscript: true,
-        addChannelToTranscript: true,
-        addUrlToTranscript: true,
-        jumpToDomain: false,
-        jumpToDomainUrl: 'https://chat.openai.com/',
-        hnIncludeAuthor: true,
-        hnIncludeTime: true,
-        hnIncludeReplies: true,
-        hnNewsIncludeTitle: true,
-        hnNewsIncludeUrl: true,
-        hnNewsIncludeSite: true,
-        hnNewsIncludePoints: true,
-        hnNewsIncludeAuthor: true,
-        hnNewsIncludeTime: true,
-        hnNewsIncludeComments: true,
-        articleExporterIncludeImages: true,
-        articleExporterOnlyLongest: false,
-        articleExporterShowInfo: true,
-        articleExporterIncludeUrl: true,
-        hnIncludeUrl: true,
-        hnIncludeItemText: true,
-        enableUsageKpi: true,
-        closeTabAfterExtraction: false,
-        downloadInsteadOfCopy: false,
-        downloadIfTokensExceed: 0,
-        enableYouTubeIntegration: true,
-        enableHackerNewsIntegration: true,
-        enableArticleIntegration: true,
-        showTokenCountInNotification: false,
-        ignoredDomains: '',
-    }, function(items) {
+    chrome.storage.sync.get(DEFAULTS, function(items) {
         includeTimestampsCheckbox.checked = items.includeTimestamps;
         addTitleToTranscriptCheckbox.checked = items.addTitleToTranscript;
         addChannelToTranscriptCheckbox.checked = items.addChannelToTranscript;
@@ -145,89 +173,88 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Save settings when changed
     includeTimestampsCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ includeTimestamps: includeTimestampsCheckbox.checked });
+        saveSetting('includeTimestamps', includeTimestampsCheckbox.checked);
     });
     addTitleToTranscriptCheckbox.addEventListener('change', function(e) {
-        chrome.storage.sync.set({ addTitleToTranscript: e.target.checked });
+        saveSetting('addTitleToTranscript', e.target.checked);
     });
     addChannelToTranscriptCheckbox.addEventListener('change', function(e) {
-        chrome.storage.sync.set({ addChannelToTranscript: e.target.checked });
+        saveSetting('addChannelToTranscript', e.target.checked);
     });
     addUrlToTranscriptCheckbox.addEventListener('change', function(e) {
-        chrome.storage.sync.set({ addUrlToTranscript: e.target.checked });
+        saveSetting('addUrlToTranscript', e.target.checked);
     });
     jumpToDomainCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ jumpToDomain: jumpToDomainCheckbox.checked });
+        saveSetting('jumpToDomain', jumpToDomainCheckbox.checked);
     });
     jumpToDomainUrlInput.addEventListener('input', function() {
-        chrome.storage.sync.set({ jumpToDomainUrl: jumpToDomainUrlInput.value });
+        saveSetting('jumpToDomainUrl', jumpToDomainUrlInput.value);
     });
     hnIncludeAuthorCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnIncludeAuthor: hnIncludeAuthorCheckbox.checked });
+        saveSetting('hnIncludeAuthor', hnIncludeAuthorCheckbox.checked);
     });
     hnIncludeTimeCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnIncludeTime: hnIncludeTimeCheckbox.checked });
+        saveSetting('hnIncludeTime', hnIncludeTimeCheckbox.checked);
     });
     hnIncludeRepliesCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnIncludeReplies: hnIncludeRepliesCheckbox.checked });
+        saveSetting('hnIncludeReplies', hnIncludeRepliesCheckbox.checked);
     });
     hnNewsIncludeTitleCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnNewsIncludeTitle: hnNewsIncludeTitleCheckbox.checked });
+        saveSetting('hnNewsIncludeTitle', hnNewsIncludeTitleCheckbox.checked);
     });
     hnNewsIncludeUrlCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnNewsIncludeUrl: hnNewsIncludeUrlCheckbox.checked });
+        saveSetting('hnNewsIncludeUrl', hnNewsIncludeUrlCheckbox.checked);
     });
     hnNewsIncludeSiteCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnNewsIncludeSite: hnNewsIncludeSiteCheckbox.checked });
+        saveSetting('hnNewsIncludeSite', hnNewsIncludeSiteCheckbox.checked);
     });
     hnNewsIncludePointsCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnNewsIncludePoints: hnNewsIncludePointsCheckbox.checked });
+        saveSetting('hnNewsIncludePoints', hnNewsIncludePointsCheckbox.checked);
     });
     hnNewsIncludeAuthorCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnNewsIncludeAuthor: hnNewsIncludeAuthorCheckbox.checked });
+        saveSetting('hnNewsIncludeAuthor', hnNewsIncludeAuthorCheckbox.checked);
     });
     hnNewsIncludeTimeCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnNewsIncludeTime: hnNewsIncludeTimeCheckbox.checked });
+        saveSetting('hnNewsIncludeTime', hnNewsIncludeTimeCheckbox.checked);
     });
     hnNewsIncludeCommentsCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnNewsIncludeComments: hnNewsIncludeCommentsCheckbox.checked });
+        saveSetting('hnNewsIncludeComments', hnNewsIncludeCommentsCheckbox.checked);
     });
     articleExporterIncludeImagesCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ articleExporterIncludeImages: articleExporterIncludeImagesCheckbox.checked });
+        saveSetting('articleExporterIncludeImages', articleExporterIncludeImagesCheckbox.checked);
     });
     articleExporterOnlyLongestCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ articleExporterOnlyLongest: articleExporterOnlyLongestCheckbox.checked });
+        saveSetting('articleExporterOnlyLongest', articleExporterOnlyLongestCheckbox.checked);
     });
     articleExporterShowInfoCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ articleExporterShowInfo: articleExporterShowInfoCheckbox.checked });
+        saveSetting('articleExporterShowInfo', articleExporterShowInfoCheckbox.checked);
     });
     articleExporterIncludeUrlCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ articleExporterIncludeUrl: articleExporterIncludeUrlCheckbox.checked });
+        saveSetting('articleExporterIncludeUrl', articleExporterIncludeUrlCheckbox.checked);
     });
     hnIncludeUrlCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnIncludeUrl: hnIncludeUrlCheckbox.checked });
+        saveSetting('hnIncludeUrl', hnIncludeUrlCheckbox.checked);
     });
     hnIncludeItemTextCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ hnIncludeItemText: hnIncludeItemTextCheckbox.checked });
+        saveSetting('hnIncludeItemText', hnIncludeItemTextCheckbox.checked);
     });
     enableUsageKpiCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ enableUsageKpi: enableUsageKpiCheckbox.checked }, function() {
-            document.getElementById('kpi-section').style.display = enableUsageKpiCheckbox.checked ? 'flex' : 'none';
-        });
+        saveSetting('enableUsageKpi', enableUsageKpiCheckbox.checked);
+        document.getElementById('kpi-section').style.display = enableUsageKpiCheckbox.checked ? 'flex' : 'none';
     });
     closeTabAfterExtractionCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ closeTabAfterExtraction: closeTabAfterExtractionCheckbox.checked });
+        saveSetting('closeTabAfterExtraction', closeTabAfterExtractionCheckbox.checked);
     });
     downloadInsteadOfCopyCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ downloadInsteadOfCopy: downloadInsteadOfCopyCheckbox.checked });
+        saveSetting('downloadInsteadOfCopy', downloadInsteadOfCopyCheckbox.checked);
     });
     downloadIfTokensExceedInput.addEventListener('input', function() {
         let val = parseInt(downloadIfTokensExceedInput.value, 10);
         if (isNaN(val) || val < 0) val = 0;
-        chrome.storage.sync.set({ downloadIfTokensExceed: val });
+        saveSetting('downloadIfTokensExceed', val);
     });
     showTokenCountInNotificationCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ showTokenCountInNotification: showTokenCountInNotificationCheckbox.checked });
+        saveSetting('showTokenCountInNotification', showTokenCountInNotificationCheckbox.checked);
     });
 
     // Domain validation regex: allows domains, localhost, and IP addresses
@@ -248,9 +275,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isValid || value.trim() === '') {
             domainValidationError.style.display = 'none';
             ignoredDomainsTextarea.style.borderColor = '#e0e3ef';
-            chrome.storage.sync.set({ ignoredDomains: value }, function() {
-                updateIgnoreButtonState();
-            });
+            saveSetting('ignoredDomains', value);
+            updateIgnoreButtonState();
         } else {
             domainValidationError.style.display = 'block';
             ignoredDomainsTextarea.style.borderColor = '#dc2626';
@@ -305,20 +331,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Un-ignore (remove)
                             currentDomains = currentDomains.filter(d => d !== domain);
                             const newValue = currentDomains.join('\n');
-                            chrome.storage.sync.set({ ignoredDomains: newValue }, function() {
-                                ignoredDomainsTextarea.value = newValue;
-                                showStatus(`Removed ${domain} from ignored domains`, 'success');
-                                updateIgnoreButtonState();
-                            });
+                            saveSetting('ignoredDomains', newValue);
+                            ignoredDomainsTextarea.value = newValue;
+                            showStatus(`Removed ${domain} from ignored domains`, 'success');
+                            updateIgnoreButtonState();
                         } else {
                             // Ignore (add)
                             currentDomains.push(domain);
                             const newValue = currentDomains.join('\n');
-                            chrome.storage.sync.set({ ignoredDomains: newValue }, function() {
-                                ignoredDomainsTextarea.value = newValue;
-                                showStatus(`Added ${domain} to ignored domains`, 'success');
-                                updateIgnoreButtonState();
-                            });
+                            saveSetting('ignoredDomains', newValue);
+                            ignoredDomainsTextarea.value = newValue;
+                            showStatus(`Added ${domain} to ignored domains`, 'success');
+                            updateIgnoreButtonState();
                         }
                     });
                 } catch (e) {
@@ -330,19 +354,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Integration enable/disable toggles (no reload, update UI in-place)
     enableYouTubeIntegrationCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ enableYouTubeIntegration: enableYouTubeIntegrationCheckbox.checked }, function() {
-            updateIntegrationVisibility();
-        });
+        saveSetting('enableYouTubeIntegration', enableYouTubeIntegrationCheckbox.checked);
+        updateIntegrationVisibility();
     });
     enableHackerNewsIntegrationCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ enableHackerNewsIntegration: enableHackerNewsIntegrationCheckbox.checked }, function() {
-            updateIntegrationVisibility();
-        });
+        saveSetting('enableHackerNewsIntegration', enableHackerNewsIntegrationCheckbox.checked);
+        updateIntegrationVisibility();
     });
     enableArticleIntegrationCheckbox.addEventListener('change', function() {
-        chrome.storage.sync.set({ enableArticleIntegration: enableArticleIntegrationCheckbox.checked }, function() {
-            updateIntegrationVisibility();
-        });
+        saveSetting('enableArticleIntegration', enableArticleIntegrationCheckbox.checked);
+        updateIntegrationVisibility();
     });
 
     // Helper to update integration visibility and preserve General Settings open state
@@ -403,13 +424,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Export settings
     exportBtn.addEventListener('click', function() {
-        chrome.storage.sync.get(null, function(settings) {
+        chrome.storage.sync.get(null, function(allSettings) {
+            // Remove orphaned/unused data from export
+            const cleanSettings = { ...allSettings };
+            delete cleanSettings.hiddenButtonsByDomain; // Legacy unused data
+            
+            // Only export non-default values (optimization)
+            const exportSettings = {};
+            for (const key in cleanSettings) {
+                // Always export usageStats (special case)
+                if (key === 'usageStats') {
+                    exportSettings[key] = cleanSettings[key];
+                    continue;
+                }
+                // Only export if value differs from default
+                if (key in DEFAULTS) {
+                    if (JSON.stringify(cleanSettings[key]) !== JSON.stringify(DEFAULTS[key])) {
+                        exportSettings[key] = cleanSettings[key];
+                    }
+                } else {
+                    // Export unknown keys (future compatibility)
+                    exportSettings[key] = cleanSettings[key];
+                }
+            }
+            
             getManifest(function(manifest) {
                 const exportData = {
                     extension: manifest.name || 'ExtractMD',
                     version: manifest.version || 'unknown',
                     timestamp: new Date().toISOString(),
-                    settings
+                    settings: exportSettings
                 };
                 const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -441,9 +485,71 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const data = JSON.parse(ev.target.result);
                 if (!data || typeof data !== 'object' || !data.settings) throw new Error('Invalid file');
-                chrome.storage.sync.set(data.settings, function() {
-                    // Reload UI with new settings
-                    location.reload();
+                
+                // Validate extension name
+                if (data.extension !== 'ExtractMD') {
+                    if (!confirm(`This file identifies as "${data.extension || 'unknown'}", not "ExtractMD". Import anyway?`)) {
+                        return;
+                    }
+                }
+
+                const settingsToImport = {};
+                const schema = {
+                    includeTimestamps: 'boolean',
+                    addTitleToTranscript: 'boolean',
+                    addChannelToTranscript: 'boolean',
+                    addUrlToTranscript: 'boolean',
+                    hnIncludeAuthor: 'boolean',
+                    hnIncludeTime: 'boolean',
+                    hnIncludeReplies: 'boolean',
+                    hnIncludeUrl: 'boolean',
+                    hnIncludeItemText: 'boolean',
+                    hnNewsIncludeTitle: 'boolean',
+                    hnNewsIncludeUrl: 'boolean',
+                    hnNewsIncludeSite: 'boolean',
+                    hnNewsIncludePoints: 'boolean',
+                    hnNewsIncludeAuthor: 'boolean',
+                    hnNewsIncludeTime: 'boolean',
+                    hnNewsIncludeComments: 'boolean',
+                    articleExporterIncludeImages: 'boolean',
+                    articleExporterOnlyLongest: 'boolean',
+                    articleExporterShowInfo: 'boolean',
+                    articleExporterIncludeUrl: 'boolean',
+                    jumpToDomain: 'boolean',
+                    jumpToDomainUrl: 'string',
+                    enableUsageKpi: 'boolean',
+                    closeTabAfterExtraction: 'boolean',
+                    downloadInsteadOfCopy: 'boolean',
+                    downloadIfTokensExceed: 'number',
+                    showTokenCountInNotification: 'boolean',
+                    ignoredDomains: 'string',
+                    enableYouTubeIntegration: 'boolean',
+                    enableHackerNewsIntegration: 'boolean',
+                    enableArticleIntegration: 'boolean'
+                };
+
+                // Filter and sanitize based on schema
+                for (const key in schema) {
+                    if (data.settings.hasOwnProperty(key)) {
+                        const type = schema[key];
+                        const val = data.settings[key];
+                        if (type === 'boolean') settingsToImport[key] = !!val;
+                        else if (type === 'number') settingsToImport[key] = parseInt(val, 10) || 0;
+                        else if (type === 'string') settingsToImport[key] = String(val);
+                    }
+                }
+
+                // Handle usageStats separately
+                if (data.settings.usageStats && typeof data.settings.usageStats === 'object') {
+                    settingsToImport.usageStats = data.settings.usageStats;
+                }
+
+                // Explicitly ignore orphaned/legacy keys that are no longer used
+                // (hiddenButtonsByDomain is legacy data not used in current codebase)
+
+                chrome.storage.sync.set(settingsToImport, function() {
+                    showStatus('Settings imported successfully!', 'success');
+                    setTimeout(() => location.reload(), 1000);
                 });
             } catch (err) {
                 showStatus('Import failed: Invalid file', 'error');
