@@ -12,12 +12,21 @@ export async function launchWithExtension() {
     headless: false,
     args: [
       `--disable-extensions-except=${extensionPath}`,
-      `--load-extension=${extensionPath}`
+      `--load-extension=${extensionPath}`,
+      // Required for CI environments (GitHub Actions, Docker, etc.)
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
     ]
   });
   
-  // Wait for extension to load
-  await context.waitForEvent('page');
+  // Wait for extension to load (with timeout to prevent hanging)
+  await Promise.race([
+    context.waitForEvent('page'),
+    new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Extension failed to load within 10s')), 10000)
+    )
+  ]);
   
   return context;
 }
