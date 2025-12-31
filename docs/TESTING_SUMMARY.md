@@ -119,10 +119,10 @@ Current test counts:
 ## Test Results
 
 ```
-✓ 72 unit tests passing
-✓ 10 test suites passing
+✓ 96 unit tests passing
+✓ 14 test suites passing
 ✓ 0 failures
-✓ Duration: ~1s
+✓ Duration: ~1.4s
 ```
 
 ## How to Run Tests
@@ -175,9 +175,18 @@ npm run test:all
 - 8 tests added
 - Integration with content scripts ready for future use
 
-### Phase 5: Popup Refactor 📋 PENDING
-- popup.js still a monolith (595 lines)
-- Ready for modularization when needed
+### Phase 5: Popup Refactor ✅ COMPLETE
+- popup.js split into 7 focused modules:
+  - `popup/index.js` - Entry point (~25 lines)
+  - `popup/settings.js` - Settings load/save (~150 lines)
+  - `popup/accordion.js` - Collapsible UI (~20 lines)
+  - `popup/kpi.js` - Usage stats display (~100 lines)
+  - `popup/importExport.js` - Settings backup/restore (~120 lines)
+  - `popup/domainIgnore.js` - Domain ignore functionality (~130 lines)
+  - `popup/integrationVisibility.js` - Integration toggles (~80 lines)
+  - `popup/ui.js` - General UI helpers (~30 lines)
+- Build updated to bundle popup modules
+- 24 new tests added for popup modules
 
 ### Phase 6: Extract CSS ✅ COMPLETE
 - Created `extension/popup.css` with CSS variables for theming
@@ -197,9 +206,10 @@ npm run test:all
 
 ## Total Implementation
 
-- **35+ files created/modified**
-- **72 unit tests** passing
-- **10 test suites** passing
+- **50+ files created/modified**
+- **96 unit tests** passing
+- **14 test suites** passing
 - **4 E2E test suites** created
 - **Testing best practices** established
 - **Zero regressions** in existing functionality
+- **Codebase fully modularized** and ready for ExtractMD 2.0

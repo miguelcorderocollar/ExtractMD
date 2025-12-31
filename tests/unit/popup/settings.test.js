@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { DEFAULTS } from '../../../extension/popup.js';
+import { DEFAULTS } from '../../../extension/shared/defaults.js';
 
 describe('popup.js - DEFAULTS', () => {
   it('has all required settings', () => {

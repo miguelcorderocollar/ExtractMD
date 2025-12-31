@@ -516,18 +516,18 @@ New for 2.0:
 | 2. Shared Defaults/Storage | ✅ DONE | High | Low | Low |
 | 3. Floating Button Component | ✅ DONE | Medium | Low | Low |
 | 4. Copy Handler | ✅ DONE | Medium | Low | Low |
-| 5. popup.js Refactor | 📋 PLANNED | High | Medium | High |
+| 5. popup.js Refactor | ✅ DONE | High | Medium | High |
 | 6. Extract CSS | ✅ DONE | Low | Low | Low |
-| 7. ExtractMD 2.0 Prep | 📋 PLANNED | Low | Low | Low |
+| 7. ExtractMD 2.0 Prep | 📋 READY | Low | Low | Low |
 
 **Progress Summary:**
-- ✅ Phase 1: Testing infrastructure - 72 unit tests passing
+- ✅ Phase 1: Testing infrastructure - 96 unit tests passing
 - ✅ Phase 2: Shared modules created (`shared/defaults.js`, `shared/storage.js`)
 - ✅ Phase 3: FloatingButton component created and integrated
 - ✅ Phase 4: Copy handler created with tests
+- ✅ Phase 5: popup.js refactored into 7 modules (595 lines → ~100 line entry point + modules)
 - ✅ Phase 6: CSS extracted to `popup.css` with CSS variables
-- 📋 Phase 5: popup.js refactor pending (595 lines → modules)
-- 📋 Phase 7: 2.0 preparation pending
+- 📋 Phase 7: Ready for 2.0 development
 
 ---
 

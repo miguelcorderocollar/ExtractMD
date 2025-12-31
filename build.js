@@ -1,5 +1,6 @@
 const esbuild = require('esbuild');
 
+// Content script bundle
 esbuild.build({
   entryPoints: ['extension/content.js'],
   bundle: true,
@@ -9,4 +10,16 @@ esbuild.build({
   target: ['chrome58'], // or your minimum Chrome version
   logLevel: 'info',
   // minify: true, // enable for production
-}).catch(() => process.exit(1)); 
+}).catch(() => process.exit(1));
+
+// Popup bundle
+esbuild.build({
+  entryPoints: ['extension/popup/index.js'],
+  bundle: true,
+  outfile: 'extension/dist/popup.js',
+  format: 'iife',
+  sourcemap: true,
+  target: ['chrome58'],
+  logLevel: 'info',
+  // minify: true, // enable for production
+}).catch(() => process.exit(1));
