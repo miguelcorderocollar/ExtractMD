@@ -38,6 +38,15 @@ const SETTING_ELEMENTS = {
     articleExporterShowInfo: { id: 'articleExporterShowInfo', type: 'checkbox' },
     articleExporterIncludeUrl: { id: 'articleExporterIncludeUrl', type: 'checkbox' },
     
+    // Universal settings
+    universalIncludeImages: { id: 'universalIncludeImages', type: 'checkbox' },
+    universalIncludeLinks: { id: 'universalIncludeLinks', type: 'checkbox' },
+    universalIncludeUrl: { id: 'universalIncludeUrl', type: 'checkbox' },
+    universalContentMode: { id: 'universalContentMode', type: 'select' },
+    universalCustomSelector: { id: 'universalCustomSelector', type: 'text' },
+    universalStripNav: { id: 'universalStripNav', type: 'checkbox' },
+    universalPreserveCodeBlocks: { id: 'universalPreserveCodeBlocks', type: 'checkbox' },
+    
     // General settings
     jumpToDomain: { id: 'jumpToDomain', type: 'checkbox' },
     jumpToDomainUrl: { id: 'jumpToDomainUrl', type: 'text' },
@@ -51,7 +60,8 @@ const SETTING_ELEMENTS = {
     // Integration toggles
     enableYouTubeIntegration: { id: 'enableYouTubeIntegration', type: 'checkbox', invertDefault: true },
     enableHackerNewsIntegration: { id: 'enableHackerNewsIntegration', type: 'checkbox', invertDefault: true },
-    enableArticleIntegration: { id: 'enableArticleIntegration', type: 'checkbox', invertDefault: true }
+    enableArticleIntegration: { id: 'enableArticleIntegration', type: 'checkbox', invertDefault: true },
+    enableUniversalIntegration: { id: 'enableUniversalIntegration', type: 'checkbox', invertDefault: true }
 };
 
 /**
@@ -75,6 +85,8 @@ export function loadSettings() {
             } else if (config.type === 'text' || config.type === 'textarea') {
                 element.value = value || '';
             } else if (config.type === 'number') {
+                element.value = value || '';
+            } else if (config.type === 'select') {
                 element.value = value || '';
             }
         }
@@ -116,13 +128,14 @@ export function attachSettingHandlers() {
                 // Special handling for integration visibility
                 if (key === 'enableYouTubeIntegration' || 
                     key === 'enableHackerNewsIntegration' || 
-                    key === 'enableArticleIntegration') {
+                    key === 'enableArticleIntegration' ||
+                    key === 'enableUniversalIntegration') {
                     updateIntegrationVisibility();
                 }
             });
         } else if (config.type === 'text' || config.type === 'textarea') {
             // Text inputs are handled separately (domain validation, etc.)
-            if (key === 'jumpToDomainUrl') {
+            if (key === 'jumpToDomainUrl' || key === 'universalCustomSelector') {
                 element.addEventListener('input', function() {
                     saveSetting(key, element.value);
                 });
@@ -134,7 +147,32 @@ export function attachSettingHandlers() {
                 if (isNaN(val) || val < 0) val = 0;
                 saveSetting(key, val);
             });
+        } else if (config.type === 'select') {
+            element.addEventListener('change', function() {
+                saveSetting(key, element.value);
+                
+                // Special handling for content mode selector visibility
+                if (key === 'universalContentMode') {
+                    updateCustomSelectorVisibility(element.value);
+                }
+            });
         }
+    }
+    
+    // Initialize custom selector visibility
+    const contentModeSelect = document.getElementById('universalContentMode');
+    if (contentModeSelect) {
+        updateCustomSelectorVisibility(contentModeSelect.value);
+    }
+}
+
+/**
+ * Update visibility of custom selector input based on content mode
+ */
+function updateCustomSelectorVisibility(mode) {
+    const customSelectorRow = document.getElementById('customSelectorRow');
+    if (customSelectorRow) {
+        customSelectorRow.style.display = mode === 'selector' ? 'flex' : 'none';
     }
 }
 

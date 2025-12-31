@@ -283,7 +283,7 @@ export function initHackerNewsFeatures() {
   chrome.storage.sync.get({ enableHackerNewsIntegration: true }, function(items) {
     if (items.enableHackerNewsIntegration === false) return;
     if (!(isHNItemPage() || isHNNewsPage())) return;
-    if (document.getElementById('yt-transcript-floating-button')) {
+    if (document.getElementById('extractmd-floating-button')) {
       console.debug('[ExtractMD] Floating button already exists (HN)');
       return;
     }

@@ -7,7 +7,8 @@ const TIME_ESTIMATES = {
     youtube: 60,
     articles: 30,
     hn_comments: 40,
-    hn_news: 20
+    hn_news: 20,
+    universal: 25
 };
 
 /**
@@ -42,7 +43,8 @@ export function calculateTimeSaved(stats) {
         (stats.youtube || 0) * TIME_ESTIMATES.youtube +
         (stats.articles || 0) * TIME_ESTIMATES.articles +
         (stats.hn_comments || 0) * TIME_ESTIMATES.hn_comments +
-        (stats.hn_news || 0) * TIME_ESTIMATES.hn_news
+        (stats.hn_news || 0) * TIME_ESTIMATES.hn_news +
+        (stats.universal || 0) * TIME_ESTIMATES.universal
     );
 }
 
@@ -58,6 +60,7 @@ export function renderKpiCounters(stats) {
     const articles = stats.articles || 0;
     const hnComments = stats.hn_comments || 0;
     const hnNews = stats.hn_news || 0;
+    const universal = stats.universal || 0;
     
     kpiCounters.innerHTML = `
         <div class="kpi-card" title="YouTube transcript copies">
@@ -75,6 +78,10 @@ export function renderKpiCounters(stats) {
         <div class="kpi-card" title="HN news exports">
             <div class="kpi-card-label">HN News</div>
             <div class="kpi-card-value">${hnNews}</div>
+        </div>
+        <div class="kpi-card" title="Universal page exports">
+            <div class="kpi-card-label">Universal</div>
+            <div class="kpi-card-value">${universal}</div>
         </div>
     `;
 
@@ -112,7 +119,7 @@ export function initializeKpi() {
     if (clearKpiBtn) {
         clearKpiBtn.addEventListener('click', function() {
             chrome.storage.sync.set({ 
-                usageStats: { youtube: 0, articles: 0, hn_comments: 0, hn_news: 0 } 
+                usageStats: { youtube: 0, articles: 0, hn_comments: 0, hn_news: 0, universal: 0 } 
             }, function() {
                 loadKpiCounters();
                 showStatus('Usage counters cleared!', 'success');

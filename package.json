@@ -37,6 +37,7 @@
     "vitest": "^4.0.16"
   },
   "dependencies": {
-    "gpt-tokenizer": "^3.0.1"
+    "gpt-tokenizer": "^3.0.1",
+    "turndown": "^7.2.2"
   }
 }

@@ -43,7 +43,17 @@ export const DEFAULTS = {
   // Integration toggles
   enableYouTubeIntegration: true,
   enableHackerNewsIntegration: true,
-  enableArticleIntegration: true
+  enableArticleIntegration: true,
+  enableUniversalIntegration: true,
+  
+  // Universal (HTML-to-MD fallback)
+  universalIncludeImages: true,
+  universalIncludeLinks: true,
+  universalIncludeUrl: true,
+  universalContentMode: 'auto',  // 'auto' | 'full' | 'main' | 'selector'
+  universalCustomSelector: '',
+  universalStripNav: true,
+  universalPreserveCodeBlocks: true
 };
 
 // Schema for validation during import
@@ -78,6 +88,14 @@ export const SETTING_SCHEMA = {
   ignoredDomains: 'string',
   enableYouTubeIntegration: 'boolean',
   enableHackerNewsIntegration: 'boolean',
-  enableArticleIntegration: 'boolean'
+  enableArticleIntegration: 'boolean',
+  enableUniversalIntegration: 'boolean',
+  universalIncludeImages: 'boolean',
+  universalIncludeLinks: 'boolean',
+  universalIncludeUrl: 'boolean',
+  universalContentMode: 'string',
+  universalCustomSelector: 'string',
+  universalStripNav: 'boolean',
+  universalPreserveCodeBlocks: 'boolean'
 };
 

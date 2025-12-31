@@ -47,6 +47,14 @@
                     </svg>
                     <span>Articles</span>
                 </button>
+                <button class="nav-item" data-section="universal">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span>Universal</span>
+                </button>
                 
                 <div class="nav-divider"></div>
                 
@@ -120,6 +128,17 @@
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="enableArticleIntegration" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Universal Integration</span>
+                            <span class="setting-desc">Fallback extraction for any webpage</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="enableUniversalIntegration" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -399,6 +418,98 @@
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="articleExporterIncludeUrl" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Universal Section -->
+            <section id="section-universal" class="settings-section">
+                <div class="section-header">
+                    <h2>Universal Settings</h2>
+                    <p>Configure fallback extraction for any webpage</p>
+                </div>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Content Detection</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Content Mode</span>
+                            <span class="setting-desc">How to detect the main content area</span>
+                        </div>
+                        <select id="universalContentMode" class="input-select">
+                            <option value="auto">Auto (Smart Detection)</option>
+                            <option value="main">Main Element Only</option>
+                            <option value="full">Full Page</option>
+                            <option value="selector">Custom Selector</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-row" id="customSelectorRow" style="display: none;">
+                        <div class="setting-info">
+                            <span class="setting-label">Custom Selector</span>
+                            <span class="setting-desc">CSS selector for content (e.g., #main, .content)</span>
+                        </div>
+                        <input type="text" id="universalCustomSelector" class="input-text" placeholder=".article-content">
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Strip Navigation</span>
+                            <span class="setting-desc">Remove nav, header, footer, and sidebar elements</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="universalStripNav" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Content Options</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Images</span>
+                            <span class="setting-desc">Convert images to markdown format</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="universalIncludeImages" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Links</span>
+                            <span class="setting-desc">Preserve hyperlinks in markdown</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="universalIncludeLinks" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Preserve Code Blocks</span>
+                            <span class="setting-desc">Format code with syntax highlighting hints</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="universalPreserveCodeBlocks" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Page URL</span>
+                            <span class="setting-desc">Add source link header to output</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="universalIncludeUrl" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
