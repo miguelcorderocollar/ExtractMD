@@ -10,10 +10,9 @@ export function showStatus(message, type) {
     if (!statusDiv) return;
     
     statusDiv.textContent = message;
-    statusDiv.className = `status ${type}`;
-    statusDiv.style.display = 'block';
+    statusDiv.className = `status-message visible ${type}`;
     setTimeout(() => {
-        statusDiv.style.display = 'none';
+        statusDiv.classList.remove('visible');
     }, 3000);
 }
 

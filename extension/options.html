@@ -4,279 +4,607 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExtractMD Settings</title>
+    <link rel="stylesheet" href="shared/theme.css">
     <link rel="stylesheet" href="options.css">
 </head>
 <body>
-    <div class="options-container">
-        <div class="header">
-            <h1>ExtractMD Settings</h1>
-            <p class="subtitle">Configure your extraction preferences</p>
-        </div>
+    <div class="options-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">ExtractMD</h1>
+                <span class="version">v2.0.0</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-section="general">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    <span>General</span>
+                </button>
+                <button class="nav-item" data-section="youtube">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
+                        <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
+                    </svg>
+                    <span>YouTube</span>
+                </button>
+                <button class="nav-item" data-section="hackernews">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4l8 8M20 4l-8 8M12 12v8"/>
+                    </svg>
+                    <span>Hacker News</span>
+                </button>
+                <button class="nav-item" data-section="articles">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    <span>Articles</span>
+                </button>
+                
+                <div class="nav-divider"></div>
+                
+                <button class="nav-item" data-section="workflow">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="16 3 21 3 21 8"/>
+                        <line x1="4" y1="20" x2="21" y2="3"/>
+                        <polyline points="21 16 21 21 16 21"/>
+                        <line x1="15" y1="15" x2="21" y2="21"/>
+                        <line x1="4" y1="4" x2="9" y2="9"/>
+                    </svg>
+                    <span>Workflow</span>
+                </button>
+                <button class="nav-item" data-section="data">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7"/>
+                        <line x1="16" y1="19" x2="22" y2="19"/>
+                        <line x1="19" y1="16" x2="19" y2="22"/>
+                    </svg>
+                    <span>Data</span>
+                </button>
+                <button class="nav-item" data-section="about">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                    <span>About</span>
+                </button>
+            </nav>
+        </aside>
 
-        <button class="collapsible"><img src="images/settings.svg" class="section-icon" alt="Settings"> <span>General Settings</span></button>
-        <div class="container">
-            <div class="settings">
-                <div class="setting-item">
-                    <span class="setting-label">Enable YouTube integration</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="enableYouTubeIntegration" checked>
-                        <span class="slider"></span>
-                    </label>
+        <!-- Main Content -->
+        <main class="content">
+            <!-- General Section -->
+            <section id="section-general" class="settings-section active">
+                <div class="section-header">
+                    <h2>General Settings</h2>
+                    <p>Enable or disable integrations and manage ignored domains</p>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Enable Hacker News integration</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="enableHackerNewsIntegration" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Enable Article integration</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="enableArticleIntegration" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Jump to domain after copy</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="jumpToDomain">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item" style="flex-direction:column;align-items:flex-start;gap:4px;">
-                    <span class="setting-label" style="font-size:12px;">Target domain/URL</span>
-                    <input type="text" id="jumpToDomainUrl" placeholder="https://chat.openai.com/">
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Enable usage KPIs</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="showUsageKpi" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Close tab after extraction</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="closeTabAfterExtraction">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Download .md instead of copy to clipboard</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="downloadInsteadOfCopy">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Download if tokens exceed (thousands)</span>
-                    <input type="number" id="downloadIfTokensExceed" min="0" step="1" style="width:80px;">
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Show token count in success notification</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="showTokenCountInNotification">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item" style="flex-direction:column;align-items:flex-start;gap:6px; margin-top: 12px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <span class="setting-label" style="font-size:12px;">Ignored domains (one per line)</span>
-                        <button id="ignoreCurrentDomainBtn" style="background: #f3f4f6; border: 1px solid #bfc6e0; border-radius: 6px; font-size: 11px; padding: 3px 8px; cursor: pointer; transition: all 0.2s;">
-                            🚫 Ignore Current
-                        </button>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Integrations</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">YouTube Integration</span>
+                            <span class="setting-desc">Extract transcripts from YouTube videos</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="enableYouTubeIntegration" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
                     </div>
-                    <textarea id="ignoredDomains" placeholder="example.com&#10;another-site.org" style="width: 100%; height: 70px; padding: 8px; border-radius: 8px; border: 1.5px solid #e0e3ef; font-family: inherit; font-size: 13px; box-sizing: border-box; resize: vertical;"></textarea>
-                    <span id="domainValidationError" style="color: #dc2626; font-size: 11px; display: none;">Invalid domain format detected</span>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Hacker News Integration</span>
+                            <span class="setting-desc">Extract comments and news from HN</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="enableHackerNewsIntegration" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Article Integration</span>
+                            <span class="setting-desc">Extract articles from any webpage</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="enableArticleIntegration" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
-            </div>
-        </div>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Ignored Domains</h3>
+                    
+                    <div class="setting-block">
+                        <div class="setting-block-header">
+                            <span class="setting-desc">ExtractMD will not activate on these domains</span>
+                            <button id="ignoreCurrentDomainBtn" class="btn btn-secondary btn-sm">
+                                Add Current Domain
+                            </button>
+                        </div>
+                        <textarea 
+                            id="ignoredDomains" 
+                            class="input-textarea" 
+                            placeholder="example.com&#10;another-site.org"
+                        ></textarea>
+                        <span id="domainValidationError" class="validation-error">Invalid domain format detected</span>
+                    </div>
+                </div>
+            </section>
 
-        <button class="collapsible"><img src="images/youtube.svg" class="section-icon" alt="YouTube"> <span>YouTube Transcript Settings</span></button>
-        <div class="container">
-            <div class="settings">
-                <div class="setting-item">
-                    <span class="setting-label">Include timestamps</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="includeTimestamps" checked>
-                        <span class="slider"></span>
-                    </label>
+            <!-- YouTube Section -->
+            <section id="section-youtube" class="settings-section">
+                <div class="section-header">
+                    <h2>YouTube Settings</h2>
+                    <p>Configure how video transcripts are extracted</p>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Add video title to transcript</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="addTitleToTranscript" checked>
-                        <span class="slider"></span>
-                    </label>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Transcript Content</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Timestamps</span>
+                            <span class="setting-desc">Add time markers to transcript lines</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="includeTimestamps" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Video Title</span>
+                            <span class="setting-desc">Add the video title as a header</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="addTitleToTranscript" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Channel Name</span>
+                            <span class="setting-desc">Add the channel name to the output</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="addChannelToTranscript" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Video URL</span>
+                            <span class="setting-desc">Add a link back to the video</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="addUrlToTranscript" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Add channel name to transcript</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="addChannelToTranscript" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Add video URL to transcript</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="addUrlToTranscript" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
+            </section>
 
-        <button class="collapsible"><img src="images/hackernews.svg" class="section-icon" alt="Hacker News"> <span>HN Comments Settings</span></button>
-        <div class="container">
-            <div class="settings">
-                <div class="setting-item">
-                    <span class="setting-label">Include author</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnIncludeAuthor" checked>
-                        <span class="slider"></span>
-                    </label>
+            <!-- Hacker News Section -->
+            <section id="section-hackernews" class="settings-section">
+                <div class="section-header">
+                    <h2>Hacker News Settings</h2>
+                    <p>Configure comment threads and news feed extraction</p>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include time</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnIncludeTime" checked>
-                        <span class="slider"></span>
-                    </label>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Comments Page</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Author</span>
+                            <span class="setting-desc">Show username for each comment</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnIncludeAuthor" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Time</span>
+                            <span class="setting-desc">Show when comments were posted</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnIncludeTime" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Replies</span>
+                            <span class="setting-desc">Extract threaded reply structure</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnIncludeReplies" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Page URL</span>
+                            <span class="setting-desc">Add link to the HN discussion</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnIncludeUrl" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Post Body</span>
+                            <span class="setting-desc">Extract the original post text</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnIncludeItemText" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include replies (threaded)</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnIncludeReplies" checked>
-                        <span class="slider"></span>
-                    </label>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">News Feed</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Title</span>
+                            <span class="setting-desc">Show the story title</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnNewsIncludeTitle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include URL</span>
+                            <span class="setting-desc">Link to the external article</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnNewsIncludeUrl" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Site</span>
+                            <span class="setting-desc">Show the domain name</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnNewsIncludeSite" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Points</span>
+                            <span class="setting-desc">Show the upvote count</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnNewsIncludePoints" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Author</span>
+                            <span class="setting-desc">Show who submitted the story</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnNewsIncludeAuthor" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Time</span>
+                            <span class="setting-desc">Show submission time</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnNewsIncludeTime" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Comment Count</span>
+                            <span class="setting-desc">Show number of comments</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hnNewsIncludeComments" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include page URL</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnIncludeUrl" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include item text (post body)</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnIncludeItemText" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
+            </section>
 
-        <button class="collapsible"><img src="images/hackernews.svg" class="section-icon" alt="HN News"> <span>HN News Settings</span></button>
-        <div class="container">
-            <div class="settings">
-                <div class="setting-item">
-                    <span class="setting-label">Include title</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnNewsIncludeTitle" checked>
-                        <span class="slider"></span>
-                    </label>
+            <!-- Articles Section -->
+            <section id="section-articles" class="settings-section">
+                <div class="section-header">
+                    <h2>Article Settings</h2>
+                    <p>Configure how web articles are extracted</p>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include URL</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnNewsIncludeUrl" checked>
-                        <span class="slider"></span>
-                    </label>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Content Options</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Images</span>
+                            <span class="setting-desc">Add image markdown with alt text</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="articleExporterIncludeImages" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Only Longest Article</span>
+                            <span class="setting-desc">Skip sidebars and extract main content only</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="articleExporterOnlyLongest">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Show Info Notification</span>
+                            <span class="setting-desc">Display article details when found</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="articleExporterShowInfo" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Include Page URL</span>
+                            <span class="setting-desc">Add source link to the article</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="articleExporterIncludeUrl" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include site</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnNewsIncludeSite" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include points</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnNewsIncludePoints" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include author</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnNewsIncludeAuthor" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include time</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnNewsIncludeTime" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include comments count</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="hnNewsIncludeComments" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
+            </section>
 
-        <button class="collapsible"><img src="images/article.svg" class="section-icon" alt="Article"> <span>Article Exporter</span></button>
-        <div class="container">
-            <div class="settings">
-                <div class="setting-item">
-                    <span class="setting-label">Include images</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="articleExporterIncludeImages" checked>
-                        <span class="slider"></span>
-                    </label>
+            <!-- Workflow Section -->
+            <section id="section-workflow" class="settings-section">
+                <div class="section-header">
+                    <h2>Workflow Settings</h2>
+                    <p>Automate your extraction workflow</p>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Only copy longest article</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="articleExporterOnlyLongest">
-                        <span class="slider"></span>
-                    </label>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">After Extraction</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Jump to Target Domain</span>
+                            <span class="setting-desc">Automatically open a URL after copying</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="jumpToDomain">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-block">
+                        <label class="setting-label-sm">Target URL</label>
+                        <input 
+                            type="text" 
+                            id="jumpToDomainUrl" 
+                            class="input-text" 
+                            placeholder="https://chat.openai.com/"
+                        >
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Close Tab After Extraction</span>
+                            <span class="setting-desc">Automatically close the source tab</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="closeTabAfterExtraction">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Show article info when found</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="articleExporterShowInfo" checked>
-                        <span class="slider"></span>
-                    </label>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Output Mode</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Download as .md File</span>
+                            <span class="setting-desc">Save to file instead of clipboard</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="downloadInsteadOfCopy">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Download if Tokens Exceed</span>
+                            <span class="setting-desc">Auto-download large extractions (thousands)</span>
+                        </div>
+                        <input type="number" id="downloadIfTokensExceed" class="input-number" min="0" step="1" placeholder="0">
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Show Token Count</span>
+                            <span class="setting-desc">Display token count in notification</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showTokenCountInNotification">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">Include page URL</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="articleExporterIncludeUrl" checked>
-                        <span class="slider"></span>
-                    </label>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Display</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-label">Show Usage KPIs</span>
+                            <span class="setting-desc">Track extraction statistics</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showUsageKpi" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </section>
 
-        <hr class="divider">
+            <!-- Data Section -->
+            <section id="section-data" class="settings-section">
+                <div class="section-header">
+                    <h2>Data & Statistics</h2>
+                    <p>View usage stats and manage settings</p>
+                </div>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Usage Statistics</h3>
+                    
+                    <div class="kpi-grid" id="kpi-counters">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <div id="kpi-time-saved" class="kpi-time-saved"></div>
+                    
+                    <button id="clearKpiBtn" class="btn btn-secondary">
+                        Clear Statistics
+                    </button>
+                </div>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Import / Export</h3>
+                    
+                    <div class="button-row">
+                        <button id="exportSettingsBtn" class="btn btn-secondary">
+                            Export Settings
+                        </button>
+                        <button id="importSettingsBtn" class="btn btn-secondary">
+                            Import Settings
+                        </button>
+                        <input type="file" id="importSettingsFile" accept="application/json" style="display:none;">
+                    </div>
+                </div>
+            </section>
 
-        <div id="kpi-section" style="margin: 0 14px 10px 14px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <div id="kpi-counters" style="display: flex; gap: 16px; font-size: 13px; font-weight: 500;"></div>
-                <button id="clearKpiBtn" title="Clear usage counters" style="background: #f3f4f6; border: 1px solid #bfc6e0; border-radius: 6px; font-size: 12px; padding: 2px 8px; cursor: pointer;">Clear</button>
-            </div>
-            <div id="kpi-time-saved" style="font-size: 13px; font-weight: 600; color: #6366f1; background: #eef2ff; padding: 4px 8px; border-radius: 6px; text-align: center;"></div>
-        </div>
+            <!-- About Section -->
+            <section id="section-about" class="settings-section">
+                <div class="section-header">
+                    <h2>About ExtractMD</h2>
+                    <p>Information and credits</p>
+                </div>
+                
+                <div class="settings-group">
+                    <div class="about-card">
+                        <img src="images/logo.svg" alt="ExtractMD Logo" class="about-logo">
+                        <h3 class="mono">ExtractMD</h3>
+                        <p class="about-version">Version 2.0.0</p>
+                        <p class="about-desc">
+                            Extract content from web pages as clean Markdown. 
+                            Perfect for feeding content to LLMs, note-taking, or archiving.
+                        </p>
+                        <div class="about-links">
+                            <a href="https://github.com/miguelcorderocollar/ExtractMD" target="_blank" class="about-link">
+                                <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                                </svg>
+                                GitHub Repository
+                            </a>
+                            <a href="https://miguelcorderocollar.com" target="_blank" class="about-link">
+                                <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="2" y1="12" x2="22" y2="12"/>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                </svg>
+                                Developer Website
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Feedback & Support</h3>
+                    <div class="feedback-card">
+                        <p class="feedback-text">
+                            Found a bug? Have a feature request? I'd love to hear from you!
+                        </p>
+                        <div class="button-row">
+                            <a href="https://github.com/miguelcorderocollar/ExtractMD/issues/new" target="_blank" class="btn btn-primary">
+                                <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                </svg>
+                                Open an Issue
+                            </a>
+                            <a href="mailto:contact@miguelcorderocollar.com" class="btn btn-secondary">
+                                <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                                Contact Developer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="about-credit">
+                    Made with <span class="credit-icon">🤖</span> by 
+                    <a href="https://github.com/miguelcorderocollar" target="_blank">miguelcorderocollar</a>
+                </div>
+            </section>
 
-        <div style="display: flex; gap: 8px; margin: 14px 14px 10px 14px;">
-            <button id="exportSettingsBtn" class="action-button" style="flex:1;">Export Settings</button>
-            <button id="importSettingsBtn" class="action-button" style="flex:1;">Import Settings</button>
-            <input type="file" id="importSettingsFile" accept="application/json" style="display:none;" />
-        </div>
-
-        <div class="status" id="status"></div>
-        <div class="footer-credit">Made with <span style="font-size:13px;">🤖</span> by <a href="https://github.com/miguelcorderocollar" target="_blank">miguelcorderocollar</a></div>
+            <!-- Status Message -->
+            <div class="status-message" id="status"></div>
+        </main>
     </div>
     <script src="dist/options.js"></script>
 </body>
 </html>
-

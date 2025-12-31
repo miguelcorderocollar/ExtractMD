@@ -2,7 +2,7 @@
 // This module imports and initializes all options page functionality
 
 import { initializeSettings } from './settings.js';
-import { initializeAccordion } from './accordion.js';
+import { initializeNavigation } from './navigation.js';
 import { initializeKpi } from './kpi.js';
 import { initializeImportExport } from './importExport.js';
 import { initializeDomainIgnore } from './domainIgnore.js';
@@ -13,9 +13,8 @@ import { initializeDomainIgnore } from './domainIgnore.js';
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all modules
     initializeSettings();
-    initializeAccordion();
+    initializeNavigation();
     initializeKpi();
     initializeImportExport();
     initializeDomainIgnore();
 });
-

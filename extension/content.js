@@ -66,6 +66,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         window.__extractmd_force_download = false;
       }, 100);
     }
+  } else if (message.action === 'checkExtractAvailable') {
+    // Check if extraction is available on this page
+    const isAvailable = typeof window.copyExtractMD === 'function';
+    sendResponse({ available: isAvailable });
   }
   return true; // Keep message channel open for async response
 });

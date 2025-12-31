@@ -47,18 +47,35 @@ export function calculateTimeSaved(stats) {
 }
 
 /**
- * Render KPI counters in the options page
+ * Render KPI counters in the options page with card layout
  * @param {Object} stats - Usage stats object
  */
 export function renderKpiCounters(stats) {
     const kpiCounters = document.getElementById('kpi-counters');
     if (!kpiCounters) return;
     
+    const youtube = stats.youtube || 0;
+    const articles = stats.articles || 0;
+    const hnComments = stats.hn_comments || 0;
+    const hnNews = stats.hn_news || 0;
+    
     kpiCounters.innerHTML = `
-        <span title="YouTube transcript copies">YT: <b>${stats.youtube || 0}</b></span>
-        <span title="Article exports">Articles: <b>${stats.articles || 0}</b></span>
-        <span title="HN comments exports">HN Comments: <b>${stats.hn_comments || 0}</b></span>
-        <span title="HN news exports">HN News: <b>${stats.hn_news || 0}</b></span>
+        <div class="kpi-card" title="YouTube transcript copies">
+            <div class="kpi-card-label">YouTube</div>
+            <div class="kpi-card-value">${youtube}</div>
+        </div>
+        <div class="kpi-card" title="Article exports">
+            <div class="kpi-card-label">Articles</div>
+            <div class="kpi-card-value">${articles}</div>
+        </div>
+        <div class="kpi-card" title="HN comments exports">
+            <div class="kpi-card-label">HN Comments</div>
+            <div class="kpi-card-value">${hnComments}</div>
+        </div>
+        <div class="kpi-card" title="HN news exports">
+            <div class="kpi-card-label">HN News</div>
+            <div class="kpi-card-value">${hnNews}</div>
+        </div>
     `;
 
     const totalSeconds = calculateTimeSaved(stats);
@@ -66,10 +83,9 @@ export function renderKpiCounters(stats) {
     
     if (timeSavedElement) {
         if (totalSeconds > 0) {
-            timeSavedElement.style.display = 'block';
-            timeSavedElement.innerHTML = `Estimated time saved: ~<b>${formatTimeSaved(totalSeconds)}</b>`;
+            timeSavedElement.textContent = `Estimated time saved: ~${formatTimeSaved(totalSeconds)}`;
         } else {
-            timeSavedElement.style.display = 'none';
+            timeSavedElement.textContent = '';
         }
     }
 }

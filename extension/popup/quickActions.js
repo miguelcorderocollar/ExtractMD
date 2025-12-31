@@ -3,6 +3,52 @@
 import { showStatus } from './ui.js';
 
 /**
+ * Check if the current domain is in the ignored list
+ * @returns {Promise<boolean>} True if domain is ignored
+ */
+async function isDomainIgnored() {
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (!tab || !tab.url) return false;
+        
+        const url = new URL(tab.url);
+        const domain = url.hostname;
+        
+        const { ignoredDomains = '' } = await chrome.storage.sync.get({ ignoredDomains: '' });
+        const domains = ignoredDomains.split('\n').map(d => d.trim()).filter(d => d.length > 0);
+        return domains.includes(domain);
+    } catch (e) {
+        console.error('[ExtractMD] Error checking ignored domain:', e);
+        return false;
+    }
+}
+
+/**
+ * Check if extraction is available on the current page
+ * @returns {Promise<boolean>} True if extraction is available
+ */
+async function isExtractionAvailable() {
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (!tab || !tab.id) return false;
+        
+        // Can't inject into chrome:// or other restricted URLs
+        if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || 
+            tab.url.startsWith('edge://') || tab.url.startsWith('about:')) {
+            return false;
+        }
+        
+        // Send message to content script to check if extraction is available
+        const response = await chrome.tabs.sendMessage(tab.id, { action: 'checkExtractAvailable' });
+        return response?.available === true;
+    } catch (e) {
+        // Content script not loaded or not responding
+        console.debug('[ExtractMD] Could not check extraction availability:', e.message);
+        return false;
+    }
+}
+
+/**
  * Handle Extract Now button click
  * Triggers extraction on the current page (respects user settings)
  */
@@ -91,16 +137,43 @@ async function initializeTargetDomain() {
 }
 
 /**
+ * Initialize Extract Now button visibility
+ * Hides the button if domain is blacklisted or no content to extract
+ */
+async function initializeExtractButton() {
+    const extractBtn = document.getElementById('extractNowBtn');
+    const extractSection = extractBtn?.parentElement;
+    
+    if (!extractBtn || !extractSection) return;
+    
+    // Check if domain is ignored
+    const ignored = await isDomainIgnored();
+    if (ignored) {
+        extractSection.style.display = 'none';
+        return;
+    }
+    
+    // Check if extraction is available
+    const available = await isExtractionAvailable();
+    if (!available) {
+        extractSection.style.display = 'none';
+        return;
+    }
+    
+    // Show the button if both checks pass
+    extractSection.style.display = 'block';
+    extractBtn.addEventListener('click', handleExtractNow);
+}
+
+/**
  * Initialize quick actions module
  */
 export function initializeQuickActions() {
-    const extractBtn = document.getElementById('extractNowBtn');
     const openTargetBtn = document.getElementById('openTargetBtn');
     const openSettingsBtn = document.getElementById('openSettingsBtn');
     
-    if (extractBtn) {
-        extractBtn.addEventListener('click', handleExtractNow);
-    }
+    // Initialize extract button (async - handles visibility)
+    initializeExtractButton();
     
     if (openTargetBtn) {
         openTargetBtn.addEventListener('click', handleOpenTarget);

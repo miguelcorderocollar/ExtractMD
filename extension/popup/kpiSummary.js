@@ -1,7 +1,7 @@
 // KPI summary display for ExtractMD popup (simplified version)
 
 /**
- * Render KPI counters in compact format
+ * Render KPI counters in compact inline format
  * @param {Object} stats - Usage stats object
  */
 function renderKpiSummary(stats) {
@@ -15,15 +15,27 @@ function renderKpiSummary(stats) {
     const total = youtube + articles + hnComments + hnNews;
     
     if (total === 0) {
-        kpiCounters.innerHTML = '<span style="color: #999; font-size: 12px;">No extractions yet</span>';
+        kpiCounters.innerHTML = '<span class="kpi-empty">No extractions yet</span>';
         return;
     }
     
     kpiCounters.innerHTML = `
-        <span title="YouTube transcript copies"><span style="font-size: 10px; color: #999;">YT</span><b>${youtube}</b></span>
-        <span title="Article exports"><span style="font-size: 10px; color: #999;">Art</span><b>${articles}</b></span>
-        <span title="HN comments exports"><span style="font-size: 10px; color: #999;">HN</span><b>${hnComments}</b></span>
-        <span title="HN news exports"><span style="font-size: 10px; color: #999;">News</span><b>${hnNews}</b></span>
+        <span class="kpi-item" title="YouTube transcript copies">
+            <span class="kpi-label">YT</span>
+            <span class="kpi-value">${youtube}</span>
+        </span>
+        <span class="kpi-item" title="Article exports">
+            <span class="kpi-label">Art</span>
+            <span class="kpi-value">${articles}</span>
+        </span>
+        <span class="kpi-item" title="HN comments exports">
+            <span class="kpi-label">HN</span>
+            <span class="kpi-value">${hnComments}</span>
+        </span>
+        <span class="kpi-item" title="HN news exports">
+            <span class="kpi-label">News</span>
+            <span class="kpi-value">${hnNews}</span>
+        </span>
     `;
 }
 
@@ -58,4 +70,3 @@ export function initializeKpiSummary() {
         }
     });
 }
-

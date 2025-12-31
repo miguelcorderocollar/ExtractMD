@@ -1,7 +1,7 @@
 // UI helper functions for ExtractMD popup
 
 /**
- * Show a status message in the popup
+ * Show a status message in the popup as a toast
  * @param {string} message - Message to display
  * @param {string} type - 'success' or 'error'
  */
@@ -10,10 +10,9 @@ export function showStatus(message, type) {
     if (!statusDiv) return;
     
     statusDiv.textContent = message;
-    statusDiv.className = `status ${type}`;
-    statusDiv.style.display = 'block';
+    statusDiv.className = `status-toast visible ${type}`;
     setTimeout(() => {
-        statusDiv.style.display = 'none';
+        statusDiv.classList.remove('visible');
     }, 3000);
 }
 
@@ -27,4 +26,3 @@ export function getManifest(callback) {
         .then(callback)
         .catch(() => callback({ name: 'ExtractMD', version: 'unknown' }));
 }
-

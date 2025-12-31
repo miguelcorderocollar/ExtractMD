@@ -70,10 +70,10 @@ function updateToggleButton(isIgnored) {
     if (!toggleBtn) return;
     
     if (isIgnored) {
-        toggleBtn.textContent = '✅ Enable';
+        toggleBtn.textContent = 'Enable';
         toggleBtn.classList.add('ignored');
     } else {
-        toggleBtn.textContent = '🚫 Ignore';
+        toggleBtn.textContent = 'Ignore';
         toggleBtn.classList.remove('ignored');
     }
 }
