@@ -1,20 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
-  <!-- Background circle -->
-  <circle cx="64" cy="64" r="60" fill="#14b8a6"/>
-  
-  <!-- Document -->
-  <rect x="35" y="30" width="40" height="55" rx="2" 
-        stroke="#fafafa" stroke-width="4" fill="none"/>
-  
-  <!-- Document fold -->
-  <path d="M65 30 L75 40 L65 40 Z" fill="#fafafa"/>
-  
-  <!-- Text lines -->
-  <line x1="42" y1="48" x2="68" y2="48" stroke="#fafafa" stroke-width="3" stroke-linecap="round"/>
-  <line x1="42" y1="58" x2="68" y2="58" stroke="#fafafa" stroke-width="3" stroke-linecap="round"/>
-  <line x1="42" y1="68" x2="55" y2="68" stroke="#fafafa" stroke-width="3" stroke-linecap="round"/>
-  
-  <!-- Extraction arrow -->
-  <line x1="78" y1="57" x2="95" y2="57" stroke="#fafafa" stroke-width="4" stroke-linecap="round"/>
-  <path d="M90 50 L100 57 L90 64" stroke="#fafafa" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap');
+    </style>
+  </defs>
+  <rect width="128" height="128" rx="19" fill="#14b8a6"/>
+  <text x="64.0" y="87.04" 
+        font-family="Playfair Display, Georgia, Times New Roman, serif" 
+        font-weight="700" 
+        font-size="83" 
+        fill="#fafafa" 
+        text-anchor="middle"
+        letter-spacing="-2">MD</text>
 </svg>
