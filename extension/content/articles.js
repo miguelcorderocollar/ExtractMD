@@ -155,6 +155,10 @@ async function extractArticleMarkdown(articleElem, includeImages) {
       return '';
     }
     const tag = node.tagName.toLowerCase();
+    // Skip SVG and other non-markdown elements to avoid attribute errors
+    if (tag === 'svg' || tag === 'script' || tag === 'style' || tag === 'noscript') {
+      return '';
+    }
     if (tag === 'h1') return `# ${node.textContent.trim()}\n\n`;
     if (tag === 'h2') return `## ${node.textContent.trim()}\n\n`;
     if (tag === 'h3') return `### ${node.textContent.trim()}\n\n`;
