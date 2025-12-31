@@ -176,7 +176,7 @@ function extractTranscriptText() {
 }
 
 // Global function for background script
-window.copyYouTubeTranscript = async function(settings = null) {
+export async function copyYouTubeTranscript(settings = null) {
   try {
     let mergedSettings = settings;
     if (!settings) {
@@ -201,7 +201,9 @@ window.copyYouTubeTranscript = async function(settings = null) {
     showNotification('Error: ' + error.message, 'error');
     throw error;
   }
-};
+}
+
+window.copyYouTubeTranscript = copyYouTubeTranscript;
 
 export function initYouTubeFeatures() {
   console.debug('[ExtractMD] initYouTubeFeatures called');
