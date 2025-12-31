@@ -1,7 +1,7 @@
 // Popup script for ExtractMD settings, import/export
 
 // Centralized defaults - single source of truth
-const DEFAULTS = {
+export const DEFAULTS = {
     includeTimestamps: true,
     addTitleToTranscript: true,
     addChannelToTranscript: true,
@@ -36,7 +36,7 @@ const DEFAULTS = {
 };
 
 // Helper: Save setting only if it differs from default, remove if it matches
-function saveSetting(key, value) {
+export function saveSetting(key, value) {
     if (key in DEFAULTS) {
         if (JSON.stringify(value) === JSON.stringify(DEFAULTS[key])) {
             // Value matches default, remove from storage to save space

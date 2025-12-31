@@ -146,55 +146,56 @@ export async function performArticleCopy(updateButton = false) {
   }
 }
 
-async function extractArticleMarkdown(articleElem, includeImages) {
-  function nodeToMarkdown(node) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      return node.textContent;
-    }
-    if (node.nodeType !== Node.ELEMENT_NODE) {
-      return '';
-    }
-    const tag = node.tagName.toLowerCase();
-    // Skip SVG and other non-markdown elements to avoid attribute errors
-    if (tag === 'svg' || tag === 'script' || tag === 'style' || tag === 'noscript') {
-      return '';
-    }
-    if (tag === 'h1') return `# ${node.textContent.trim()}\n\n`;
-    if (tag === 'h2') return `## ${node.textContent.trim()}\n\n`;
-    if (tag === 'h3') return `### ${node.textContent.trim()}\n\n`;
-    if (tag === 'h4') return `#### ${node.textContent.trim()}\n\n`;
-    if (tag === 'h5') return `##### ${node.textContent.trim()}\n\n`;
-    if (tag === 'h6') return `###### ${node.textContent.trim()}\n\n`;
-    if (tag === 'p') return `${Array.from(node.childNodes).map(nodeToMarkdown).join('')}\n\n`;
-    if (tag === 'ul') return `\n${Array.from(node.children).map(li => `- ${nodeToMarkdown(li)}`).join('')}\n`;
-    if (tag === 'ol') return `\n${Array.from(node.children).map((li, i) => `${i+1}. ${nodeToMarkdown(li)}`).join('')}\n`;
-    if (tag === 'li') return `${Array.from(node.childNodes).map(nodeToMarkdown).join('')}`;
-    if (tag === 'strong' || tag === 'b') return `**${node.textContent}**`;
-    if (tag === 'em' || tag === 'i') return `*${node.textContent}*`;
-    if (tag === 'blockquote') return `> ${node.textContent}\n\n`;
-    if (tag === 'code') return '```' + node.textContent + '```';
-    if (tag === 'pre') return '```' + node.textContent + '```';
-    if (tag === 'img' && includeImages) {
-      const alt = node.getAttribute('alt') || '';
-      let src = node.getAttribute('src') || '';
-      if (src) {
-        if (!src.match(/^https?:\/\//)) {
-          if (src.startsWith('/')) {
-            src = window.location.origin + src;
-          } else {
-            const base = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
-            src = base + src;
-          }
-        }
-        return `![${alt}](${src})\n\n`;
-      }
-    }
-    return Array.from(node.childNodes).map(nodeToMarkdown).join('');
+export function nodeToMarkdown(node, includeImages) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent;
   }
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return '';
+  }
+  const tag = node.tagName.toLowerCase();
+  // Skip SVG and other non-markdown elements to avoid attribute errors
+  if (tag === 'svg' || tag === 'script' || tag === 'style' || tag === 'noscript') {
+    return '';
+  }
+  if (tag === 'h1') return `# ${node.textContent.trim()}\n\n`;
+  if (tag === 'h2') return `## ${node.textContent.trim()}\n\n`;
+  if (tag === 'h3') return `### ${node.textContent.trim()}\n\n`;
+  if (tag === 'h4') return `#### ${node.textContent.trim()}\n\n`;
+  if (tag === 'h5') return `##### ${node.textContent.trim()}\n\n`;
+  if (tag === 'h6') return `###### ${node.textContent.trim()}\n\n`;
+  if (tag === 'p') return `${Array.from(node.childNodes).map(n => nodeToMarkdown(n, includeImages)).join('')}\n\n`;
+  if (tag === 'ul') return `\n${Array.from(node.children).map(li => `- ${nodeToMarkdown(li, includeImages)}`).join('\n')}\n`;
+  if (tag === 'ol') return `\n${Array.from(node.children).map((li, i) => `${i+1}. ${nodeToMarkdown(li, includeImages)}`).join('\n')}\n`;
+  if (tag === 'li') return `${Array.from(node.childNodes).map(n => nodeToMarkdown(n, includeImages)).join('')}`;
+  if (tag === 'strong' || tag === 'b') return `**${node.textContent}**`;
+  if (tag === 'em' || tag === 'i') return `*${node.textContent}*`;
+  if (tag === 'blockquote') return `> ${node.textContent}\n\n`;
+  if (tag === 'code') return '```' + node.textContent + '```';
+  if (tag === 'pre') return '```' + node.textContent + '```';
+  if (tag === 'img' && includeImages) {
+    const alt = node.getAttribute('alt') || '';
+    let src = node.getAttribute('src') || '';
+    if (src) {
+      if (!src.match(/^https?:\/\//)) {
+        if (src.startsWith('/')) {
+          src = window.location.origin + src;
+        } else {
+          const base = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
+          src = base + src;
+        }
+      }
+      return `![${alt}](${src})\n\n`;
+    }
+  }
+  return Array.from(node.childNodes).map(n => nodeToMarkdown(n, includeImages)).join('');
+}
+
+export async function extractArticleMarkdown(articleElem, includeImages) {
   let markdown = '';
   const children = Array.from(articleElem.childNodes);
   children.forEach(child => {
-    const md = nodeToMarkdown(child);
+    const md = nodeToMarkdown(child, includeImages);
     if (md && md.trim()) {
       markdown += md;
     }
