@@ -1,4 +1,6 @@
 import { defineConfig } from 'vitest/config';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
 export default defineConfig({
   test: {
@@ -11,6 +13,18 @@ export default defineConfig({
       include: ['extension/**/*.js'],
       exclude: ['extension/dist/**', 'tests/unit/**']
     }
-  }
+  },
+  plugins: [
+    {
+      name: 'svg-loader',
+      load(id) {
+        if (id.endsWith('.svg')) {
+          // Trim whitespace and newlines from SVG content
+          const svgContent = readFileSync(id, 'utf-8').trim();
+          return `export default ${JSON.stringify(svgContent)}`;
+        }
+      }
+    }
+  ]
 });
 

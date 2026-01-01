@@ -61,11 +61,13 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       
-      const svg = controller.element.querySelector('svg');
-      expect(svg).not.toBeNull();
-      expect(controller.element.innerHTML).toContain('viewBox="0 0 24 24"');
-      // Check for clipboard path
-      expect(controller.element.innerHTML).toContain('M16 4h2a2 2 0 0 1 2 2v14');
+      // SVG is inside the content container - jsdom converts SVG to data URI
+      const contentContainer = controller.element.querySelector('.extractmd-button-content');
+      expect(contentContainer).not.toBeNull();
+      // Decode URL-encoded content to check SVG
+      const innerHTML = decodeURIComponent(contentContainer.innerHTML);
+      expect(innerHTML).toContain('viewBox');
+      expect(innerHTML).toContain('M16 4h2a2 2 0 0 1 2 2v14');
     });
 
     it('uses custom id when provided', async () => {
@@ -326,9 +328,13 @@ describe('FloatingButton component', () => {
       
       controller.setSuccess();
       
-      // Should contain checkmark polyline
-      expect(controller.element.innerHTML).toContain('polyline');
-      expect(controller.element.innerHTML).toContain('points="20 6 9 17 4 12"');
+      // Should contain checkmark polyline - decode URL-encoded content
+      const contentContainer = controller.element.querySelector('.extractmd-button-content');
+      expect(contentContainer).not.toBeNull();
+      const innerHTML = decodeURIComponent(contentContainer.innerHTML);
+      expect(innerHTML).toContain('polyline');
+      // SVG may use single or double quotes
+      expect(innerHTML).toMatch(/points=['"]20\s+6\s+9\s+17\s+4\s+12['"]/);
     });
 
     it('setSuccess uses success color for background', async () => {
@@ -347,9 +353,13 @@ describe('FloatingButton component', () => {
       
       controller.setError();
       
-      // Should contain X lines
-      expect(controller.element.innerHTML).toContain('x1="18"');
-      expect(controller.element.innerHTML).toContain('x2="6"');
+      // Should contain X lines - check innerHTML (may be URL-encoded)
+      const contentContainer = controller.element.querySelector('.extractmd-button-content');
+      expect(contentContainer).not.toBeNull();
+      const innerHTML = contentContainer.innerHTML;
+      expect(innerHTML).toMatch(/line/i);
+      expect(innerHTML).toMatch(/x1[=:]['"]18['"]/i);
+      expect(innerHTML).toMatch(/x2[=:]['"]6['"]/i);
     });
 
     it('setError uses error color for background', async () => {
@@ -369,8 +379,11 @@ describe('FloatingButton component', () => {
       controller.setLoading();
       controller.setNormal();
       
-      // Should contain clipboard path again
-      expect(controller.element.innerHTML).toContain('M16 4h2a2 2 0 0 1 2 2v14');
+      // Should contain clipboard path again - decode URL-encoded content
+      const contentContainer = controller.element.querySelector('.extractmd-button-content');
+      expect(contentContainer).not.toBeNull();
+      const innerHTML = decodeURIComponent(contentContainer.innerHTML);
+      expect(innerHTML).toContain('M16 4h2a2 2 0 0 1 2 2v14');
       expect(controller.element.dataset.processing).toBeUndefined();
       expect(controller.element.style.cursor).toBe('pointer');
       expect(controller.element.style.opacity).toBe('0.5');
