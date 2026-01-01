@@ -96,16 +96,16 @@ Contact: [Your email or support URL]
 
 #### Required Assets
 - [x] Extension icons (16x16, 48x48, 128x128) ✅
-- [ ] **Screenshots** (at least 1, recommended 3-5)
-  - [ ] Screenshot 1: Popup interface showing settings
+- [x] **Screenshots** (at least 1, recommended 3-5)
+  - [x] Screenshot 1: Popup interface showing settings
   - [ ] Screenshot 2: Floating button on YouTube page
   - [ ] Screenshot 3: Floating button on Hacker News
-  - [ ] Screenshot 4: Options page
+  - [x] Screenshot 4: Options page
   - [ ] Screenshot 5: Example extracted Markdown output
 - [ ] **Promotional images** (optional but recommended)
-  - [ ] Small promotional tile (440x280)
+  - [x] Small promotional tile (440x280)
   - [ ] Large promotional tile (920x680)
-  - [ ] Marquee promotional tile (1400x560)
+  - [x] Marquee promotional tile (1400x560)
 
 #### Screenshot Requirements
 - Minimum 1 screenshot required
@@ -163,19 +163,23 @@ Contact: [Your email or support URL]
 ### 7. Packaging & Submission
 
 #### Package Preparation
-- [ ] Run production build: `npm run build:prod`
-- [ ] Verify all files are included:
-  - [ ] manifest.json
-  - [ ] background.js
-  - [ ] dist/content.js (bundled)
-  - [ ] popup.html, popup.js, popup.css
-  - [ ] options.html, options.js, options.css
-  - [ ] All icon files (16, 48, 128)
-  - [ ] All image assets
-- [ ] Create ZIP file of extension folder
-- [ ] Test ZIP by loading as unpacked extension
-- [ ] Verify no unnecessary files included (node_modules, tests, etc.)
-- [ ] Check ZIP file size (should be reasonable, < 10MB typically)
+- [x] Run package script: `npm run package` (automates all steps below)
+  - [x] Automatically runs production build: `npm run build:prod`
+  - [x] Verifies all required files are included:
+    - [x] manifest.json
+    - [x] background.js
+    - [x] dist/content.js (bundled)
+    - [x] dist/popup.js (bundled)
+    - [x] dist/options.js (bundled)
+    - [x] popup.html, popup.css
+    - [x] options.html, options.css
+    - [x] All icon files (16, 48, 128)
+    - [x] All image assets
+  - [x] Creates ZIP file (`extractmd.zip`) in project root
+  - [x] Verifies no unnecessary files included (node_modules, tests, source maps, etc.)
+  - [x] Checks ZIP file size (warns if > 10MB)
+- [x] Test ZIP by loading as unpacked extension in Chrome
+- [x] Verify all features work correctly
 
 #### Submission Process
 - [ ] Upload ZIP file via Chrome Developer Dashboard
