@@ -22,7 +22,7 @@ This document contains the ready-to-use content for the Chrome Web Store listing
 https://github.com/miguelcorderocollar/yt-transcript-extension/issues
 
 ## Homepage URL
-https://github.com/miguelcorderocollar/yt-transcript-extension
+https://extractmd.miguelcorderocollar.com/
 
 ---
 

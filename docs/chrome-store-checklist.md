@@ -131,7 +131,7 @@ Contact: [Your email or support URL]
 - [x] **Category**: Productivity (or Developer Tools)
 - [x] **Language**: English
 - [x] **Support URL**: `https://github.com/miguelcorderocollar/yt-transcript-extension/issues`
-- [x] **Homepage URL**: `https://github.com/miguelcorderocollar/yt-transcript-extension`
+- [x] **Homepage URL**: `https://extractmd.miguelcorderocollar.com/`
 
 #### Listing Best Practices
 - [ ] Description is clear and accurate

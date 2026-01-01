@@ -27,7 +27,7 @@
   "bugs": {
     "url": "https://github.com/miguelcorderocollar/yt-transcript-extension/issues"
   },
-  "homepage": "https://github.com/miguelcorderocollar/yt-transcript-extension#readme",
+  "homepage": "https://extractmd.miguelcorderocollar.com/",
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "@vitest/coverage-v8": "^4.0.16",
