@@ -43,6 +43,13 @@
         "mac": "Command+Shift+E"
       },
       "description": "Copy content as Markdown"
+    },
+    "hide-content": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+H",
+        "mac": "Command+Shift+H"
+      },
+      "description": "Toggle ExtractMD button for this domain (hide/show)"
     }
   },
   "options_ui": {

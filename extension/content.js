@@ -1,5 +1,6 @@
 // Utility functions have been moved to './content/utils.js' and are now imported below.
 import { copyToClipboard, showNotification, htmlToMarkdown, sleep, getSettings } from './content/utils.js';
+import { saveSetting } from './shared/storage.js';
 import { initYouTubeFeatures, copyYouTubeTranscript } from './content/youtube.js';
 import { initHackerNewsFeatures, performHNCopy } from './content/hackernews.js';
 import { initArticleFeatures, performArticleCopy } from './content/articles.js';
@@ -113,20 +114,90 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true; // Keep message channel open for async response
 });
 
-// Listen for keyboard shortcut Ctrl+Shift+C
+/**
+ * Toggle ExtractMD button for current domain (hide/show)
+ * Equivalent to clicking the X on floating button or disable/enable on popup
+ */
+async function toggleExtractMDForDomain() {
+  const domain = window.location.hostname;
+  if (!domain) return;
+  
+  return new Promise(resolve => {
+    chrome.storage.sync.get({ ignoredDomains: '' }, (items) => {
+      let domains = items.ignoredDomains.split('\n').map(d => d.trim()).filter(d => d.length > 0);
+      const isCurrentlyIgnored = domains.includes(domain);
+      
+      if (isCurrentlyIgnored) {
+        // Remove from ignored list (enable ExtractMD)
+        domains = domains.filter(d => d !== domain);
+        const newValue = domains.join('\n');
+        saveSetting('ignoredDomains', newValue);
+        
+        // Clear the ignored flag
+        window.__extractmd_domain_ignored = false;
+        
+        // Reinitialize ExtractMD for this page
+        setTimeout(() => {
+          runInitForCurrentPage();
+        }, 100);
+        
+        // Show notification
+        showNotification(`ExtractMD enabled for ${domain}`, 'success');
+        
+        console.debug(`[ExtractMD] Domain ${domain} removed from ignore list`);
+        resolve();
+      } else {
+        // Add to ignored list (disable ExtractMD)
+        domains.push(domain);
+        const newValue = domains.join('\n');
+        saveSetting('ignoredDomains', newValue);
+        
+        // Set global flag to prevent mutation observers from recreating the button
+        window.__extractmd_domain_ignored = true;
+        
+        // Clear the copy function
+        window.copyExtractMD = null;
+        
+        // Remove the floating button if it exists
+        const existingButton = document.getElementById('extractmd-floating-button');
+        if (existingButton && existingButton.parentNode) {
+          existingButton.parentNode.removeChild(existingButton);
+        }
+        
+        // Show notification
+        showNotification(`ExtractMD disabled for ${domain}`, 'info');
+        
+        console.debug(`[ExtractMD] Domain ${domain} added to ignore list`);
+        resolve();
+      }
+    });
+  });
+}
+
+// Keep the old name for backward compatibility with background.js
+window.hideExtractMDForDomain = toggleExtractMDForDomain;
+
+// Make it available globally for background script
+window.hideExtractMDForDomain = hideExtractMDForDomain;
+
+// Listen for keyboard shortcut Ctrl+Shift+E (copy) and Ctrl+Shift+H (toggle hide/show)
 document.addEventListener('keydown', (e) => {
-  // Check for Ctrl+Shift+C (or Cmd+Shift+C on Mac)
+  // Check for Ctrl+Shift (or Cmd+Shift on Mac)
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
   const modifier = isMac ? e.metaKey : e.ctrlKey;
   
   if (modifier && e.shiftKey && e.code === 'KeyE') {
     if (window.copyExtractMD) {
-      console.debug('[ExtractMD] Shortcut triggered: Ctrl+Shift+C');
+      console.debug('[ExtractMD] Shortcut triggered: Ctrl+Shift+E (copy)');
       // We don't always want to preventDefault because it might interfere with other things,
       // but for this specific shortcut it's usually what's intended.
       // e.preventDefault(); 
       window.copyExtractMD();
     }
+  } else if (modifier && e.shiftKey && e.code === 'KeyH') {
+    console.debug('[ExtractMD] Shortcut triggered: Ctrl+Shift+H (toggle hide/show)');
+    e.preventDefault();
+    toggleExtractMDForDomain();
   }
 });
 
