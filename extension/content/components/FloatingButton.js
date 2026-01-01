@@ -8,6 +8,91 @@ const DEFAULT_BOTTOM = 20;
 const DRAG_THRESHOLD = 5; // pixels - movement less than this triggers click
 const HOVER_DELAY_MS = 500; // ms before showing dismiss button
 
+// Size configurations
+const SIZE_CONFIG = {
+  extraSmall: { size: 32, radius: 8, iconSize: 14 },
+  small: { size: 40, radius: 10, iconSize: 18 },
+  medium: { size: 48, radius: 12, iconSize: 22 },
+  large: { size: 56, radius: 14, iconSize: 26 },
+  extraLarge: { size: 64, radius: 16, iconSize: 30 }
+};
+
+// Transparency configurations (opacity values)
+const TRANSPARENCY_CONFIG = {
+  low: 0.3,
+  medium: 0.5,
+  high: 0.7,
+  full: 1.0
+};
+
+// Theme colors - hardcoded since we inject into third-party pages
+const THEME = {
+  light: {
+    accent: '#14b8a6',
+    accentHover: '#0d9488',
+    success: '#22c55e',
+    error: '#ef4444',
+    loading: '#f59e0b',
+    iconColor: '#fafafa'
+  },
+  dark: {
+    accent: '#2dd4bf',
+    accentHover: '#5eead4',
+    success: '#4ade80',
+    error: '#f87171',
+    loading: '#fbbf24',
+    iconColor: '#171717'
+  }
+};
+
+// SVG Icons
+const ICONS = {
+  clipboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+  </svg>`,
+  success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>`,
+  error: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/>
+    <line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>`,
+  loading: `<svg viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="6" cy="12" r="2" class="extractmd-dot extractmd-dot-1"/>
+    <circle cx="12" cy="12" r="2" class="extractmd-dot extractmd-dot-2"/>
+    <circle cx="18" cy="12" r="2" class="extractmd-dot extractmd-dot-3"/>
+  </svg>`
+};
+
+// CSS animation for loading dots
+const LOADING_ANIMATION_CSS = `
+  @keyframes extractmd-bounce {
+    0%, 80%, 100% { transform: scale(1); opacity: 0.5; }
+    40% { transform: scale(1.2); opacity: 1; }
+  }
+  .extractmd-dot { animation: extractmd-bounce 1.4s infinite ease-in-out both; }
+  .extractmd-dot-1 { animation-delay: -0.32s; }
+  .extractmd-dot-2 { animation-delay: -0.16s; }
+  .extractmd-dot-3 { animation-delay: 0s; }
+`;
+
+/**
+ * Detect if user prefers dark mode
+ * @returns {boolean}
+ */
+function isDarkMode() {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+/**
+ * Get current theme colors based on system preference
+ * @returns {Object}
+ */
+function getThemeColors() {
+  return isDarkMode() ? THEME.dark : THEME.light;
+}
+
 /**
  * Load saved position offset for a domain from chrome.storage.local
  * @param {string} domain - The domain to load position for
@@ -20,6 +105,30 @@ async function loadPositionOffset(domain) {
     chrome.storage.local.get({ floatingButtonPositions: {} }, (items) => {
       const positions = items.floatingButtonPositions || {};
       resolve(positions[domain] || DEFAULT_OFFSET);
+    });
+  });
+}
+
+/**
+ * Load button size setting from storage
+ * @returns {Promise<string>}
+ */
+async function loadButtonSize() {
+  return new Promise(resolve => {
+    chrome.storage.sync.get({ floatingButtonSize: 'medium' }, (items) => {
+      resolve(items.floatingButtonSize || 'medium');
+    });
+  });
+}
+
+/**
+ * Load button transparency setting from storage
+ * @returns {Promise<string>}
+ */
+async function loadButtonTransparency() {
+  return new Promise(resolve => {
+    chrome.storage.sync.get({ floatingButtonTransparency: 'medium' }, (items) => {
+      resolve(items.floatingButtonTransparency || 'medium');
     });
   });
 }
@@ -62,11 +171,21 @@ async function addDomainToIgnoreList(domain) {
 }
 
 /**
+ * Inject loading animation styles if not already present
+ */
+function injectAnimationStyles() {
+  if (document.getElementById('extractmd-animation-styles')) return;
+  
+  const style = document.createElement('style');
+  style.id = 'extractmd-animation-styles';
+  style.textContent = LOADING_ANIMATION_CSS;
+  document.head.appendChild(style);
+}
+
+/**
  * Creates a floating action button for ExtractMD
  * @param {Object} options - Configuration options
  * @param {Function} options.onClick - Click handler function
- * @param {string} [options.variant='dark'] - Visual variant: 'dark' (glassmorphism) or 'light' (solid white)
- * @param {string} [options.emoji='📝'] - Emoji to display in the button
  * @param {string} [options.id='extractmd-floating-button'] - DOM element ID
  * @param {string} [options.domain] - Current domain for position persistence and ignore functionality
  * @param {boolean} [options.enableDrag=true] - Whether dragging to reposition is enabled
@@ -75,8 +194,6 @@ async function addDomainToIgnoreList(domain) {
  */
 export async function createFloatingButton({
   onClick,
-  variant = 'dark',
-  emoji = '📝',
   id = 'extractmd-floating-button',
   domain = '',
   enableDrag = true,
@@ -88,88 +205,94 @@ export async function createFloatingButton({
     return null;
   }
 
-  // Load saved position BEFORE creating the button to avoid flash
+  // Inject animation styles
+  injectAnimationStyles();
+
+  // Load settings
   let currentOffset = { ...DEFAULT_OFFSET };
   if (domain) {
     currentOffset = await loadPositionOffset(domain);
   }
+  const sizeName = await loadButtonSize();
+  const sizeConfig = SIZE_CONFIG[sizeName] || SIZE_CONFIG.medium;
+  const transparencyName = await loadButtonTransparency();
+  const idleOpacity = TRANSPARENCY_CONFIG[transparencyName] || TRANSPARENCY_CONFIG.medium;
+  
+  // Get theme colors
+  const colors = getThemeColors();
 
   const button = document.createElement('div');
   button.id = id;
   
-  // Create inner content container
+  // Create inner content container for icon
   const contentContainer = document.createElement('div');
-  contentContainer.className = 'button-content';
-  contentContainer.innerHTML = `<div class="button-emoji">${emoji}</div>`;
+  contentContainer.className = 'extractmd-button-content';
+  contentContainer.innerHTML = ICONS.clipboard;
+  
+  // Set content container styles individually for jsdom compatibility
+  const cs = contentContainer.style;
+  cs.width = `${sizeConfig.iconSize}px`;
+  cs.height = `${sizeConfig.iconSize}px`;
+  cs.display = 'flex';
+  cs.alignItems = 'center';
+  cs.justifyContent = 'center';
+  cs.color = colors.iconColor;
+  
+  const svg = contentContainer.querySelector('svg');
+  if (svg) {
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+  }
   button.appendChild(contentContainer);
   
   // Create dismiss button (hidden by default)
   const dismissBtn = document.createElement('div');
   dismissBtn.className = 'extractmd-dismiss-btn';
   dismissBtn.innerHTML = '×';
-  dismissBtn.style.cssText = `
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #ef4444;
-    color: white;
-    font-size: 14px;
-    line-height: 18px;
-    text-align: center;
-    cursor: pointer;
-    display: none;
-    z-index: 10001;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    font-weight: bold;
-  `;
+  
+  // Set dismiss button styles individually
+  const ds = dismissBtn.style;
+  ds.position = 'absolute';
+  ds.top = '-6px';
+  ds.right = '-6px';
+  ds.width = '18px';
+  ds.height = '18px';
+  ds.borderRadius = '50%';
+  ds.background = colors.error;
+  ds.color = 'white';
+  ds.fontSize = '14px';
+  ds.lineHeight = '18px';
+  ds.textAlign = 'center';
+  ds.cursor = 'pointer';
+  ds.display = 'none';
+  ds.zIndex = '10001';
+  ds.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+  ds.fontWeight = 'bold';
   button.appendChild(dismissBtn);
 
   // Calculate initial position with saved offset applied
   const initialRight = DEFAULT_RIGHT + currentOffset.left;
   const initialBottom = DEFAULT_BOTTOM + currentOffset.up;
 
-  // Variant-specific styles
-  const baseStyles = `
-    position: fixed;
-    bottom: ${initialBottom}px;
-    right: ${initialRight}px;
-    border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    cursor: pointer;
-    font-size: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: box-shadow 0.3s ease, opacity 0.3s ease, background 0.3s ease;
-    user-select: none;
-  `;
-
-  const variantStyles = variant === 'light'
-    ? `
-      background: rgba(255, 255, 255, 0.95);
-      color: #222;
-      border: 1px solid #ccc;
-      opacity: 1;
-    `
-    : `
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      color: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      opacity: 0.7;
-    `;
-
-  button.style.cssText = baseStyles + variantStyles;
-
-  // Hover effects based on variant
-  const hoverBg = variant === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.25)';
-  const normalBg = variant === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.15)';
+  // Button styles - set individually for jsdom compatibility
+  const bs = button.style;
+  bs.position = 'fixed';
+  bs.bottom = `${initialBottom}px`;
+  bs.right = `${initialRight}px`;
+  bs.borderRadius = `${sizeConfig.radius}px`;
+  bs.width = `${sizeConfig.size}px`;
+  bs.height = `${sizeConfig.size}px`;
+  bs.cursor = 'pointer';
+  bs.background = colors.accent;
+  bs.border = 'none';
+  bs.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+  bs.zIndex = '10000';
+  bs.display = 'flex';
+  bs.alignItems = 'center';
+  bs.justifyContent = 'center';
+  bs.transition = 'box-shadow 0.2s ease, opacity 0.2s ease, background 0.2s ease, transform 0.2s ease';
+  bs.userSelect = 'none';
+  bs.opacity = idleOpacity.toString();
 
   // Drag state
   let isDragging = false;
@@ -205,7 +328,7 @@ export async function createFloatingButton({
     
     // Change cursor
     button.style.cursor = 'grabbing';
-    button.style.transition = 'box-shadow 0.3s ease, opacity 0.3s ease, background 0.3s ease';
+    button.style.transition = 'box-shadow 0.2s ease, opacity 0.2s ease, background 0.2s ease';
   });
 
   // Mouse move - handle drag
@@ -221,15 +344,15 @@ export async function createFloatingButton({
     }
     
     // Update position
-    const newRight = Math.max(0, Math.min(window.innerWidth - 60, buttonStartRight + deltaX));
-    const newBottom = Math.max(0, Math.min(window.innerHeight - 60, buttonStartBottom + deltaY));
+    const newRight = Math.max(0, Math.min(window.innerWidth - sizeConfig.size - 4, buttonStartRight + deltaX));
+    const newBottom = Math.max(0, Math.min(window.innerHeight - sizeConfig.size - 4, buttonStartBottom + deltaY));
     
     button.style.right = `${newRight}px`;
     button.style.bottom = `${newBottom}px`;
   };
 
   // Mouse up - end drag or trigger click
-  const handleMouseUp = (e) => {
+  const handleMouseUp = () => {
     if (!isDragging) return;
     
     isDragging = false;
@@ -283,7 +406,8 @@ export async function createFloatingButton({
       isHovering = true;
       button.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
       button.style.opacity = '1';
-      button.style.background = hoverBg;
+      button.style.background = colors.accentHover;
+      button.style.transform = 'scale(1.05)';
       
       // Start timer to show dismiss button (only if dismiss is enabled)
       if (domain && enableDismiss) {
@@ -310,8 +434,9 @@ export async function createFloatingButton({
     
     if (!button.dataset.processing) {
       button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-      button.style.opacity = variant === 'light' ? '1' : '0.7';
-      button.style.background = normalBg;
+      button.style.opacity = idleOpacity.toString();
+      button.style.background = colors.accent;
+      button.style.transform = 'scale(1)';
     }
   });
 
@@ -339,6 +464,16 @@ export async function createFloatingButton({
     }
   });
 
+  // Helper to update icon
+  const updateIcon = (iconHtml, color) => {
+    contentContainer.innerHTML = iconHtml;
+    contentContainer.style.color = color;
+    const svg = contentContainer.querySelector('svg');
+    if (svg) {
+      svg.style.cssText = 'width: 100%; height: 100%;';
+    }
+  };
+
   // Controller object with state methods
   const controller = {
     element: button,
@@ -348,12 +483,11 @@ export async function createFloatingButton({
      */
     setLoading() {
       button.dataset.processing = 'true';
-      contentContainer.innerHTML = `<div class="button-emoji">⏳</div>`;
-      button.style.background = 'rgba(255, 193, 7, 0.8)';
-      button.style.border = '1px solid rgba(255, 193, 7, 0.3)';
+      updateIcon(ICONS.loading, colors.iconColor);
+      button.style.background = colors.loading;
       button.style.cursor = 'not-allowed';
-      button.style.fontSize = '20px';
       button.style.opacity = '1';
+      button.style.transform = 'scale(1)';
       dismissBtn.style.display = 'none';
     },
 
@@ -361,22 +495,20 @@ export async function createFloatingButton({
      * Set button to success state
      */
     setSuccess() {
-      contentContainer.innerHTML = `<div class="button-emoji">✅</div>`;
-      button.style.background = 'rgba(76, 175, 80, 0.8)';
-      button.style.border = '1px solid rgba(76, 175, 80, 0.3)';
-      button.style.fontSize = '24px';
+      updateIcon(ICONS.success, colors.iconColor);
+      button.style.background = colors.success;
       button.style.opacity = '1';
+      button.style.transform = 'scale(1)';
     },
 
     /**
      * Set button to error state
      */
     setError() {
-      contentContainer.innerHTML = `<div class="button-emoji">❌</div>`;
-      button.style.background = 'rgba(244, 67, 54, 0.8)';
-      button.style.border = '1px solid rgba(244, 67, 54, 0.3)';
-      button.style.fontSize = '24px';
+      updateIcon(ICONS.error, colors.iconColor);
+      button.style.background = colors.error;
       button.style.opacity = '1';
+      button.style.transform = 'scale(1)';
     },
 
     /**
@@ -384,12 +516,11 @@ export async function createFloatingButton({
      */
     setNormal() {
       delete button.dataset.processing;
-      contentContainer.innerHTML = `<div class="button-emoji">${emoji}</div>`;
-      button.style.background = normalBg;
-      button.style.border = variant === 'light' ? '1px solid #ccc' : '1px solid rgba(255, 255, 255, 0.2)';
+      updateIcon(ICONS.clipboard, colors.iconColor);
+      button.style.background = colors.accent;
       button.style.cursor = 'pointer';
-      button.style.fontSize = '24px';
-      button.style.opacity = variant === 'light' ? '1' : '0.7';
+      button.style.opacity = idleOpacity.toString();
+      button.style.transform = 'scale(1)';
     },
 
     /**

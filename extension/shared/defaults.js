@@ -57,7 +57,9 @@ export const DEFAULTS = {
   
   // Floating button behavior
   floatingButtonEnableDrag: true,
-  floatingButtonEnableDismiss: true
+  floatingButtonEnableDismiss: true,
+  floatingButtonSize: 'medium',  // 'small' | 'medium' | 'large'
+  floatingButtonTransparency: 'medium'  // 'low' | 'medium' | 'high' | 'full'
 };
 
 // Schema for validation during import
@@ -102,6 +104,8 @@ export const SETTING_SCHEMA = {
   universalStripNav: 'boolean',
   universalPreserveCodeBlocks: 'boolean',
   floatingButtonEnableDrag: 'boolean',
-  floatingButtonEnableDismiss: 'boolean'
+  floatingButtonEnableDismiss: 'boolean',
+  floatingButtonSize: 'string',
+  floatingButtonTransparency: 'string'
 };
 

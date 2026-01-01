@@ -1,15 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <defs>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap');
-    </style>
-  </defs>
+  <!-- Background rounded square -->
   <rect width="128" height="128" rx="19" fill="#14b8a6"/>
-  <text x="64.0" y="87.04" 
-        font-family="Playfair Display, Georgia, Times New Roman, serif" 
-        font-weight="700" 
-        font-size="83" 
-        fill="#fafafa" 
-        text-anchor="middle"
-        letter-spacing="-2">MD</text>
+  
+  <!-- Clipboard icon - use nested SVG for clean scaling -->
+  <svg x="17.92" y="17.92" width="92.16" height="92.16" viewBox="0 0 24 24">
+    <!-- Clipboard board - open path that wraps around but leaves gap at top for clip -->
+    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" 
+          fill="none" stroke="#fafafa" stroke-width="2.5" 
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Clip at top -->
+    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" 
+          fill="none" stroke="#fafafa" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
 </svg>

@@ -275,8 +275,6 @@ async function initializeFloatingButton() {
   });
   
   floatingButtonController = await createFloatingButton({
-    variant: 'dark',
-    emoji: '📝',
     domain: window.location.hostname,
     enableDrag: buttonSettings.floatingButtonEnableDrag,
     enableDismiss: buttonSettings.floatingButtonEnableDismiss,

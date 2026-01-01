@@ -293,8 +293,6 @@ export function initHackerNewsFeatures() {
     }
     
     floatingButtonController = await createFloatingButton({
-      variant: 'dark',
-      emoji: '📝',
       domain: window.location.hostname,
       enableDrag: items.floatingButtonEnableDrag,
       enableDismiss: items.floatingButtonEnableDismiss,

@@ -286,8 +286,6 @@ async function manageFloatingButtonForArticles() {
       });
       
       floatingButtonController = await createFloatingButton({
-        variant: 'light',
-        emoji: '📝',
         domain: window.location.hostname,
         enableDrag: buttonSettings.floatingButtonEnableDrag,
         enableDismiss: buttonSettings.floatingButtonEnableDismiss,
