@@ -110,6 +110,16 @@ export async function initializeDomainToggle() {
             const nowIgnored = await toggleDomainIgnore(currentDomain);
             updateToggleButton(nowIgnored);
             
+            // Send message to content script to reinitialize
+            try {
+                const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+                if (tab && tab.id) {
+                    chrome.tabs.sendMessage(tab.id, { action: 'reinitialize' });
+                }
+            } catch (e) {
+                console.debug('[ExtractMD] Could not send reinitialize message:', e);
+            }
+            
             if (nowIgnored) {
                 showStatus(`${currentDomain} will be ignored`, 'success');
             } else {

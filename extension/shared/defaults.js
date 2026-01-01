@@ -53,7 +53,11 @@ export const DEFAULTS = {
   universalContentMode: 'auto',  // 'auto' | 'full' | 'main' | 'selector'
   universalCustomSelector: '',
   universalStripNav: true,
-  universalPreserveCodeBlocks: true
+  universalPreserveCodeBlocks: true,
+  
+  // Floating button behavior
+  floatingButtonEnableDrag: true,
+  floatingButtonEnableDismiss: true
 };
 
 // Schema for validation during import
@@ -96,6 +100,8 @@ export const SETTING_SCHEMA = {
   universalContentMode: 'string',
   universalCustomSelector: 'string',
   universalStripNav: 'boolean',
-  universalPreserveCodeBlocks: 'boolean'
+  universalPreserveCodeBlocks: 'boolean',
+  floatingButtonEnableDrag: 'boolean',
+  floatingButtonEnableDismiss: 'boolean'
 };
 
