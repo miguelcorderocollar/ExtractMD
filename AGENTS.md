@@ -32,3 +32,20 @@ When the user says **"create PR"**, automatically:
 
 No user input required—infer everything from git history and file changes.
 
+## Packaging Workflow
+
+The packaging script (`scripts/package.js`) is used to prepare the extension for Chrome Web Store submission:
+
+- **Command**: `npm run package`
+- **Location**: `scripts/package.js`
+- **Process**:
+  1. Runs production build (`npm run build:prod`)
+  2. Verifies all required files exist
+  3. Checks for source maps (excludes from ZIP)
+  4. Validates manifest.json file references
+  5. Creates versioned ZIP in `packages/extractmd-{version}.zip`
+- **Output**: ZIP file ready for Chrome Web Store upload
+- **Validation**: Script provides errors/warnings for missing files, large sizes (>10MB), and manifest issues
+
+Always run `npm run package` before submitting to Chrome Web Store to ensure all files are properly included and validated.
+

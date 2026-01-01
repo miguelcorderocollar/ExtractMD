@@ -175,7 +175,7 @@ Contact: [Your email or support URL]
     - [x] options.html, options.css
     - [x] All icon files (16, 48, 128)
     - [x] All image assets
-  - [x] Creates ZIP file (`extractmd.zip`) in project root
+  - [x] Creates ZIP file (`extractmd-{version}.zip`) in `packages/` folder (e.g., `packages/extractmd-1.0.zip`)
   - [x] Verifies no unnecessary files included (node_modules, tests, source maps, etc.)
   - [x] Checks ZIP file size (warns if > 10MB)
 - [x] Test ZIP by loading as unpacked extension in Chrome

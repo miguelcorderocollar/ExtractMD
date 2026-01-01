@@ -71,7 +71,23 @@ npm run build:prod
 
 # Watch mode (auto-rebuild)
 npm run watch
+
+# Package extension for Chrome Web Store
+npm run package
 ```
+
+### Packaging
+
+The packaging script (`scripts/package.js`) prepares the extension for Chrome Web Store submission:
+
+- Runs production build automatically
+- Verifies all required files are present
+- Checks for source maps (excludes them from ZIP)
+- Validates manifest.json references
+- Creates a versioned ZIP file in `packages/` directory
+- Provides warnings for files larger than 10MB
+
+The generated ZIP file (`packages/extractmd-{version}.zip`) is ready for upload to the Chrome Web Store Developer Dashboard.
 
 ## Architecture
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execSync } from 'child_process';
-import { readdir, stat, readFile, writeFile } from 'fs/promises';
+import { readdir, stat, readFile, writeFile, mkdir } from 'fs/promises';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -10,6 +10,7 @@ const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 const extensionDir = join(rootDir, 'extension');
 const distDir = join(extensionDir, 'dist');
+const packagesDir = join(rootDir, 'packages');
 
 // Files that MUST be included
 const REQUIRED_FILES = [
@@ -155,9 +156,32 @@ async function getAllFiles(dir, baseDir = dir) {
   return files;
 }
 
+async function getVersion() {
+  try {
+    const manifestPath = join(extensionDir, 'manifest.json');
+    const manifestContent = await readFile(manifestPath, 'utf-8');
+    const manifest = JSON.parse(manifestContent);
+    return manifest.version || 'unknown';
+  } catch (err) {
+    return 'unknown';
+  }
+}
+
 async function createZip() {
   log('Creating ZIP file...', 'info');
-  const zipPath = join(rootDir, 'extractmd.zip');
+  const version = await getVersion();
+  
+  // Ensure packages directory exists
+  try {
+    await mkdir(packagesDir, { recursive: true });
+  } catch (err) {
+    if (err.code !== 'EEXIST') {
+      errors.push(`Could not create packages directory: ${err.message}`);
+      throw err;
+    }
+  }
+  
+  const zipPath = join(packagesDir, `extractmd-${version}.zip`);
   
   try {
     // Get all files to include
@@ -207,8 +231,8 @@ async function createZip() {
       await writeFile(fileListPath, fileListContent);
       
       warnings.push(`Could not create ZIP automatically. Please create ZIP manually:`);
-      warnings.push(`  Linux/Mac: cd extension && zip -r ../extractmd.zip -@ < ../zip-files.txt`);
-      warnings.push(`  Windows: Use 7-Zip or PowerShell: Compress-Archive -Path extension\\* -DestinationPath extractmd.zip`);
+      warnings.push(`  Linux/Mac: cd extension && zip -r ../packages/extractmd-${version}.zip -@ < ../zip-files.txt`);
+      warnings.push(`  Windows: Use 7-Zip or PowerShell: Compress-Archive -Path extension\\* -DestinationPath packages\\extractmd-${version}.zip`);
       warnings.push(`  File list saved to: ${fileListPath}`);
       
       // Return a placeholder result

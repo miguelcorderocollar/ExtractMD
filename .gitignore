@@ -4,4 +4,4 @@ dist/
 extension/dist/
 test-results/
 coverage/
-extractmd.zip
+packages/
