@@ -49,3 +49,15 @@ The packaging script (`scripts/package.js`) is used to prepare the extension for
 
 Always run `npm run package` before submitting to Chrome Web Store to ensure all files are properly included and validated.
 
+## UI Preview Workflow
+
+When making any UI changes (excluding text-only changes) that require visual review:
+
+1. **Start local server**: Run `cd web && python3 -m http.server 8000` (runs in background)
+2. **Launch Chrome**: Open `http://localhost:8000` in Chrome browser
+3. **Test responsive design**: Use Chrome DevTools (F12) to test different screen sizes, especially for responsive breakpoints
+
+**Note**: Text-only changes (e.g., updating copy, fixing typos) don't require preview. Visual changes (CSS, layout, responsive design, component styling) should always be previewed.
+
+The server runs in the background until stopped. Use DevTools device toolbar (Ctrl+Shift+M) to test mobile breakpoints.
+

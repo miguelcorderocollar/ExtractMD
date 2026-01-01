@@ -291,6 +291,42 @@ a:hover {
   color: var(--text-primary);
 }
 
+.nav-link-github {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link-icon {
+  display: none;
+  width: 18px;
+  height: 18px;
+}
+
+/* Hide Features and Privacy links, show GitHub icon only at < 500px */
+@media (max-width: 500px) {
+  .nav-link-text {
+    display: none;
+  }
+  
+  .nav-link-github .nav-link-text {
+    display: none;
+  }
+  
+  .nav-link-github .nav-link-icon {
+    display: block;
+  }
+  
+  .nav-link-github {
+    padding: 6px;
+    border-radius: var(--radius-md);
+  }
+  
+  .nav-link-github:hover {
+    background: var(--bg-hover);
+  }
+}
+
 /* ============================================
    Hero Section
    ============================================ */
