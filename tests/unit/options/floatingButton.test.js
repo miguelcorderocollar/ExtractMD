@@ -38,26 +38,26 @@ describe('Floating Button Settings', () => {
     
     // Save a non-default value (should call set)
     saveSetting('floatingButtonSize', 'large');
-    expect(setSpy).toHaveBeenCalledWith({ floatingButtonSize: 'large' });
+    expect(setSpy).toHaveBeenCalledWith({ floatingButtonSize: 'large' }, expect.any(Function));
     
     // Save a default value (should call remove to save space)
     saveSetting('floatingButtonSize', 'medium');
-    expect(removeSpy).toHaveBeenCalledWith('floatingButtonSize');
+    expect(removeSpy).toHaveBeenCalledWith('floatingButtonSize', expect.any(Function));
     
     // Save boolean settings
     saveSetting('floatingButtonEnableDrag', false);
-    expect(setSpy).toHaveBeenCalledWith({ floatingButtonEnableDrag: false });
+    expect(setSpy).toHaveBeenCalledWith({ floatingButtonEnableDrag: false }, expect.any(Function));
     
     saveSetting('floatingButtonEnableDismiss', false);
-    expect(setSpy).toHaveBeenCalledWith({ floatingButtonEnableDismiss: false });
+    expect(setSpy).toHaveBeenCalledWith({ floatingButtonEnableDismiss: false }, expect.any(Function));
     
     // Save transparency setting
     saveSetting('floatingButtonTransparency', 'high');
-    expect(setSpy).toHaveBeenCalledWith({ floatingButtonTransparency: 'high' });
+    expect(setSpy).toHaveBeenCalledWith({ floatingButtonTransparency: 'high' }, expect.any(Function));
     
     // Save default transparency (should call remove)
     saveSetting('floatingButtonTransparency', 'medium');
-    expect(removeSpy).toHaveBeenCalledWith('floatingButtonTransparency');
+    expect(removeSpy).toHaveBeenCalledWith('floatingButtonTransparency', expect.any(Function));
   });
 
   it('should load floating button settings with defaults', async () => {

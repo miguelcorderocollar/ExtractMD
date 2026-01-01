@@ -484,3 +484,51 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* ============================================
+   Save Toast (compact notification)
+   ============================================ */
+.save-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+    transition: opacity 150ms ease, transform 150ms ease;
+    pointer-events: none;
+}
+
+.save-toast.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.save-toast.success {
+    background: var(--success-bg);
+    color: var(--success);
+    border: 1px solid var(--success-border);
+}
+
+.save-toast.error {
+    background: var(--error-bg);
+    color: var(--error);
+    border: 1px solid var(--error-border);
+}
+
+.save-toast-icon {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+}

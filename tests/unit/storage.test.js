@@ -15,7 +15,7 @@ describe('storage patterns (saveSetting)', () => {
     
     await saveSetting(key, newValue);
     
-    expect(chrome.storage.sync.set).toHaveBeenCalledWith({ [key]: newValue });
+    expect(chrome.storage.sync.set).toHaveBeenCalledWith({ [key]: newValue }, expect.any(Function));
   });
 
   it('removes value from storage when it matches default', async () => {
@@ -28,7 +28,7 @@ describe('storage patterns (saveSetting)', () => {
     // Now save the default value
     await saveSetting(key, defaultValue);
     
-    expect(chrome.storage.sync.remove).toHaveBeenCalledWith(key);
+    expect(chrome.storage.sync.remove).toHaveBeenCalledWith(key, expect.any(Function));
   });
 
   it('saves unknown keys anyway', async () => {
@@ -37,7 +37,7 @@ describe('storage patterns (saveSetting)', () => {
     
     await saveSetting(key, value);
     
-    expect(chrome.storage.sync.set).toHaveBeenCalledWith({ [key]: value });
+    expect(chrome.storage.sync.set).toHaveBeenCalledWith({ [key]: value }, expect.any(Function));
   });
 });
 

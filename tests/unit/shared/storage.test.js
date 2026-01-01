@@ -46,7 +46,7 @@ describe('shared/storage', () => {
       
       saveSetting(key, newValue);
       
-      expect(chrome.storage.sync.set).toHaveBeenCalledWith({ [key]: newValue });
+      expect(chrome.storage.sync.set).toHaveBeenCalledWith({ [key]: newValue }, expect.any(Function));
     });
 
     it('removes value from storage when it matches default', () => {
@@ -55,7 +55,7 @@ describe('shared/storage', () => {
       
       saveSetting(key, defaultValue);
       
-      expect(chrome.storage.sync.remove).toHaveBeenCalledWith(key);
+      expect(chrome.storage.sync.remove).toHaveBeenCalledWith(key, expect.any(Function));
     });
 
     it('saves unknown keys anyway for future compatibility', () => {
@@ -64,7 +64,7 @@ describe('shared/storage', () => {
       
       saveSetting(key, value);
       
-      expect(chrome.storage.sync.set).toHaveBeenCalledWith({ [key]: value });
+      expect(chrome.storage.sync.set).toHaveBeenCalledWith({ [key]: value }, expect.any(Function));
     });
   });
 
