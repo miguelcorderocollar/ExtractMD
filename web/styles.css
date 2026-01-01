@@ -410,17 +410,6 @@ a:hover {
   display: block;
 }
 
-.screenshot-placeholder {
-  background: var(--bg-tertiary);
-  border: 2px dashed var(--border-strong);
-  border-radius: var(--radius-md);
-  padding: 80px 24px;
-  text-align: center;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 14px;
-}
-
 /* ============================================
    Features Section
    ============================================ */
