@@ -449,8 +449,14 @@ a:hover {
 
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+}
+
+@media (max-width: 640px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .feature-card {
@@ -510,17 +516,22 @@ a:hover {
 }
 
 .steps {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 32px;
-  flex-wrap: wrap;
-  justify-content: center;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .step {
-  flex: 1;
-  min-width: 200px;
-  max-width: 280px;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
 }
 
 .step-number {
