@@ -45,7 +45,7 @@ ExtractMD includes a Universal Article Extractor that allows users to extract Ma
 
 #### Privacy Policy Required
 - [x] **Create a privacy policy document** ✅ See `docs/privacy-policy.md`
-- [ ] Host privacy policy at a publicly accessible URL (e.g., GitHub Pages, Gist, or repo raw file)
+- [x] Host privacy policy at a publicly accessible URL ✅ `https://extractmd.miguelcorderocollar.com/privacy`
 - [ ] Link privacy policy in Chrome Web Store listing
 
 #### Data Collection Disclosure
@@ -213,7 +213,7 @@ Contact: [Your email or support URL]
 ## 🔴 Critical Missing Items
 
 ### High Priority (Must Have Before Submission)
-1. **Privacy Policy** - ✅ Created (`docs/privacy-policy.md`), needs hosting
+1. **Privacy Policy** - ✅ Created and hosted at `https://extractmd.miguelcorderocollar.com/privacy`
 2. **Screenshots** - Create at least 1-3 screenshots showing extension in action
 3. **Permissions Justification** - ✅ Added explanation for `<all_urls>` permission
 4. **Production Build** - ✅ Configured (`npm run build:prod`)
