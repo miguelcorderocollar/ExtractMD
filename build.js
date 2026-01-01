@@ -10,6 +10,9 @@ const commonOptions = {
   logLevel: 'info',
   minify: isProduction,
   sourcemap: isProduction ? false : true, // No source maps in production
+  loader: {
+    '.svg': 'text' // Load SVG files as text strings
+  }
 };
 
 console.log(`\n🔨 Building ExtractMD (${isProduction ? 'PRODUCTION' : 'development'})...\n`);

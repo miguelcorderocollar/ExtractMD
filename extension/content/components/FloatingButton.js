@@ -1,6 +1,8 @@
 // Shared Floating Button component for ExtractMD
 // Used by YouTube, Hacker News, and Article extractors
 
+import { ICONS } from '../../shared/icons.js';
+
 // Default position offset from bottom-right corner
 const DEFAULT_OFFSET = { left: 0, up: 0 };
 const DEFAULT_RIGHT = 20;
@@ -43,26 +45,6 @@ const THEME = {
     loading: '#fbbf24',
     iconColor: '#171717'
   }
-};
-
-// SVG Icons
-const ICONS = {
-  clipboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-  </svg>`,
-  success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>`,
-  error: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18"/>
-    <line x1="6" y1="6" x2="18" y2="18"/>
-  </svg>`,
-  loading: `<svg viewBox="0 0 24 24" fill="currentColor">
-    <circle cx="6" cy="12" r="2" class="extractmd-dot extractmd-dot-1"/>
-    <circle cx="12" cy="12" r="2" class="extractmd-dot extractmd-dot-2"/>
-    <circle cx="18" cy="12" r="2" class="extractmd-dot extractmd-dot-3"/>
-  </svg>`
 };
 
 // CSS animation for loading dots
