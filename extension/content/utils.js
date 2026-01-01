@@ -27,52 +27,133 @@ export async function copyToClipboard(text, includeTimestamps) {
   }
 }
 
+// Notification theme colors matching ExtractMD design system
+const NOTIFICATION_THEME = {
+  light: {
+    success: { bg: '#dcfce7', text: '#22c55e', border: '#bbf7d0' },
+    error: { bg: '#fee2e2', text: '#ef4444', border: '#fecaca' },
+    info: { bg: '#ccfbf1', text: '#14b8a6', border: '#99f6e4' },
+    shadow: '0 4px 12px rgba(0,0,0,0.1)'
+  },
+  dark: {
+    success: { bg: '#14532d', text: '#4ade80', border: '#166534' },
+    error: { bg: '#450a0a', text: '#f87171', border: '#7f1d1d' },
+    info: { bg: '#134e4a', text: '#2dd4bf', border: '#115e59' },
+    shadow: '0 4px 12px rgba(0,0,0,0.4)'
+  }
+};
+
+// SVG icons for notifications
+const NOTIFICATION_ICONS = {
+  success: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+  error: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`,
+  info: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`
+};
+
+/**
+ * Detect if user prefers dark mode
+ * @returns {boolean}
+ */
+function isDarkMode() {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+/**
+ * Inject notification animation styles if not already present
+ */
+function injectNotificationStyles() {
+  if (document.getElementById('extractmd-notification-styles')) return;
+  
+  const style = document.createElement('style');
+  style.id = 'extractmd-notification-styles';
+  style.textContent = `
+    @keyframes extractmd-slide-in {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes extractmd-fade-out {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(20px); }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 /**
  * Shows a notification. Message can contain <br> for line breaks.
  * If you use user content, escape it for HTML.
  */
 export function showNotification(message, type = 'info', prominent = false) {
-  // Create a notification element
+  // Inject animation styles
+  injectNotificationStyles();
+  
+  // Get theme colors
+  const theme = isDarkMode() ? NOTIFICATION_THEME.dark : NOTIFICATION_THEME.light;
+  const colors = theme[type] || theme.info;
+  const icon = NOTIFICATION_ICONS[type] || NOTIFICATION_ICONS.info;
+  
+  // Create notification container
   const notification = document.createElement('div');
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: ${prominent ? '20px 28px' : '12px 20px'};
-    border-radius: 8px;
-    color: white;
-    font-family: Arial, sans-serif;
-    font-size: ${prominent ? '18px' : '14px'};
-    font-weight: 600;
-    z-index: 10000;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-    transition: opacity 0.3s ease;
-    max-width: 350px;
-    word-wrap: break-word;
-    text-align: left;
+  notification.className = 'extractmd-notification';
+  
+  // Apply styles individually for better compatibility
+  const s = notification.style;
+  s.position = 'fixed';
+  s.top = '20px';
+  s.right = '20px';
+  s.display = 'flex';
+  s.alignItems = 'flex-start';
+  s.gap = '12px';
+  s.padding = prominent ? '16px 20px' : '12px 16px';
+  s.borderRadius = '8px';
+  s.background = colors.bg;
+  s.color = colors.text;
+  s.border = `1px solid ${colors.border}`;
+  s.fontFamily = "'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace";
+  s.fontSize = prominent ? '14px' : '13px';
+  s.fontWeight = '500';
+  s.zIndex = '10000';
+  s.boxShadow = theme.shadow;
+  s.maxWidth = '360px';
+  s.wordWrap = 'break-word';
+  s.textAlign = 'left';
+  s.lineHeight = '1.5';
+  s.animation = 'extractmd-slide-in 200ms ease forwards';
+  
+  // Create icon container
+  const iconContainer = document.createElement('div');
+  iconContainer.style.cssText = `
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
   `;
-  // Set background color based on type
-  switch (type) {
-    case 'success':
-      notification.style.backgroundColor = '#4CAF50';
-      break;
-    case 'error':
-      notification.style.backgroundColor = '#f44336';
-      break;
-    default:
-      notification.style.backgroundColor = '#2196F3';
-  }
-  notification.innerHTML = message;
+  iconContainer.innerHTML = icon;
+  
+  // Create message container
+  const messageContainer = document.createElement('div');
+  messageContainer.style.cssText = `
+    flex: 1;
+    min-width: 0;
+  `;
+  messageContainer.innerHTML = message;
+  
+  // Assemble notification
+  notification.appendChild(iconContainer);
+  notification.appendChild(messageContainer);
   document.body.appendChild(notification);
-  // Remove after 3 seconds (or 5s if prominent)
+  
+  // Remove after delay (3s normal, 5s prominent)
+  const duration = prominent ? 5000 : 3000;
   setTimeout(() => {
-    notification.style.opacity = '0';
+    notification.style.animation = 'extractmd-fade-out 200ms ease forwards';
     setTimeout(() => {
       if (notification.parentNode) {
         notification.parentNode.removeChild(notification);
       }
-    }, 300);
-  }, prominent ? 5000 : 3000);
+    }, 200);
+  }, duration);
 }
 
 /**
@@ -87,7 +168,7 @@ export function showSuccessNotificationWithTokens(message, text, type = 'success
     let msg = message;
     if (items.showTokenCountInNotification) {
       const tokens = encode(text).length;
-      msg += `<br><span style='font-weight:normal;font-size:13px;'>${tokens} tokens</span>`;
+      msg += `<br><span style='font-weight:400;font-size:12px;opacity:0.85;'>${tokens.toLocaleString()} tokens</span>`;
     }
     showNotification(msg, type, prominent);
   });
