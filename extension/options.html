@@ -103,6 +103,32 @@
                     <setting-toggle setting-id="enableUniversalIntegration" label="Universal Integration" description="Fallback extraction for any webpage" checked></setting-toggle>
                 </setting-group>
                 
+                <setting-group title="Floating Button">
+                    <setting-toggle setting-id="floatingButtonEnableDrag" label="Enable Drag" description="Allow repositioning the button by dragging" checked></setting-toggle>
+                    <setting-toggle setting-id="floatingButtonEnableDismiss" label="Enable Dismiss" description="Show X button on hover to hide on this domain" checked></setting-toggle>
+                    <setting-select 
+                        setting-id="floatingButtonSize" 
+                        label="Button Size" 
+                        description="Size of the floating extraction button"
+                        value="medium">
+                        <option value="extraSmall">Extra Small (32px)</option>
+                        <option value="small">Small (40px)</option>
+                        <option value="medium">Medium (48px)</option>
+                        <option value="large">Large (56px)</option>
+                        <option value="extraLarge">Extra Large (64px)</option>
+                    </setting-select>
+                    <setting-select 
+                        setting-id="floatingButtonTransparency" 
+                        label="Button Transparency" 
+                        description="Transparency level when button is idle"
+                        value="medium">
+                        <option value="low">Low (30%)</option>
+                        <option value="medium">Medium (50%)</option>
+                        <option value="high">High (70%)</option>
+                        <option value="full">Full (100%)</option>
+                    </setting-select>
+                </setting-group>
+                
                 <div class="settings-group">
                     <h3 class="group-title">Ignored Domains</h3>
                     <div class="setting-block">
@@ -292,6 +318,23 @@
                             Import Settings
                         </button>
                         <input type="file" id="importSettingsFile" accept="application/json" style="display:none;">
+                    </div>
+                </div>
+                
+                <div class="settings-group">
+                    <h3 class="group-title">Reset Data</h3>
+                    <p class="group-desc">Clear stored data that accumulates over time. This does not affect your settings.</p>
+                    
+                    <div class="setting-block">
+                        <div class="setting-block-header">
+                            <div class="setting-info">
+                                <span class="setting-label">Floating Button Positions</span>
+                                <span class="setting-desc">Clear all saved button positions across domains</span>
+                            </div>
+                            <button id="resetPositionsBtn" class="btn btn-secondary btn-sm">
+                                Reset Positions
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>

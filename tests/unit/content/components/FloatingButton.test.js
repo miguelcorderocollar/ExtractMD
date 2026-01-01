@@ -19,7 +19,7 @@ describe('FloatingButton component', () => {
         },
         sync: {
           get: vi.fn((keys, callback) => {
-            callback({ ignoredDomains: '' });
+            callback({ ignoredDomains: '', floatingButtonSize: 'medium', floatingButtonTransparency: 'medium' });
           }),
           set: vi.fn((data, callback) => {
             if (callback) callback();
@@ -27,12 +27,22 @@ describe('FloatingButton component', () => {
         }
       }
     };
+
+    // Mock matchMedia for dark mode detection
+    global.matchMedia = vi.fn().mockImplementation(query => ({
+      matches: false, // Default to light mode
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
   });
 
   afterEach(() => {
-    // Clean up any buttons
+    // Clean up any buttons and injected styles
     const buttons = document.querySelectorAll('#extractmd-floating-button');
     buttons.forEach(b => b.remove());
+    const styles = document.getElementById('extractmd-animation-styles');
+    if (styles) styles.remove();
     container.remove();
     vi.clearAllMocks();
   });
@@ -45,14 +55,17 @@ describe('FloatingButton component', () => {
       expect(controller).not.toBeNull();
       expect(controller.element).toBeDefined();
       expect(controller.element.id).toBe('extractmd-floating-button');
-      expect(controller.element.innerHTML).toContain('📝');
     });
 
-    it('uses custom emoji when provided', async () => {
+    it('renders clipboard SVG icon by default', async () => {
       const onClick = vi.fn();
-      const controller = await createFloatingButton({ onClick, emoji: '🎬' });
+      const controller = await createFloatingButton({ onClick });
       
-      expect(controller.element.innerHTML).toContain('🎬');
+      const svg = controller.element.querySelector('svg');
+      expect(svg).not.toBeNull();
+      expect(controller.element.innerHTML).toContain('viewBox="0 0 24 24"');
+      // Check for clipboard path
+      expect(controller.element.innerHTML).toContain('M16 4h2a2 2 0 0 1 2 2v14');
     });
 
     it('uses custom id when provided', async () => {
@@ -89,74 +102,278 @@ describe('FloatingButton component', () => {
       expect(controller).not.toBeNull();
       expect(controller.element).toBeDefined();
     });
-  });
 
-  describe('dark variant (default)', () => {
-    it('creates button with dark variant', async () => {
+    it('injects animation styles into document head', async () => {
       const onClick = vi.fn();
-      const controller = await createFloatingButton({ onClick });
+      await createFloatingButton({ onClick });
       
-      // Verify button is created with correct structure
-      expect(controller).not.toBeNull();
-      expect(controller.element.tagName).toBe('DIV');
-      expect(controller.element.id).toBe('extractmd-floating-button');
+      const styleEl = document.getElementById('extractmd-animation-styles');
+      expect(styleEl).not.toBeNull();
+      expect(styleEl.textContent).toContain('extractmd-bounce');
     });
   });
 
-  describe('light variant', () => {
-    it('creates button with light variant', async () => {
+  describe('button appearance', () => {
+    it('creates button with teal accent background color', async () => {
       const onClick = vi.fn();
-      const controller = await createFloatingButton({ onClick, variant: 'light' });
+      const controller = await createFloatingButton({ onClick });
       
-      // Verify button is created with correct structure
       expect(controller).not.toBeNull();
-      expect(controller.element.tagName).toBe('DIV');
-      expect(controller.element.id).toBe('extractmd-floating-button');
+      // Light mode uses #14b8a6 - jsdom converts to rgb
+      expect(controller.element.style.background).toBe('rgb(20, 184, 166)');
+    });
+
+    it('creates button with rounded square shape (not circular)', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      // Medium size has 12px border radius
+      expect(controller.element.style.borderRadius).toBe('12px');
+    });
+
+    it('button has reduced opacity by default (medium transparency)', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      expect(controller.element.style.opacity).toBe('0.5');
+    });
+  });
+
+  describe('size configurations', () => {
+    it('uses medium size (48px) by default', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      expect(controller.element.style.width).toBe('48px');
+      expect(controller.element.style.height).toBe('48px');
+      expect(controller.element.style.borderRadius).toBe('12px');
+    });
+
+    it('uses small size (40px) when configured', async () => {
+      // Mock storage to return small size
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({ floatingButtonSize: 'small', floatingButtonTransparency: 'medium' });
+      });
+      
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      expect(controller.element.style.width).toBe('40px');
+      expect(controller.element.style.height).toBe('40px');
+      expect(controller.element.style.borderRadius).toBe('10px');
+    });
+
+    it('uses large size (56px) when configured', async () => {
+      // Mock storage to return large size
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({ floatingButtonSize: 'large', floatingButtonTransparency: 'medium' });
+      });
+      
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      expect(controller.element.style.width).toBe('56px');
+      expect(controller.element.style.height).toBe('56px');
+      expect(controller.element.style.borderRadius).toBe('14px');
+    });
+
+    it('uses extra small size (32px) when configured', async () => {
+      // Mock storage to return extraSmall size
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({ floatingButtonSize: 'extraSmall', floatingButtonTransparency: 'medium' });
+      });
+      
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      expect(controller.element.style.width).toBe('32px');
+      expect(controller.element.style.height).toBe('32px');
+      expect(controller.element.style.borderRadius).toBe('8px');
+    });
+
+    it('uses extra large size (64px) when configured', async () => {
+      // Mock storage to return extraLarge size
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({ floatingButtonSize: 'extraLarge', floatingButtonTransparency: 'medium' });
+      });
+      
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      expect(controller.element.style.width).toBe('64px');
+      expect(controller.element.style.height).toBe('64px');
+      expect(controller.element.style.borderRadius).toBe('16px');
+    });
+  });
+
+  describe('transparency settings', () => {
+    it('uses medium transparency (0.5) by default', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      expect(controller.element.style.opacity).toBe('0.5');
+    });
+
+    it('uses low transparency (0.3) when configured', async () => {
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({ floatingButtonSize: 'medium', floatingButtonTransparency: 'low' });
+      });
+      
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      expect(controller.element.style.opacity).toBe('0.3');
+    });
+
+    it('uses high transparency (0.7) when configured', async () => {
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({ floatingButtonSize: 'medium', floatingButtonTransparency: 'high' });
+      });
+      
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      expect(controller.element.style.opacity).toBe('0.7');
+    });
+
+    it('uses full opacity (1.0) when configured', async () => {
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({ floatingButtonSize: 'medium', floatingButtonTransparency: 'full' });
+      });
+      
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      expect(controller.element.style.opacity).toBe('1');
+    });
+
+    it('resets to configured transparency after setNormal', async () => {
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({ floatingButtonSize: 'medium', floatingButtonTransparency: 'low' });
+      });
+      
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      // Set to loading (opacity 1)
+      controller.setLoading();
+      expect(controller.element.style.opacity).toBe('1');
+      
+      // Reset to normal (should use configured transparency)
+      controller.setNormal();
+      expect(controller.element.style.opacity).toBe('0.3');
+    });
+  });
+
+  describe('dark mode support', () => {
+    it('uses light theme colors when prefers-color-scheme is light', async () => {
+      global.matchMedia = vi.fn().mockImplementation(() => ({
+        matches: false, // Light mode
+        media: '(prefers-color-scheme: dark)',
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }));
+      
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      // Light mode accent is #14b8a6 = rgb(20, 184, 166)
+      expect(controller.element.style.background).toBe('rgb(20, 184, 166)');
+    });
+
+    it('uses dark theme colors when prefers-color-scheme is dark', async () => {
+      global.matchMedia = vi.fn().mockImplementation(() => ({
+        matches: true, // Dark mode
+        media: '(prefers-color-scheme: dark)',
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }));
+      
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      // Dark mode accent is #2dd4bf = rgb(45, 212, 191)
+      expect(controller.element.style.background).toBe('rgb(45, 212, 191)');
     });
   });
 
   describe('state methods', () => {
-    it('setLoading updates button to loading state', async () => {
+    it('setLoading updates button to loading state with animated dots', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       
       controller.setLoading();
       
-      expect(controller.element.innerHTML).toContain('⏳');
+      // Should contain loading dots SVG
+      expect(controller.element.innerHTML).toContain('extractmd-dot');
       expect(controller.element.dataset.processing).toBe('true');
       expect(controller.element.style.cursor).toBe('not-allowed');
     });
 
-    it('setSuccess updates button to success state', async () => {
+    it('setLoading uses warning color for background', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      controller.setLoading();
+      
+      // Light mode loading color is #f59e0b = rgb(245, 158, 11)
+      expect(controller.element.style.background).toBe('rgb(245, 158, 11)');
+    });
+
+    it('setSuccess updates button to success state with checkmark', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       
       controller.setSuccess();
       
-      expect(controller.element.innerHTML).toContain('✅');
-      expect(controller.element.style.background).toContain('rgba(76, 175, 80');
+      // Should contain checkmark polyline
+      expect(controller.element.innerHTML).toContain('polyline');
+      expect(controller.element.innerHTML).toContain('points="20 6 9 17 4 12"');
     });
 
-    it('setError updates button to error state', async () => {
+    it('setSuccess uses success color for background', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      
+      controller.setSuccess();
+      
+      // Light mode success color is #22c55e = rgb(34, 197, 94)
+      expect(controller.element.style.background).toBe('rgb(34, 197, 94)');
+    });
+
+    it('setError updates button to error state with X icon', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       
       controller.setError();
       
-      expect(controller.element.innerHTML).toContain('❌');
-      expect(controller.element.style.background).toContain('rgba(244, 67, 54');
+      // Should contain X lines
+      expect(controller.element.innerHTML).toContain('x1="18"');
+      expect(controller.element.innerHTML).toContain('x2="6"');
     });
 
-    it('setNormal resets button to initial state', async () => {
+    it('setError uses error color for background', async () => {
       const onClick = vi.fn();
-      const controller = await createFloatingButton({ onClick, emoji: '📝' });
+      const controller = await createFloatingButton({ onClick });
+      
+      controller.setError();
+      
+      // Light mode error color is #ef4444 = rgb(239, 68, 68)
+      expect(controller.element.style.background).toBe('rgb(239, 68, 68)');
+    });
+
+    it('setNormal resets button to initial state with clipboard icon', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
       
       controller.setLoading();
       controller.setNormal();
       
-      expect(controller.element.innerHTML).toContain('📝');
+      // Should contain clipboard path again
+      expect(controller.element.innerHTML).toContain('M16 4h2a2 2 0 0 1 2 2v14');
       expect(controller.element.dataset.processing).toBeUndefined();
       expect(controller.element.style.cursor).toBe('pointer');
+      expect(controller.element.style.opacity).toBe('0.5');
     });
   });
 
@@ -427,6 +644,65 @@ describe('FloatingButton component', () => {
       expect(dismissBtn.style.display).not.toBe('block');
       
       vi.useRealTimers();
+    });
+  });
+
+  describe('hover effects', () => {
+    it('increases opacity to 1 on hover', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      controller.appendTo(document.body);
+      
+      // Initial opacity (default is medium = 0.5)
+      expect(controller.element.style.opacity).toBe('0.5');
+      
+      // Simulate mouseenter
+      const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
+      controller.element.dispatchEvent(mouseenterEvent);
+      
+      // After hover, opacity is set directly via style.opacity
+      expect(controller.element.style.opacity).toBe('1');
+    });
+
+    it('reduces opacity back to configured transparency on mouseleave', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      controller.appendTo(document.body);
+      
+      // Hover
+      const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
+      controller.element.dispatchEvent(mouseenterEvent);
+      expect(controller.element.style.opacity).toBe('1');
+      
+      // Leave (should return to default medium = 0.5)
+      const mouseleaveEvent = new MouseEvent('mouseleave', { bubbles: true });
+      controller.element.dispatchEvent(mouseleaveEvent);
+      expect(controller.element.style.opacity).toBe('0.5');
+    });
+
+    it('applies scale transform on hover', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      controller.appendTo(document.body);
+      
+      // Simulate mouseenter
+      const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
+      controller.element.dispatchEvent(mouseenterEvent);
+      
+      expect(controller.element.style.transform).toBe('scale(1.05)');
+    });
+
+    it('changes to hover background color on mouseenter', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      controller.appendTo(document.body);
+      
+      // Simulate mouseenter
+      const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
+      controller.element.dispatchEvent(mouseenterEvent);
+      
+      // Light mode hover is #0d9488 - jsdom converts to rgb
+      expect(controller.element.style.background).toBe('rgb(13, 148, 136)');
     });
   });
 

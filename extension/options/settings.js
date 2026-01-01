@@ -4,6 +4,7 @@ import { DEFAULTS } from '../shared/defaults.js';
 import { saveSetting } from '../shared/storage.js';
 import { updateIgnoreButtonState } from './domainIgnore.js';
 import { applyInitialIntegrationVisibility, updateIntegrationVisibility } from './integrationVisibility.js';
+import { showStatus } from './ui.js';
 
 /**
  * Mapping of setting keys to their DOM element IDs and types
@@ -61,7 +62,13 @@ const SETTING_ELEMENTS = {
     enableYouTubeIntegration: { id: 'enableYouTubeIntegration', type: 'checkbox', invertDefault: true },
     enableHackerNewsIntegration: { id: 'enableHackerNewsIntegration', type: 'checkbox', invertDefault: true },
     enableArticleIntegration: { id: 'enableArticleIntegration', type: 'checkbox', invertDefault: true },
-    enableUniversalIntegration: { id: 'enableUniversalIntegration', type: 'checkbox', invertDefault: true }
+    enableUniversalIntegration: { id: 'enableUniversalIntegration', type: 'checkbox', invertDefault: true },
+    
+    // Floating Button settings
+    floatingButtonEnableDrag: { id: 'floatingButtonEnableDrag', type: 'checkbox' },
+    floatingButtonEnableDismiss: { id: 'floatingButtonEnableDismiss', type: 'checkbox' },
+    floatingButtonSize: { id: 'floatingButtonSize', type: 'select' },
+    floatingButtonTransparency: { id: 'floatingButtonTransparency', type: 'select' }
 };
 
 /**
@@ -258,6 +265,19 @@ function updateCustomSelectorVisibility(mode) {
 }
 
 /**
+ * Reset all stored floating button positions
+ * Clears all domain-specific position offsets from chrome.storage.local
+ */
+export function resetFloatingButtonPositions() {
+    return new Promise((resolve) => {
+        chrome.storage.local.remove('floatingButtonPositions', function() {
+            console.debug('[ExtractMD] Reset all floating button positions');
+            resolve();
+        });
+    });
+}
+
+/**
  * Clean up orphaned/legacy data from storage
  */
 export function cleanupLegacyData() {
@@ -271,10 +291,26 @@ export function cleanupLegacyData() {
 }
 
 /**
+ * Initialize reset button for floating button positions
+ */
+function initializeResetPositionsButton() {
+    const resetPositionsBtn = document.getElementById('resetPositionsBtn');
+    if (resetPositionsBtn) {
+        resetPositionsBtn.addEventListener('click', async function() {
+            if (confirm('Are you sure you want to reset all floating button positions? This will restore all buttons to their default positions.')) {
+                await resetFloatingButtonPositions();
+                showStatus('All floating button positions have been reset', 'success');
+            }
+        });
+    }
+}
+
+/**
  * Initialize settings module
  */
 export function initializeSettings() {
     cleanupLegacyData();
     loadSettings();
     attachSettingHandlers();
+    initializeResetPositionsButton();
 }
