@@ -280,7 +280,11 @@ function extractHNNewsMarkdown(settings) {
 
 export function initHackerNewsFeatures() {
   console.debug('[ExtractMD] initHackerNewsFeatures called');
-  chrome.storage.sync.get({ enableHackerNewsIntegration: true }, function(items) {
+  chrome.storage.sync.get({ 
+    enableHackerNewsIntegration: true,
+    floatingButtonEnableDrag: true,
+    floatingButtonEnableDismiss: true
+  }, async function(items) {
     if (items.enableHackerNewsIntegration === false) return;
     if (!(isHNItemPage() || isHNNewsPage())) return;
     if (document.getElementById('extractmd-floating-button')) {
@@ -288,9 +292,12 @@ export function initHackerNewsFeatures() {
       return;
     }
     
-    floatingButtonController = createFloatingButton({
+    floatingButtonController = await createFloatingButton({
       variant: 'dark',
       emoji: '📝',
+      domain: window.location.hostname,
+      enableDrag: items.floatingButtonEnableDrag,
+      enableDismiss: items.floatingButtonEnableDismiss,
       onClick: async () => {
         await performHNCopy(true);
       }

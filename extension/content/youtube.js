@@ -258,7 +258,7 @@ export function initYouTubeFeatures() {
   });
 }
 
-function initializeFloatingButton() {
+async function initializeFloatingButton() {
   console.debug('[ExtractMD] initializeFloatingButton (YouTube) called');
   if (!(window.location.hostname.includes('youtube.com') && window.location.pathname.includes('/watch'))) return;
   if (document.getElementById('extractmd-floating-button')) {
@@ -266,9 +266,20 @@ function initializeFloatingButton() {
     return;
   }
   
-  floatingButtonController = createFloatingButton({
+  // Load floating button settings
+  const buttonSettings = await new Promise(resolve => {
+    chrome.storage.sync.get({
+      floatingButtonEnableDrag: true,
+      floatingButtonEnableDismiss: true
+    }, resolve);
+  });
+  
+  floatingButtonController = await createFloatingButton({
     variant: 'dark',
     emoji: '📝',
+    domain: window.location.hostname,
+    enableDrag: buttonSettings.floatingButtonEnableDrag,
+    enableDismiss: buttonSettings.floatingButtonEnableDismiss,
     onClick: async () => {
       if (isProcessing) return;
       isProcessing = true;

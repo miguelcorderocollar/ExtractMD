@@ -262,15 +262,35 @@ async function showArticleInfoNotification(articles, highlightLongest = false) {
   showNotification(message, 'info');
 }
 
-function manageFloatingButtonForArticles() {
+async function manageFloatingButtonForArticles() {
+  // Don't create button if domain is ignored
+  if (window.__extractmd_domain_ignored) {
+    if (floatingButtonController) {
+      floatingButtonController.remove();
+      floatingButtonController = null;
+    }
+    return;
+  }
+  
   const articles = Array.from(document.querySelectorAll('article'));
   const existingButton = document.getElementById('extractmd-floating-button');
   
   if (articles.length > 0) {
     if (!existingButton) {
-      floatingButtonController = createFloatingButton({
+      // Load floating button settings
+      const buttonSettings = await new Promise(resolve => {
+        chrome.storage.sync.get({
+          floatingButtonEnableDrag: true,
+          floatingButtonEnableDismiss: true
+        }, resolve);
+      });
+      
+      floatingButtonController = await createFloatingButton({
         variant: 'light',
         emoji: '📝',
+        domain: window.location.hostname,
+        enableDrag: buttonSettings.floatingButtonEnableDrag,
+        enableDismiss: buttonSettings.floatingButtonEnableDismiss,
         onClick: async () => {
           await performArticleCopy(true);
         }

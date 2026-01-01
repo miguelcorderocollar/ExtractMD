@@ -17,6 +17,8 @@ async function runInitForCurrentPage() {
   
   if (ignoredDomains.includes(window.location.hostname)) {
     console.debug(`[ExtractMD] Domain ${window.location.hostname} is ignored, skipping initialization`);
+    // Set global flag so feature modules know to not create buttons
+    window.__extractmd_domain_ignored = true;
     // Clear any existing copy function if it was set before (e.g. during SPA navigation)
     window.copyExtractMD = null;
     // Remove any existing floating button
@@ -26,6 +28,9 @@ async function runInitForCurrentPage() {
     }
     return;
   }
+  
+  // Clear the ignored flag
+  window.__extractmd_domain_ignored = false;
 
   const isYouTubeDomain = window.location.hostname.includes('youtube.com');
   const isHNDomain = window.location.hostname.includes('ycombinator.com');
@@ -96,6 +101,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Check if extraction is available on this page
     const isAvailable = typeof window.copyExtractMD === 'function';
     sendResponse({ available: isAvailable });
+  } else if (message.action === 'reinitialize') {
+    // Re-run initialization (called when ignore status changes from popup)
+    console.debug('[ExtractMD] Reinitializing due to settings change');
+    // Small delay to ensure storage is updated before we check it
+    setTimeout(() => {
+      runInitForCurrentPage();
+    }, 100);
+    sendResponse({ success: true });
   }
   return true; // Keep message channel open for async response
 });

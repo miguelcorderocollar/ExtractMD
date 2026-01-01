@@ -213,7 +213,16 @@ function showContentInfoNotification(contentElement) {
 /**
  * Manage the floating button for universal extraction
  */
-function manageFloatingButtonForUniversal() {
+async function manageFloatingButtonForUniversal() {
+  // Don't create button if domain is ignored
+  if (window.__extractmd_domain_ignored) {
+    if (floatingButtonController) {
+      floatingButtonController.remove();
+      floatingButtonController = null;
+    }
+    return;
+  }
+  
   const existingButton = document.getElementById('extractmd-floating-button');
   
   // Check if there's meaningful content on the page
@@ -222,9 +231,20 @@ function manageFloatingButtonForUniversal() {
   
   if (hasContent) {
     if (!existingButton) {
-      floatingButtonController = createFloatingButton({
+      // Load floating button settings
+      const buttonSettings = await new Promise(resolve => {
+        chrome.storage.sync.get({
+          floatingButtonEnableDrag: true,
+          floatingButtonEnableDismiss: true
+        }, resolve);
+      });
+      
+      floatingButtonController = await createFloatingButton({
         variant: 'light',
         emoji: '📄',
+        domain: window.location.hostname,
+        enableDrag: buttonSettings.floatingButtonEnableDrag,
+        enableDismiss: buttonSettings.floatingButtonEnableDismiss,
         onClick: async () => {
           await performUniversalCopy(true);
         }
