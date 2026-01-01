@@ -6,11 +6,11 @@ This checklist covers all requirements for publishing ExtractMD to the Chrome We
 ## ✅ Pre-Submission Requirements
 
 ### 1. Developer Account Setup
-- [ ] Create a Google account (if not already have one)
-- [ ] Register as a Chrome Web Store developer
-- [ ] Pay the one-time registration fee ($5 USD as of 2025)
-- [ ] Verify developer account email address
-- [ ] Complete developer profile with accurate contact information
+- [x] Create a Google account (if not already have one)
+- [x] Register as a Chrome Web Store developer
+- [x] Pay the one-time registration fee ($5 USD as of 2025)
+- [x] Verify developer account email address
+- [x] Complete developer profile with accurate contact information
 
 ### 2. Extension Technical Requirements
 
@@ -21,11 +21,11 @@ This checklist covers all requirements for publishing ExtractMD to the Chrome We
 - [x] No inline scripts or eval()
 
 #### Code Quality
-- [ ] Extension tested thoroughly on latest Chrome version
-- [ ] No crashes or broken features
-- [ ] All permissions properly justified (see Permissions section below)
-- [ ] Code is minified/bundled for production (`npm run build:prod`)
-- [ ] Source maps removed from production build (or kept for debugging)
+- [x] Extension tested thoroughly on latest Chrome version
+- [x] No crashes or broken features
+- [x] All permissions properly justified (see Permissions section below)
+- [x] Code is minified/bundled for production (`npm run build:prod`)
+- [x] Source maps removed from production build (or kept for debugging)
 
 #### Permissions Justification
 The extension currently requests:
@@ -33,19 +33,19 @@ The extension currently requests:
 - `storage` ✅ - Needed to save user settings and preferences
 - `clipboardWrite` ✅ - Needed to copy extracted Markdown to clipboard
 - `scripting` ✅ - Needed to inject content scripts dynamically
-- `host_permissions: <all_urls>` ⚠️ - **NEEDS JUSTIFICATION**
+- `host_permissions: <all_urls>` ✅ - **JUSTIFIED** (see below)
 
-**Action Required for `<all_urls>`:**
-- [ ] Add detailed justification in store listing explaining why universal access is needed
-- [ ] Consider if we can use more specific host permissions instead
-- [ ] Document that extension only activates on supported sites (YouTube, Hacker News, articles)
-- [ ] Explain that universal access allows article extraction from any website
+**`<all_urls>` Justification:**
+ExtractMD includes a Universal Article Extractor that allows users to extract Markdown from **any webpage**, not just YouTube and Hacker News. This enables users to copy content from blogs, documentation sites, news articles, and any other web content. The extension only processes content when the user explicitly requests extraction—it does not run automatically or collect any browsing data.
+
+> **Store Listing Text (copy this to Privacy tab):**
+> "The `<all_urls>` permission is required because ExtractMD includes a Universal Article Extractor feature that enables Markdown extraction from any website. This allows users to extract content from blogs, documentation, news sites, and other web pages beyond the built-in YouTube and Hacker News integrations. The extension only activates when users explicitly request extraction and does not automatically access or collect any browsing data."
 
 ### 3. Privacy Policy & Data Disclosure ⚠️ **CRITICAL**
 
 #### Privacy Policy Required
-- [ ] **Create a privacy policy document** (HTML or hosted webpage)
-- [ ] Host privacy policy at a publicly accessible URL
+- [x] **Create a privacy policy document** ✅ See `docs/privacy-policy.md`
+- [ ] Host privacy policy at a publicly accessible URL (e.g., GitHub Pages, Gist, or repo raw file)
 - [ ] Link privacy policy in Chrome Web Store listing
 
 #### Data Collection Disclosure
@@ -56,14 +56,14 @@ Based on codebase analysis, the extension:
 - ✅ Does NOT collect personal information
 - ✅ Does NOT use analytics or tracking services
 
-**Privacy Policy Must Include:**
-- [ ] Statement that no user data is sent to external servers
-- [ ] Explanation of local storage usage (settings, KPIs)
-- [ ] Description of what data is stored locally
-- [ ] User's right to clear data (via settings export/import)
-- [ ] Statement that extension only processes content user explicitly extracts
-- [ ] No third-party data sharing
-- [ ] Contact information for privacy inquiries
+**Privacy Policy Must Include:** ✅ All covered in `docs/privacy-policy.md`
+- [x] Statement that no user data is sent to external servers
+- [x] Explanation of local storage usage (settings, KPIs)
+- [x] Description of what data is stored locally
+- [x] User's right to clear data (via settings export/import)
+- [x] Statement that extension only processes content user explicitly extracts
+- [x] No third-party data sharing
+- [x] Contact information for privacy inquiries
 
 **Suggested Privacy Policy Content:**
 ```
@@ -117,24 +117,21 @@ Contact: [Your email or support URL]
 
 ### 5. Store Listing Content
 
-#### Required Fields
-- [ ] **Name**: "ExtractMD" (max 45 characters) ✅
-- [ ] **Short description**: 132 characters max
-  - Current: "Extract and copy information as Markdown from YouTube, Hacker News, and more."
-  - ✅ Within limit
-- [ ] **Detailed description**: Up to 16,000 characters
-  - [ ] Expand current README description
-  - [ ] Include feature highlights
-  - [ ] Add usage instructions
-  - [ ] Include troubleshooting tips
-  - [ ] Avoid keyword stuffing
-- [ ] **Category**: Select appropriate category
-  - Suggested: "Productivity" or "Developer Tools"
-- [ ] **Language**: Select primary language (English)
-- [ ] **Support URL**: GitHub issues page or support email
-  - Current: `https://github.com/miguelcorderocollar/yt-transcript-extension/issues`
-- [ ] **Homepage URL**: GitHub repository
-  - Current: `https://github.com/miguelcorderocollar/yt-transcript-extension`
+#### Required Fields ✅ See `docs/store-listing.md` for ready-to-use content
+- [x] **Name**: "ExtractMD" (max 45 characters)
+- [x] **Short description**: 132 characters max
+  - Current: "Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles."
+  - ✅ Within limit (109 characters)
+- [x] **Detailed description**: Up to 16,000 characters (~2,800 chars written)
+  - [x] Expand current README description
+  - [x] Include feature highlights
+  - [x] Add usage instructions
+  - [x] Include troubleshooting tips
+  - [x] Avoid keyword stuffing
+- [x] **Category**: Productivity (or Developer Tools)
+- [x] **Language**: English
+- [x] **Support URL**: `https://github.com/miguelcorderocollar/yt-transcript-extension/issues`
+- [x] **Homepage URL**: `https://github.com/miguelcorderocollar/yt-transcript-extension`
 
 #### Listing Best Practices
 - [ ] Description is clear and accurate
@@ -216,10 +213,10 @@ Contact: [Your email or support URL]
 ## 🔴 Critical Missing Items
 
 ### High Priority (Must Have Before Submission)
-1. **Privacy Policy** - Create and host a privacy policy document
+1. **Privacy Policy** - ✅ Created (`docs/privacy-policy.md`), needs hosting
 2. **Screenshots** - Create at least 1-3 screenshots showing extension in action
-3. **Permissions Justification** - Add detailed explanation for `<all_urls>` permission
-4. **Production Build** - Ensure production build is optimized and tested
+3. **Permissions Justification** - ✅ Added explanation for `<all_urls>` permission
+4. **Production Build** - ✅ Configured (`npm run build:prod`)
 
 ### Medium Priority (Recommended)
 1. **Promotional Images** - Create promotional tiles for better store visibility

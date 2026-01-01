@@ -1,7 +1,7 @@
 {
   "name": "extractMD",
   "version": "1.0.0",
-  "description": "A Chrome extension that extracts and copies information as Markdown from YouTube, Hacker News, and articles, with a beautiful floating button and rich settings.",
+  "description": "A Chrome extension that extracts and copies content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles, with a floating button and rich settings.",
   "type": "module",
   "main": "index.js",
   "directories": {
