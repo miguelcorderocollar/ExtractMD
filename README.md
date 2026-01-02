@@ -2,6 +2,11 @@
 
 A Chrome extension that extracts content as Markdown from YouTube videos, Hacker News, articles, and any webpage. Features a floating button interface, comprehensive settings, and modular architecture.
 
+## Links
+
+- **Website**: [https://extractmd.miguelcorderocollar.com/](https://extractmd.miguelcorderocollar.com/)
+- **Chrome Web Store**: Pending approval
+
 ## Features
 
 ### Integrations
