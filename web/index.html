@@ -279,39 +279,49 @@
                 <p>Your data never leaves your browser</p>
             </div>
             
-            <div class="privacy-grid">
-                <div class="privacy-item">
-                    <!-- Source: extension/images/icons/checkmark.svg -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    <span>No data collection</span>
+            <div class="privacy-terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <span class="terminal-title">privacy.config</span>
                 </div>
-                <div class="privacy-item">
-                    <!-- Source: extension/images/icons/checkmark.svg -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    <span>No external servers</span>
-                </div>
-                <div class="privacy-item">
-                    <!-- Source: extension/images/icons/checkmark.svg -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    <span>No analytics or tracking</span>
-                </div>
-                <div class="privacy-item">
-                    <!-- Source: extension/images/icons/checkmark.svg -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    <span>100% open source</span>
+                <div class="terminal-body">
+                    <div class="config-line">
+                        <span class="config-key">data_collection</span>
+                        <span class="config-colon">:</span>
+                        <span class="config-value config-false">false</span>
+                    </div>
+                    <div class="config-line">
+                        <span class="config-key">external_servers</span>
+                        <span class="config-colon">:</span>
+                        <span class="config-value config-false">false</span>
+                    </div>
+                    <div class="config-line">
+                        <span class="config-key">analytics</span>
+                        <span class="config-colon">:</span>
+                        <span class="config-value config-false">false</span>
+                    </div>
+                    <div class="config-line">
+                        <span class="config-key">tracking</span>
+                        <span class="config-colon">:</span>
+                        <span class="config-value config-false">false</span>
+                    </div>
+                    <div class="config-line">
+                        <span class="config-key">open_source</span>
+                        <span class="config-colon">:</span>
+                        <span class="config-value config-true">true</span>
+                    </div>
+                    <div class="config-line">
+                        <span class="config-key">local_only</span>
+                        <span class="config-colon">:</span>
+                        <span class="config-value config-true">true</span>
+                    </div>
                 </div>
             </div>
             
-            <p style="text-align: center; margin-top: 24px;">
-                <a href="privacy" style="font-family: var(--font-mono); font-size: 14px;">Read our Privacy Policy →</a>
+            <p class="privacy-link">
+                <a href="privacy">Read the full Privacy Policy →</a>
             </p>
         </div>
     </section>
