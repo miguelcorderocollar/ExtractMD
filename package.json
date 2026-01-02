@@ -15,6 +15,7 @@
     "test:all": "npm run test:run && npm run test:e2e",
     "build": "node build.js",
     "build:prod": "node build.js --production",
+    "build:web": "node scripts/minify-css.js",
     "watch": "esbuild extension/content.js --bundle --outfile=extension/dist/content.js --format=iife --sourcemap --watch --loader:.svg=text",
     "package": "node scripts/package.js"
   },

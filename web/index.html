@@ -15,6 +15,16 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://extractmd.miguelcorderocollar.com/">
     
+    <!-- Resource Hints -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="favicon.png" as="image" type="image/png">
+    <link rel="preload" href="styles.css" as="style">
+    
     <!-- Open Graph -->
     <meta property="og:title" content="ExtractMD - Convert Any Webpage to Markdown">
     <meta property="og:description" content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles.">
@@ -90,7 +100,7 @@
         <div class="container">
             <nav class="nav">
                 <a href="/" class="logo">
-                    <img src="favicon.png" alt="ExtractMD" class="logo-icon">
+                    <img src="favicon.png" alt="ExtractMD" class="logo-icon" loading="eager" width="32" height="32">
                     ExtractMD
                 </a>
                 <div class="nav-links">
@@ -167,7 +177,7 @@
         <!-- Hero Screenshot -->
         <div class="hero-image">
             <div class="screenshot-container">
-                <img src="images/promotional-banner.png" alt="ExtractMD popup and settings interface" class="hero-screenshot">
+                <img src="images/promotional-banner.png" alt="ExtractMD popup and settings interface" class="hero-screenshot" loading="lazy" width="1200" height="630" decoding="async">
             </div>
         </div>
     </section>
