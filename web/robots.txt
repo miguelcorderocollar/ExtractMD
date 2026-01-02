@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://extractmd.miguelcorderocollar.com/sitemap.xml
+
+# Disallow common non-content paths (if any are added in future)
+# Disallow: /api/
+# Disallow: /admin/
+
