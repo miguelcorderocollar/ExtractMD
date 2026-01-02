@@ -1,6 +1,12 @@
 # ExtractMD
 
-A Chrome extension that extracts content as Markdown from YouTube videos, Hacker News, articles, and any webpage. Features a floating button interface, comprehensive settings, and modular architecture.
+<div align="center">
+  <img src="web/images/promotional-banner.png" alt="ExtractMD Banner" width="600"/>
+</div>
+
+<div align="center">
+  <p>A Chrome extension that extracts content as Markdown from YouTube videos, Hacker News, articles, and any webpage. Features a floating button interface, comprehensive settings, and modular architecture.</p>
+</div>
 
 ## Links
 
@@ -58,6 +64,16 @@ A Chrome extension that extracts content as Markdown from YouTube videos, Hacker
 - **Popup** - Click extension icon for quick actions: Extract Now, domain toggle, KPI summary, last extraction status
 - **Options Page** - Right-click extension icon → Options for comprehensive settings management
 - **Keyboard Shortcut** - Press `Ctrl+Shift+E` to trigger extraction on current page
+
+<div align="center">
+  <img src="web/images/popup-with-bg.png" alt="ExtractMD Popup Interface" width="400"/>
+  <p><em>Popup interface with quick actions and KPI summary</em></p>
+</div>
+
+<div align="center">
+  <img src="web/images/settings-with-bg.png" alt="ExtractMD Settings Interface" width="600"/>
+  <p><em>Comprehensive settings page with all configuration options</em></p>
+</div>
 
 ## Development
 
