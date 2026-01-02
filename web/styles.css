@@ -372,6 +372,22 @@ a:hover {
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.install-btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.install-hint {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  text-align: center;
 }
 
 /* ============================================
@@ -393,6 +409,14 @@ a:hover {
   text-decoration: none;
 }
 
+/* Button reset for consistent styling */
+button.btn {
+  background: none;
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+}
+
 .btn-primary {
   background: var(--accent);
   color: var(--text-inverse);
@@ -403,6 +427,20 @@ a:hover {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
   color: var(--text-inverse);
+}
+
+.btn-primary:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  border-color: var(--border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-primary:disabled:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-muted);
 }
 
 .btn-secondary {
