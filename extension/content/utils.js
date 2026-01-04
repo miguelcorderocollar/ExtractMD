@@ -8,6 +8,47 @@ export async function getSettings() {
   return getSettingsFromStorage();
 }
 
+/**
+ * Robust detection of fullscreen or theater modes across websites.
+ * Includes generic native fullscreen and site-specific theater modes.
+ * @returns {boolean}
+ */
+export function isFullscreen() {
+  // Check native browser fullscreen
+  if (document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement) {
+    return true;
+  }
+
+  // YouTube specific checks (Theater Mode, etc.)
+  if (window.location.hostname.includes('youtube.com')) {
+    // Check YouTube specific attributes on the watch element
+    const watchElement = document.querySelector('ytd-watch-flexy');
+    if (watchElement) {
+      if (watchElement.hasAttribute('fullscreen')) return true;
+      if (watchElement.hasAttribute('theater')) return true;
+    }
+
+    // Fallback to buttons using standard classes instead of localized aria-labels
+    const theaterButton = document.querySelector('.ytp-size-button');
+    if (theaterButton && theaterButton.getAttribute('aria-pressed') === 'true') {
+      return true;
+    }
+
+    const fullscreenButton = document.querySelector('.ytp-fullscreen-button');
+    if (fullscreenButton && fullscreenButton.getAttribute('aria-pressed') === 'true') {
+      return true;
+    }
+  }
+
+  // TODO: Add other site-specific theater or "dim lights" detections here if needed
+  // For now, native fullscreen covers most cases (Netflix, Twitch, etc.)
+
+  return false;
+}
+
 export async function copyToClipboard(text, includeTimestamps) {
   let textToCopy = text;
   if (!includeTimestamps) {
@@ -63,7 +104,7 @@ function isDarkMode() {
  */
 function injectNotificationStyles() {
   if (document.getElementById('extractmd-notification-styles')) return;
-  
+
   const style = document.createElement('style');
   style.id = 'extractmd-notification-styles';
   style.textContent = `
@@ -86,16 +127,16 @@ function injectNotificationStyles() {
 export function showNotification(message, type = 'info', prominent = false) {
   // Inject animation styles
   injectNotificationStyles();
-  
+
   // Get theme colors
   const theme = isDarkMode() ? NOTIFICATION_THEME.dark : NOTIFICATION_THEME.light;
   const colors = theme[type] || theme.info;
   const icon = NOTIFICATION_ICONS[type] || NOTIFICATION_ICONS.info;
-  
+
   // Create notification container
   const notification = document.createElement('div');
   notification.className = 'extractmd-notification';
-  
+
   // Apply styles individually for better compatibility
   const s = notification.style;
   s.position = 'fixed';
@@ -119,7 +160,7 @@ export function showNotification(message, type = 'info', prominent = false) {
   s.textAlign = 'left';
   s.lineHeight = '1.5';
   s.animation = 'extractmd-slide-in 200ms ease forwards';
-  
+
   // Create icon container
   const iconContainer = document.createElement('div');
   iconContainer.style.cssText = `
@@ -130,7 +171,7 @@ export function showNotification(message, type = 'info', prominent = false) {
     margin-top: 1px;
   `;
   iconContainer.innerHTML = icon;
-  
+
   // Create message container
   const messageContainer = document.createElement('div');
   messageContainer.style.cssText = `
@@ -138,12 +179,12 @@ export function showNotification(message, type = 'info', prominent = false) {
     min-width: 0;
   `;
   messageContainer.innerHTML = message;
-  
+
   // Assemble notification
   notification.appendChild(iconContainer);
   notification.appendChild(messageContainer);
   document.body.appendChild(notification);
-  
+
   // Remove after delay (3s normal, 5s prominent)
   const duration = prominent ? 5000 : 3000;
   setTimeout(() => {
@@ -164,7 +205,7 @@ export function showNotification(message, type = 'info', prominent = false) {
  * @param {boolean} [prominent=false] - Whether to show as prominent notification.
  */
 export function showSuccessNotificationWithTokens(message, text, type = 'success', prominent = false) {
-  chrome.storage.sync.get({ showTokenCountInNotification: false }, function(items) {
+  chrome.storage.sync.get({ showTokenCountInNotification: false }, function (items) {
     let msg = message;
     if (items.showTokenCountInNotification) {
       const tokens = encode(text).length;
@@ -188,7 +229,7 @@ export function htmlToMarkdown(html) {
     .replace(/<a [^>]*href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)')
     .replace(/<i>(.*?)<\/i>/gi, '*$1*')
     .replace(/<b>(.*?)<\/b>/gi, '**$1**')
-    .replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/gi, function(_, code) { return '```' + code + '```'; })
+    .replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/gi, function (_, code) { return '```' + code + '```'; })
     .replace(/<[^>]+>/g, '') // Remove any other tags
     .replace(/&quot;/g, '"')
     .replace(/&amp;/g, '&')

@@ -1,5 +1,5 @@
 // YouTube-specific logic for ExtractMD extension
-import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import { copyToClipboard, showNotification, sleep, getSettings, closeCurrentTab, downloadMarkdownFile, showSuccessNotificationWithTokens, isFullscreen } from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
 import { encode } from 'gpt-tokenizer';
@@ -8,42 +8,9 @@ let floatingButtonController = null;
 let isProcessing = false;
 let currentUrl = window.location.href;
 
-function isVideoFullscreen() {
-  if (document.fullscreenElement || 
-      document.webkitFullscreenElement || 
-      document.mozFullScreenElement || 
-      document.msFullscreenElement) {
-    return true;
-  }
-  const theaterModeButton = document.querySelector('button[aria-label="Theater mode (t)"]');
-  if (theaterModeButton && theaterModeButton.getAttribute('aria-pressed') === 'true') {
-    return true;
-  }
-  const fullscreenButton = document.querySelector('button[aria-label="Full screen (f)"]');
-  if (fullscreenButton && fullscreenButton.getAttribute('aria-pressed') === 'true') {
-    return true;
-  }
-  return false;
-}
-
-function updateButtonVisibility() {
-  if (!floatingButtonController) return;
-  if (isVideoFullscreen()) {
-    floatingButtonController.hide();
-  } else {
-    floatingButtonController.show();
-  }
-}
 
 function startPlayerObserver() {
-  const playerControls = document.querySelector('#movie_player');
-  if (playerControls) {
-    playerObserver.observe(playerControls, {
-      attributes: true,
-      subtree: true,
-      attributeFilter: ['aria-pressed']
-    });
-  }
+  // No-op - visibility is now handled by the FloatingButton component itself
 }
 
 async function expandDescription() {
@@ -108,36 +75,36 @@ async function waitForTranscriptAndCopy(settings = {}) {
   }
   transcriptText = metaMd + transcriptText;
   const userSettings = await getSettings();
-  chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function(items) {
-        if (items.downloadInsteadOfCopy) {
-            // Use video title for filename
-            let title = '';
-            const titleElem = document.querySelector('div#title h1 yt-formatted-string');
-            if (titleElem) title = titleElem.textContent.trim();
-            downloadMarkdownFile(transcriptText, title, 'ExtractMD');
-            showSuccessNotificationWithTokens('Transcript downloaded as .md!', transcriptText);
-        } else {
-            // Check token threshold
-            let threshold = parseInt(items.downloadIfTokensExceed, 10);
-            if (!isNaN(threshold) && threshold > 0) {
-                const tokens = encode(transcriptText).length;
-                if (tokens >= threshold * 1000) {
-                    let title = '';
-                    const titleElem = document.querySelector('div#title h1 yt-formatted-string');
-                    if (titleElem) title = titleElem.textContent.trim();
-                    downloadMarkdownFile(transcriptText, title, 'ExtractMD');
-                    showSuccessNotificationWithTokens('Transcript downloaded as .md (token threshold)!', transcriptText);
-                    return;
-                }
-            }
-            // Timestamps already handled in extractTranscriptText, so pass true to avoid re-processing
-            copyToClipboard(transcriptText, true);
-            showSuccessNotificationWithTokens('Transcript copied to clipboard!', transcriptText);
+  chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, function (items) {
+    if (items.downloadInsteadOfCopy) {
+      // Use video title for filename
+      let title = '';
+      const titleElem = document.querySelector('div#title h1 yt-formatted-string');
+      if (titleElem) title = titleElem.textContent.trim();
+      downloadMarkdownFile(transcriptText, title, 'ExtractMD');
+      showSuccessNotificationWithTokens('Transcript downloaded as .md!', transcriptText);
+    } else {
+      // Check token threshold
+      let threshold = parseInt(items.downloadIfTokensExceed, 10);
+      if (!isNaN(threshold) && threshold > 0) {
+        const tokens = encode(transcriptText).length;
+        if (tokens >= threshold * 1000) {
+          let title = '';
+          const titleElem = document.querySelector('div#title h1 yt-formatted-string');
+          if (titleElem) title = titleElem.textContent.trim();
+          downloadMarkdownFile(transcriptText, title, 'ExtractMD');
+          showSuccessNotificationWithTokens('Transcript downloaded as .md (token threshold)!', transcriptText);
+          return;
         }
-    });
+      }
+      // Timestamps already handled in extractTranscriptText, so pass true to avoid re-processing
+      copyToClipboard(transcriptText, true);
+      showSuccessNotificationWithTokens('Transcript copied to clipboard!', transcriptText);
+    }
+  });
   // Increment KPI counter
   incrementKpi('youtube');
-  
+
   // Close tab after extraction if setting is enabled
   if (userSettings.closeTabAfterExtraction) {
     setTimeout(() => {
@@ -146,7 +113,7 @@ async function waitForTranscriptAndCopy(settings = {}) {
   }
 }
 
-function extractTranscriptText(includeTimestamps = true) {
+export function extractTranscriptText(includeTimestamps = true) {
   const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
   const sections = document.querySelectorAll('ytd-transcript-section-header-renderer');
   let transcript = '';
@@ -204,7 +171,7 @@ window.copyYouTubeTranscript = copyYouTubeTranscript;
 
 export function initYouTubeFeatures() {
   console.debug('[ExtractMD] initYouTubeFeatures called');
-  chrome.storage.sync.get({ enableYouTubeIntegration: true }, function(items) {
+  chrome.storage.sync.get({ enableYouTubeIntegration: true }, function (items) {
     if (items.enableYouTubeIntegration === false) return;
     // Ensure floating button is initialized after DOM is ready
     if (document.readyState === 'loading') {
@@ -237,24 +204,8 @@ export function initYouTubeFeatures() {
     document.addEventListener('fullscreenchange', updateButtonVisibility);
     document.addEventListener('webkitfullscreenchange', updateButtonVisibility);
     document.addEventListener('mozfullscreenchange', updateButtonVisibility);
-    document.addEventListener('MSFullscreenChange', updateButtonVisibility);
-
     // Monitor for YouTube player state changes (theater mode, fullscreen buttons)
-    const playerObserver = new MutationObserver(() => {
-      updateButtonVisibility();
-    });
-    startPlayerObserver();
-    // Also start player observer on YouTube navigation
-    const urlObserver = new MutationObserver(() => {
-      if (window.location.href !== currentUrl) {
-        currentUrl = window.location.href;
-        setTimeout(startPlayerObserver, 1000);
-      }
-    });
-    urlObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    // No longer needed as FloatingButton handles this internally
   });
 }
 
@@ -265,7 +216,7 @@ async function initializeFloatingButton() {
     console.debug('[ExtractMD] Floating button already exists (YouTube)');
     return;
   }
-  
+
   // Load floating button settings
   const buttonSettings = await new Promise(resolve => {
     chrome.storage.sync.get({
@@ -273,7 +224,7 @@ async function initializeFloatingButton() {
       floatingButtonEnableDismiss: true
     }, resolve);
   });
-  
+
   floatingButtonController = await createFloatingButton({
     domain: window.location.hostname,
     enableDrag: buttonSettings.floatingButtonEnableDrag,
@@ -298,10 +249,9 @@ async function initializeFloatingButton() {
       }
     }
   });
-  
+
   if (floatingButtonController) {
     floatingButtonController.appendTo(document.body);
     console.debug('[ExtractMD] Floating button created and added to DOM (YouTube)');
-    updateButtonVisibility();
   }
 } 
