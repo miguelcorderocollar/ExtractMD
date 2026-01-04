@@ -205,7 +205,9 @@ async function createZip() {
       try {
         const { unlink } = await import('fs/promises');
         await unlink(fileListPath);
-      } catch {}
+      } catch (e) {
+        // Ignore error if temp file cannot be deleted
+      }
 
       // Get file size
       const stats = await stat(zipPath);

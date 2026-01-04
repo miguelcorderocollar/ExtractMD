@@ -51,6 +51,8 @@ export default [
       'node_modules/**',
       'coverage/**',
       'dist/**',
+      'extension/dist/**',
+      '**/dist/**',
       'packages/**',
       'playwright-report/**',
       'test-results/**',
