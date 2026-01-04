@@ -29,16 +29,12 @@ export function isFullscreen() {
     // Check YouTube specific attributes on the watch element
     const watchElement = document.querySelector('ytd-watch-flexy');
     if (watchElement) {
-      if (watchElement.hasAttribute('fullscreen') || watchElement.hasAttribute('theater'))
-        return true;
+      if (watchElement.hasAttribute('fullscreen')) return true;
+      // Note: theater mode is not considered fullscreen, button should show in theater mode
     }
 
     // Fallback to buttons using standard classes instead of localized aria-labels
-    const theaterButton = document.querySelector('.ytp-size-button');
-    if (theaterButton && theaterButton.getAttribute('aria-pressed') === 'true') {
-      return true;
-    }
-
+    // Only fullscreen button is considered fullscreen, theater mode should show button
     const fullscreenButton = document.querySelector('.ytp-fullscreen-button');
     if (fullscreenButton && fullscreenButton.getAttribute('aria-pressed') === 'true') {
       return true;

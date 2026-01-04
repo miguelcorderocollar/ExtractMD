@@ -130,10 +130,10 @@ describe('utils.js', () => {
       expect(isFullscreen()).toBe(true);
     });
 
-    it('detects YouTube theater mode via ytd-watch-flexy attribute', () => {
+    it('does not detect YouTube theater mode via ytd-watch-flexy attribute as fullscreen', () => {
       window.location.hostname = 'youtube.com';
       document.body.innerHTML = '<ytd-watch-flexy theater></ytd-watch-flexy>';
-      expect(isFullscreen()).toBe(true);
+      expect(isFullscreen()).toBe(false);
     });
 
     it('detects YouTube fullscreen mode via ytd-watch-flexy attribute', () => {
@@ -142,11 +142,11 @@ describe('utils.js', () => {
       expect(isFullscreen()).toBe(true);
     });
 
-    it('detects YouTube theater mode via ytp-size-button class', () => {
+    it('does not detect YouTube theater mode via ytp-size-button class as fullscreen', () => {
       window.location.hostname = 'youtube.com';
       document.body.innerHTML =
         '<button class="ytp-size-button" aria-pressed="true" aria-label="Modo cine (t)"></button>';
-      expect(isFullscreen()).toBe(true);
+      expect(isFullscreen()).toBe(false);
     });
 
     it('detects YouTube fullscreen mode via ytp-fullscreen-button class', () => {
