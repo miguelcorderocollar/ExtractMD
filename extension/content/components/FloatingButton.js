@@ -2,7 +2,9 @@
 // Used by YouTube, Hacker News, and Article extractors
 
 import { ICONS } from '../../shared/icons.js';
+import { DEFAULTS } from '../../shared/defaults.js';
 import { isFullscreen } from '../utils.js';
+import { ColorUtils } from '../../shared/theme-manager.js';
 
 // Default position offset from bottom-right corner
 const DEFAULT_OFFSET = { left: 0, up: 0 };
@@ -28,19 +30,15 @@ const TRANSPARENCY_CONFIG = {
   full: 1.0,
 };
 
-// Theme colors - hardcoded since we inject into third-party pages
+// Theme colors - base colors for light/dark mode (accent colors will be loaded dynamically)
 const THEME = {
   light: {
-    accent: '#14b8a6',
-    accentHover: '#0d9488',
     success: '#22c55e',
     error: '#ef4444',
     loading: '#f59e0b',
     iconColor: '#fafafa',
   },
   dark: {
-    accent: '#2dd4bf',
-    accentHover: '#5eead4',
     success: '#4ade80',
     error: '#f87171',
     loading: '#fbbf24',
@@ -70,10 +68,26 @@ function isDarkMode() {
 
 /**
  * Get current theme colors based on system preference
+ * Uses ColorUtils from theme-manager for consistent color manipulation
+ * @param {string} accentColor - The accent color to use
  * @returns {Object}
  */
-function getThemeColors() {
-  return isDarkMode() ? THEME.dark : THEME.light;
+function getThemeColors(accentColor) {
+  const dark = isDarkMode();
+  const baseTheme = dark ? THEME.dark : THEME.light;
+
+  // Generate variants using shared ColorUtils
+  // Dark mode uses lighter accent, light mode uses base color
+  const accent = dark ? ColorUtils.lighten(accentColor, 10) : accentColor;
+  const accentHover = dark
+    ? ColorUtils.lighten(accentColor, 20)
+    : ColorUtils.darken(accentColor, 10);
+
+  return {
+    ...baseTheme,
+    accent,
+    accentHover,
+  };
 }
 
 /**
@@ -93,26 +107,25 @@ async function loadPositionOffset(domain) {
 }
 
 /**
- * Load button size setting from storage
- * @returns {Promise<string>}
+ * Load all button settings from storage in a single call
+ * @returns {Promise<{size: string, transparency: string, accentColor: string}>}
  */
-async function loadButtonSize() {
+async function loadButtonSettings() {
   return new Promise((resolve) => {
-    chrome.storage.sync.get({ floatingButtonSize: 'medium' }, (items) => {
-      resolve(items.floatingButtonSize || 'medium');
-    });
-  });
-}
-
-/**
- * Load button transparency setting from storage
- * @returns {Promise<string>}
- */
-async function loadButtonTransparency() {
-  return new Promise((resolve) => {
-    chrome.storage.sync.get({ floatingButtonTransparency: 'medium' }, (items) => {
-      resolve(items.floatingButtonTransparency || 'medium');
-    });
+    chrome.storage.sync.get(
+      {
+        floatingButtonSize: 'medium',
+        floatingButtonTransparency: 'medium',
+        accentColor: DEFAULTS.accentColor,
+      },
+      (items) => {
+        resolve({
+          size: items.floatingButtonSize || 'medium',
+          transparency: items.floatingButtonTransparency || 'medium',
+          accentColor: items.accentColor || DEFAULTS.accentColor,
+        });
+      }
+    );
   });
 }
 
@@ -194,18 +207,18 @@ export async function createFloatingButton({
   // Inject animation styles
   injectAnimationStyles();
 
-  // Load settings
-  let currentOffset = { ...DEFAULT_OFFSET };
-  if (domain) {
-    currentOffset = await loadPositionOffset(domain);
-  }
-  const sizeName = await loadButtonSize();
-  const sizeConfig = SIZE_CONFIG[sizeName] || SIZE_CONFIG.medium;
-  const transparencyName = await loadButtonTransparency();
-  const idleOpacity = TRANSPARENCY_CONFIG[transparencyName] || TRANSPARENCY_CONFIG.medium;
+  // Load all settings in parallel for efficiency
+  const [positionOffset, settings] = await Promise.all([
+    domain ? loadPositionOffset(domain) : Promise.resolve(DEFAULT_OFFSET),
+    loadButtonSettings(),
+  ]);
 
-  // Get theme colors
-  const colors = getThemeColors();
+  let currentOffset = { ...positionOffset };
+  const sizeConfig = SIZE_CONFIG[settings.size] || SIZE_CONFIG.medium;
+  const idleOpacity = TRANSPARENCY_CONFIG[settings.transparency] || TRANSPARENCY_CONFIG.medium;
+
+  // Get theme colors using loaded accent color
+  const colors = getThemeColors(settings.accentColor);
 
   const button = document.createElement('div');
   button.id = id;

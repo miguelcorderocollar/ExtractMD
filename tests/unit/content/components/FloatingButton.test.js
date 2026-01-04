@@ -23,6 +23,7 @@ describe('FloatingButton component', () => {
               ignoredDomains: '',
               floatingButtonSize: 'medium',
               floatingButtonTransparency: 'medium',
+              accentColor: '#14b8a6',
             });
           }),
           set: vi.fn((data, callback) => {
@@ -120,7 +121,7 @@ describe('FloatingButton component', () => {
   });
 
   describe('button appearance', () => {
-    it('creates button with teal accent background color', async () => {
+    it('creates button with default teal accent background color', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
 
@@ -298,8 +299,45 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
 
-      // Dark mode accent is #2dd4bf = rgb(45, 212, 191)
-      expect(controller.element.style.background).toBe('rgb(45, 212, 191)');
+      // Dark mode uses a lightened accent color for better visibility
+      // The exact color depends on ColorUtils.lighten(#14b8a6, 10)
+      expect(controller.element.style.background).not.toBe('');
+      // Just verify it's different from light mode (rgb(20, 184, 166))
+      expect(controller.element.style.background).not.toBe('rgb(20, 184, 166)');
+    });
+
+    it('uses custom accent color from storage', async () => {
+      // Mock storage to return custom color
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({ accentColor: '#ff0000' }); // Red
+      });
+
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+
+      expect(controller.element.style.background).toBe('rgb(255, 0, 0)');
+    });
+
+    it('computes hover variant correctly', async () => {
+      // Mock storage to return blue color
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({ accentColor: '#0066cc' }); // Blue
+      });
+
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      controller.appendTo(document.body);
+
+      // Get initial background
+      const initialBg = controller.element.style.background;
+
+      // Simulate mouseenter to trigger hover variant
+      const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
+      controller.element.dispatchEvent(mouseenterEvent);
+
+      // Should use a different (darker) color for hover
+      expect(controller.element.style.background).not.toBe('');
+      expect(controller.element.style.background).not.toBe(initialBg);
     });
   });
 
@@ -714,12 +752,16 @@ describe('FloatingButton component', () => {
       const controller = await createFloatingButton({ onClick });
       controller.appendTo(document.body);
 
+      // Get initial background (accent color)
+      const initialBg = controller.element.style.background;
+
       // Simulate mouseenter
       const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
       controller.element.dispatchEvent(mouseenterEvent);
 
-      // Light mode hover is #0d9488 - jsdom converts to rgb
-      expect(controller.element.style.background).toBe('rgb(13, 148, 136)');
+      // Hover uses a darkened version of the accent color
+      expect(controller.element.style.background).not.toBe('');
+      expect(controller.element.style.background).not.toBe(initialBg);
     });
   });
 

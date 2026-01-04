@@ -10,11 +10,15 @@ import { initializeKpi } from './kpi.js';
 import { initializeImportExport } from './importExport.js';
 import { initializeDomainIgnore } from './domainIgnore.js';
 import { initializeSaveToast } from './ui.js';
+import { initializeTheme } from '../shared/theme-manager.js';
 
 /**
  * Initialize all options page modules when DOM is ready
  */
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
+  // Initialize theme manager first
+  await initializeTheme();
+
   // Initialize all modules
   initializeSettings();
   initializeNavigation();

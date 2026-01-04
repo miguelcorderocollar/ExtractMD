@@ -60,6 +60,7 @@ const SETTING_ELEMENTS = {
   downloadIfTokensExceed: { id: 'downloadIfTokensExceed', type: 'number' },
   showTokenCountInNotification: { id: 'showTokenCountInNotification', type: 'checkbox' },
   ignoredDomains: { id: 'ignoredDomains', type: 'textarea' },
+  accentColor: { id: 'accentColor', type: 'color' },
 
   // Integration toggles
   enableYouTubeIntegration: {
@@ -166,6 +167,12 @@ export function loadSettings() {
         } else {
           element.value = value || '';
         }
+      } else if (config.type === 'color') {
+        if (isWebComponent(element)) {
+          element.value = value || DEFAULTS.accentColor;
+        } else {
+          element.value = value || DEFAULTS.accentColor;
+        }
       }
     }
 
@@ -224,7 +231,7 @@ export function attachSettingHandlers() {
           updateIntegrationVisibility();
         }
       });
-    } else if (config.type === 'text' || config.type === 'textarea') {
+    } else if (config.type === 'text' || config.type === 'textarea' || config.type === 'color') {
       // Text inputs are handled separately (domain validation, etc.)
       if (key === 'jumpToDomainUrl' || key === 'universalCustomSelector') {
         const inputEl = getInputElement(element);
@@ -233,6 +240,43 @@ export function attachSettingHandlers() {
         });
       }
       // ignoredDomains is handled by domainIgnore.js
+
+      // Special handling for accent color with debouncing
+      if (key === 'accentColor') {
+        let debounceTimeout = null;
+        const inputEl = getInputElement(element);
+
+        const saveAndDispatch = (value) => {
+          saveSetting(key, value);
+          // Dispatch custom event for theme manager
+          document.dispatchEvent(
+            new CustomEvent('extractmd-setting-saved', {
+              detail: { settingId: key, value },
+            })
+          );
+        };
+
+        // Debounced handler for input events (fires rapidly during color picker drag)
+        const handleInput = (e) => {
+          // Get value from CustomEvent detail (reset button) or from input element
+          const value = e.detail?.value ?? inputEl.value;
+          clearTimeout(debounceTimeout);
+          debounceTimeout = setTimeout(() => saveAndDispatch(value), 150);
+        };
+
+        // Immediate handler for change event (fires once when picker closes or reset)
+        const handleChange = (e) => {
+          clearTimeout(debounceTimeout); // Cancel pending debounce
+          debounceTimeout = null;
+          // Get value from CustomEvent detail (reset button) or from input element
+          const value = e.detail?.value ?? inputEl.value;
+          saveAndDispatch(value);
+        };
+
+        // Attach to web component element to receive both native and synthetic events
+        element.addEventListener('input', handleInput);
+        element.addEventListener('change', handleChange);
+      }
     } else if (config.type === 'number') {
       // Handle both Web Components and regular number inputs
       element.addEventListener('change', function (e) {

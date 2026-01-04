@@ -22,7 +22,7 @@
   --text-muted: #a3a3a3;
   --text-inverse: #fafafa;
 
-  /* Accent - Teal */
+  /* Accent - Default values, overridden by ThemeManager */
   --accent: #14b8a6;
   --accent-hover: #0d9488;
   --accent-light: #ccfbf1;
@@ -81,7 +81,7 @@
     --text-muted: #737373;
     --text-inverse: #171717;
 
-    /* Accent - Brighter Teal for dark mode */
+    /* Accent - Default dark mode values, overridden by ThemeManager */
     --accent: #2dd4bf;
     --accent-hover: #5eead4;
     --accent-light: #134e4a;
@@ -319,6 +319,39 @@ body {
   outline: none;
   border-color: var(--accent);
   background: var(--bg-primary);
+}
+
+/* Color Input */
+.input-color {
+  width: 60px;
+  height: 36px;
+  padding: 2px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.input-color:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.input-color::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.input-color::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+.setting-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Status Messages */

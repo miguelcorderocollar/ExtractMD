@@ -60,6 +60,9 @@ export const DEFAULTS = {
   floatingButtonEnableDismiss: true,
   floatingButtonSize: 'medium', // 'small' | 'medium' | 'large'
   floatingButtonTransparency: 'medium', // 'low' | 'medium' | 'high' | 'full'
+
+  // Theme
+  accentColor: '#14b8a6', // Default teal
 };
 
 // Schema for validation during import
@@ -107,4 +110,5 @@ export const SETTING_SCHEMA = {
   floatingButtonEnableDismiss: 'boolean',
   floatingButtonSize: 'string',
   floatingButtonTransparency: 'string',
+  accentColor: 'string',
 };
