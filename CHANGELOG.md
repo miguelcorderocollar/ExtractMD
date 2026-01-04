@@ -7,7 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2024-12-XX
+## [1.1.0] - 2026-01-04
+
+### Added
+
+- **Global Enable/Disable Toggle**: Add extension-wide enable/disable switch in popup and settings for quick control
+- **Accent Color Customization**: New setting to change accent color across the entire extension UI
+- **Welcome Modal**: Welcome modal on first installation to introduce users to the extension
+- **Initial Notification Settings**: Configurable options for initial notifications on articles and universal extraction
+- **Visual Disabled State**: Red extension icon when the extension is disabled for better visibility
+
+### Fixed
+
+- **YouTube Fullscreen**: Button no longer appears on YouTube fullscreen videos
+- **Icon Fixes**: Corrected icons for about and info sections in the settings
+- **Settings Description Padding**: Improved visual spacing for "options" setting descriptions
+
+## [1.0.0] - 2026-01-01
 
 ### Added
 
