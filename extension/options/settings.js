@@ -52,6 +52,7 @@ const SETTING_ELEMENTS = {
   universalPreserveCodeBlocks: { id: 'universalPreserveCodeBlocks', type: 'checkbox' },
 
   // General settings
+  globalEnabled: { id: 'globalEnabled', type: 'checkbox' },
   jumpToDomain: { id: 'jumpToDomain', type: 'checkbox' },
   jumpToDomainUrl: { id: 'jumpToDomainUrl', type: 'text' },
   enableUsageKpi: { id: 'showUsageKpi', type: 'checkbox', invertDefault: true },

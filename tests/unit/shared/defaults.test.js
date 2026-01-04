@@ -35,6 +35,7 @@ describe('shared/defaults', () => {
     expect(DEFAULTS.articleExporterIncludeUrl).toBe(true);
 
     // General settings
+    expect(DEFAULTS.globalEnabled).toBe(true);
     expect(DEFAULTS.jumpToDomain).toBe(false);
     expect(DEFAULTS.jumpToDomainUrl).toBe('https://chat.openai.com/');
     expect(DEFAULTS.enableUsageKpi).toBe(true);

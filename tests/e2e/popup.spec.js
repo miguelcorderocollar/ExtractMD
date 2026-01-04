@@ -71,4 +71,52 @@ test.describe('ExtractMD Popup', () => {
     await expect(settingsBtn).toBeVisible();
     await expect(settingsBtn).toContainText('Settings');
   });
+
+  test('global enable toggle works and persists', async () => {
+    const page = await context.newPage();
+    await page.goto(`chrome-extension://${extensionId}/popup.html`);
+
+    // Check that global enable toggle exists and is visible
+    const toggleLabel = page.locator('.toggle-switch').first(); // The label containing the globalEnabled input
+    await expect(toggleLabel).toBeVisible();
+
+    // Check label and description are visible
+    await expect(page.locator('text=Enabled')).toBeVisible();
+    await expect(page.locator('text=Master switch for all functionality')).toBeVisible();
+
+    // Wait for initialization
+    await page.waitForTimeout(200);
+
+    // Get initial state from the hidden input
+    const globalInput = page.locator('#globalEnabled');
+    const initialState = await globalInput.isChecked();
+    expect(initialState).toBe(true); // Should be enabled by default
+
+    // Toggle the switch off by clicking the label
+    await toggleLabel.click();
+
+    // Wait for setting to save
+    await page.waitForTimeout(100);
+
+    // Verify toggle is now unchecked
+    const newState = await globalInput.isChecked();
+    expect(newState).toBe(false);
+
+    // Reload popup to test persistence
+    await page.reload();
+    await page.waitForTimeout(200);
+
+    // Verify state persisted
+    const persistedState = await page.locator('#globalEnabled').isChecked();
+    expect(persistedState).toBe(false);
+
+    // Toggle back to enabled state for cleanup
+    const resetLabel = page.locator('.toggle-switch').first();
+    await resetLabel.click();
+    await page.waitForTimeout(100);
+
+    // Verify it's back to enabled
+    const resetState = await page.locator('#globalEnabled').isChecked();
+    expect(resetState).toBe(true);
+  });
 });

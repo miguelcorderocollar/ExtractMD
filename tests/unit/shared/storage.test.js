@@ -15,6 +15,7 @@ describe('shared/storage', () => {
 
       expect(chrome.storage.sync.get).toHaveBeenCalledWith(DEFAULTS, expect.any(Function));
       expect(settings).toEqual(DEFAULTS);
+      expect(settings.globalEnabled).toBe(true); // Specifically check globalEnabled default
     });
 
     it('returns only requested keys when specified', async () => {
@@ -36,6 +37,14 @@ describe('shared/storage', () => {
       const settings = await getSettings(['includeTimestamps']);
 
       expect(settings.includeTimestamps).toBe(false);
+    });
+
+    it('merges defaults when storage returns empty object', async () => {
+      // Simulate empty storage (no stored values)
+      const settings = await getSettings(['globalEnabled', 'includeTimestamps']);
+
+      expect(settings.globalEnabled).toBe(true); // Should be default value
+      expect(settings.includeTimestamps).toBe(true); // Should be default value
     });
   });
 

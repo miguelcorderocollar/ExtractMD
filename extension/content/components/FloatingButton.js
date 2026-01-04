@@ -501,18 +501,18 @@ export async function createFloatingButton({
   document.addEventListener('mozfullscreenchange', updateVisibility);
   document.addEventListener('MSFullscreenChange', updateVisibility);
 
-  // For YouTube theater mode and other dynamic changes that don't trigger fullscreenchange
+  // For YouTube fullscreen changes (theater mode no longer hides the button)
   if (window.location.hostname.includes('youtube.com')) {
     const ytObserver = new MutationObserver(updateVisibility);
-    // Observe attributes on the watch element if it exists
+    // Only observe fullscreen attribute changes (not theater)
     const watchElement = document.querySelector('ytd-watch-flexy');
     if (watchElement) {
       ytObserver.observe(watchElement, {
         attributes: true,
-        attributeFilter: ['theater', 'fullscreen'],
+        attributeFilter: ['fullscreen'], // Removed 'theater'
       });
     }
-    // Also observe the movie player for aria-pressed changes
+    // Also observe the movie player for aria-pressed changes on fullscreen button
     const player = document.querySelector('#movie_player');
     if (player) {
       ytObserver.observe(player, {
@@ -522,7 +522,7 @@ export async function createFloatingButton({
       });
     }
 
-    // Initial check
+    // Initial check for fullscreen only
     updateVisibility();
   }
 

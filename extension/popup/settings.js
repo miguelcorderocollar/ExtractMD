@@ -42,6 +42,7 @@ const SETTING_ELEMENTS = {
   articleExporterIncludeUrl: { id: 'articleExporterIncludeUrl', type: 'checkbox' },
 
   // General settings
+  globalEnabled: { id: 'globalEnabled', type: 'checkbox' },
   jumpToDomain: { id: 'jumpToDomain', type: 'checkbox' },
   jumpToDomainUrl: { id: 'jumpToDomainUrl', type: 'text' },
   enableUsageKpi: { id: 'showUsageKpi', type: 'checkbox', invertDefault: true },
@@ -119,6 +120,15 @@ export function attachSettingHandlers() {
     if (config.type === 'checkbox') {
       element.addEventListener('change', function () {
         saveSetting(key, element.checked);
+
+        // Special handling for global enable toggle
+        if (key === 'globalEnabled') {
+          // Provide feedback when disabling globally
+          if (!element.checked) {
+            // Could add a brief status message, but for now just console log
+            console.debug('[ExtractMD] Extension globally disabled');
+          }
+        }
 
         // Special handling for KPI visibility
         if (key === 'enableUsageKpi') {

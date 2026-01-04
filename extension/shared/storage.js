@@ -11,7 +11,11 @@ import { DEFAULTS } from './defaults.js';
 export function getSettings(keys = null) {
   const toGet = keys ? pick(DEFAULTS, keys) : DEFAULTS;
   return new Promise((resolve) => {
-    chrome.storage.sync.get(toGet, resolve);
+    chrome.storage.sync.get(toGet, (result) => {
+      // Merge with defaults since chrome.storage doesn't do this automatically
+      const merged = { ...DEFAULTS, ...result };
+      resolve(keys ? pick(merged, keys) : merged);
+    });
   });
 }
 

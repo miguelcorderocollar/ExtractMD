@@ -5,6 +5,7 @@ import { initializeQuickActions } from './quickActions.js';
 import { initializeDomainToggle } from './domainToggle.js';
 import { initializeLastExtraction } from './lastExtraction.js';
 import { initializeKpiSummary } from './kpiSummary.js';
+import { initializeSettings } from './settings.js';
 import { initializeTheme } from '../shared/theme-manager.js';
 
 // Re-export DEFAULTS and saveSetting for backwards compatibility with tests
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   await initializeTheme();
 
   // Initialize all modules
+  initializeSettings();
   initializeQuickActions();
   initializeDomainToggle();
   initializeLastExtraction();

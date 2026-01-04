@@ -30,7 +30,6 @@ export function isFullscreen() {
     const watchElement = document.querySelector('ytd-watch-flexy');
     if (watchElement) {
       if (watchElement.hasAttribute('fullscreen')) return true;
-      if (watchElement.hasAttribute('theater')) return true;
     }
 
     // Fallback to buttons using standard classes instead of localized aria-labels

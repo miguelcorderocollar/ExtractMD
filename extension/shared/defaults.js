@@ -31,6 +31,7 @@ export const DEFAULTS = {
   articleExporterIncludeUrl: true,
 
   // General
+  globalEnabled: true,
   jumpToDomain: false,
   jumpToDomainUrl: 'https://chat.openai.com/',
   enableUsageKpi: true,
@@ -87,6 +88,7 @@ export const SETTING_SCHEMA = {
   articleExporterOnlyLongest: 'boolean',
   articleExporterShowInfo: 'boolean',
   articleExporterIncludeUrl: 'boolean',
+  globalEnabled: 'boolean',
   jumpToDomain: 'boolean',
   jumpToDomainUrl: 'string',
   enableUsageKpi: 'boolean',

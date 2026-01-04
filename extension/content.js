@@ -20,6 +20,19 @@ function isHNNewsPage() {
 
 async function runInitForCurrentPage() {
   const settings = await getSettings();
+
+  // Check global enable setting first - if disabled, skip all initialization
+  if (settings.globalEnabled === false) {
+    console.debug('[ExtractMD] Extension globally disabled, skipping initialization');
+    // Clear any existing copy function and floating button
+    window.copyExtractMD = null;
+    const existingButton = document.getElementById('extractmd-floating-button');
+    if (existingButton) {
+      existingButton.remove();
+    }
+    return;
+  }
+
   const ignoredDomains = (settings.ignoredDomains || '')
     .split('\n')
     .map((d) => d.trim())
