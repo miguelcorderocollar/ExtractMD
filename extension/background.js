@@ -1,4 +1,14 @@
-// Background script for YouTube Transcript Copier
+// Background script for ExtractMD
+
+// Handle extension installation - auto-open options page
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+    // Mark welcome as not completed so modal shows
+    chrome.storage.sync.set({ welcomeCompleted: false });
+    // Open options page for onboarding
+    chrome.runtime.openOptionsPage();
+  }
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'openNewTab' && message.url) {

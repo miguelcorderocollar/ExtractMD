@@ -65,6 +65,9 @@ export const DEFAULTS = {
 
   // Theme
   accentColor: '#14b8a6', // Default teal
+
+  // Welcome/Onboarding
+  welcomeCompleted: false, // Whether user has completed welcome modal
 };
 
 // Schema for validation during import
@@ -115,4 +118,5 @@ export const SETTING_SCHEMA = {
   floatingButtonSize: 'string',
   floatingButtonTransparency: 'string',
   accentColor: 'string',
+  welcomeCompleted: 'boolean',
 };

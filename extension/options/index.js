@@ -14,6 +14,21 @@ import { initializeStorageUsage } from './storageUsage.js';
 import { initializeTheme } from '../shared/theme-manager.js';
 
 /**
+ * Initialize replay welcome button functionality
+ */
+function initializeReplayWelcome() {
+  const replayBtn = document.getElementById('replayWelcomeBtn');
+  if (replayBtn) {
+    replayBtn.addEventListener('click', () => {
+      const welcomeModal = document.getElementById('welcomeModal');
+      if (welcomeModal) {
+        welcomeModal.show();
+      }
+    });
+  }
+}
+
+/**
  * Initialize all options page modules when DOM is ready
  */
 document.addEventListener('DOMContentLoaded', async function () {
@@ -28,4 +43,5 @@ document.addEventListener('DOMContentLoaded', async function () {
   initializeDomainIgnore();
   initializeStorageUsage();
   initializeSaveToast();
+  initializeReplayWelcome();
 });
