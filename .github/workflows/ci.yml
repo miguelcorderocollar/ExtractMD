@@ -16,23 +16,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build extension
-        run: npm run build
+        run: pnpm run build
 
       - name: Run unit tests
-        run: npm run test:run
+        run: pnpm run test:run
 
       - name: Run unit tests with coverage
-        run: npm run test:coverage
+        run: pnpm run test:coverage
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -52,11 +57,14 @@ jobs:
   #   timeout-minutes: 30
   #   steps:
   #     - uses: actions/checkout@v4
+  #     - uses: pnpm/action-setup@v4
+  #       with:
+  #         version: 9
   #     - uses: actions/setup-node@v4
   #       with:
   #         node-version: lts/*
-  #         cache: 'npm'
-  #     - run: npm ci
-  #     - run: npm run build
+  #         cache: 'pnpm'
+  #     - run: pnpm install --frozen-lockfile
+  #     - run: pnpm run build
   #     - run: npx playwright install --with-deps chromium
   #     - run: xvfb-run --auto-servernum npx playwright test
