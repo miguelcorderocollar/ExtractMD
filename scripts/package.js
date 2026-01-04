@@ -161,7 +161,7 @@ async function getVersion() {
     const manifestContent = await readFile(manifestPath, 'utf-8');
     const manifest = JSON.parse(manifestContent);
     return manifest.version || 'unknown';
-  } catch (err) {
+  } catch {
     return 'unknown';
   }
 }
@@ -205,7 +205,7 @@ async function createZip() {
       try {
         const { unlink } = await import('fs/promises');
         await unlink(fileListPath);
-      } catch (e) {
+      } catch {
         // Ignore error if temp file cannot be deleted
       }
 
@@ -223,7 +223,7 @@ async function createZip() {
       }
 
       return { path: zipPath, size: stats.size };
-    } catch (zipError) {
+    } catch {
       // If zip command fails, provide manual instructions
       log(
         'System zip command not available or failed. Providing manual instructions...',
@@ -298,7 +298,7 @@ async function main() {
   try {
     execSync('npm run build:prod', { cwd: rootDir, stdio: 'inherit' });
     log('Production build completed', 'success');
-  } catch (err) {
+  } catch {
     errors.push('Production build failed');
     log('Production build failed', 'error');
     process.exit(1);
@@ -308,7 +308,7 @@ async function main() {
 
   // Step 2: Verify required files
   log('Step 2: Verifying required files...', 'info');
-  const filesOk = await checkRequiredFiles();
+  await checkRequiredFiles();
   console.log('');
 
   // Step 3: Check for source maps

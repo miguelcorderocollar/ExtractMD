@@ -17,7 +17,7 @@ async function cleanDist() {
       const filePath = join(distDir, file);
       try {
         await unlink(filePath);
-      } catch (err) {
+      } catch {
         // Ignore errors for files that don't exist
       }
     }

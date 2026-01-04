@@ -103,7 +103,7 @@ export function handleImportFile(e) {
         showStatus('Settings imported successfully!', 'success');
         setTimeout(() => location.reload(), 1000);
       });
-    } catch (err) {
+    } catch {
       showStatus('Import failed: Invalid file', 'error');
     }
   };

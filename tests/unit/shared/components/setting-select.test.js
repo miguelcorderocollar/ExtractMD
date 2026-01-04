@@ -1,11 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { SettingSelect } from '../../../../extension/shared/components/setting-select.js';
-
-/**
- * Helper to wait for component to render (handles async connectedCallback)
- */
-const waitForRender = () =>
-  new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
 
 describe('SettingSelect Web Component', () => {
   let container;

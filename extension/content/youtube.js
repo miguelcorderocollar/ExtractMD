@@ -1,13 +1,12 @@
 // YouTube-specific logic for ExtractMD extension
 import {
   copyToClipboard,
-  showNotification,
-  sleep,
-  getSettings,
-  closeCurrentTab,
   downloadMarkdownFile,
   showSuccessNotificationWithTokens,
-  isFullscreen,
+  sleep,
+  showNotification,
+  getSettings,
+  closeCurrentTab,
 } from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
@@ -15,11 +14,6 @@ import { encode } from 'gpt-tokenizer';
 
 let floatingButtonController = null;
 let isProcessing = false;
-let currentUrl = window.location.href;
-
-function startPlayerObserver() {
-  // No-op - visibility is now handled by the FloatingButton component itself
-}
 
 async function expandDescription() {
   const expandButton = document.querySelector('tp-yt-paper-button#expand');
@@ -143,8 +137,6 @@ async function waitForTranscriptAndCopy(settings = {}) {
 }
 
 export function extractTranscriptText(includeTimestamps = true) {
-  const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
-  const sections = document.querySelectorAll('ytd-transcript-section-header-renderer');
   let transcript = '';
   const allElements = Array.from(
     document.querySelectorAll(
@@ -283,7 +275,7 @@ async function initializeFloatingButton() {
           floatingButtonController.setNormal();
           isProcessing = false;
         }, 2000);
-      } catch (error) {
+      } catch {
         floatingButtonController.setError();
         setTimeout(() => {
           floatingButtonController.setNormal();

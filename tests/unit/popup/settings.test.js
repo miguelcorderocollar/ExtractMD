@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DEFAULTS } from '../../../extension/shared/defaults.js';
-import { loadSettings, attachSettingHandlers } from '../../../extension/popup/settings.js';
+import { attachSettingHandlers } from '../../../extension/popup/settings.js';
 import { saveSetting } from '../../../extension/shared/storage.js';
 
 describe('popup.js - DEFAULTS', () => {

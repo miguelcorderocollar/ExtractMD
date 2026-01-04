@@ -15,7 +15,6 @@ import {
   copyToClipboard,
   downloadMarkdownFile,
   showSuccessNotificationWithTokens,
-  closeCurrentTab,
 } from '../../../../extension/content/utils.js';
 
 describe('copyHandler', () => {

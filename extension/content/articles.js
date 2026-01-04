@@ -176,7 +176,7 @@ export async function performArticleCopy(updateButton = false) {
     } else {
       isProcessing = false;
     }
-  } catch (e) {
+  } catch {
     if (updateButton && floatingButtonController) {
       floatingButtonController.setError();
       setTimeout(() => {

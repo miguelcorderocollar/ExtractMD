@@ -1,7 +1,7 @@
 // Shared copy/download handler for ExtractMD
 // Consolidates copy, download, token threshold, and KPI logic
 
-import { getSettings, incrementKpi } from '../../shared/storage.js';
+import { incrementKpi } from '../../shared/storage.js';
 import {
   copyToClipboard,
   downloadMarkdownFile,

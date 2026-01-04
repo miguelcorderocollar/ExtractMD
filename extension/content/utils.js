@@ -29,7 +29,8 @@ export function isFullscreen() {
     // Check YouTube specific attributes on the watch element
     const watchElement = document.querySelector('ytd-watch-flexy');
     if (watchElement) {
-      if (watchElement.hasAttribute('fullscreen')) return true;
+      if (watchElement.hasAttribute('fullscreen') || watchElement.hasAttribute('theater'))
+        return true;
     }
 
     // Fallback to buttons using standard classes instead of localized aria-labels
@@ -61,7 +62,7 @@ export async function copyToClipboard(text, includeTimestamps) {
   }
   try {
     await navigator.clipboard.writeText(textToCopy);
-  } catch (error) {
+  } catch {
     // Fallback method
     const textArea = document.createElement('textarea');
     textArea.value = textToCopy;

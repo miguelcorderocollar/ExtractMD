@@ -1,6 +1,5 @@
 import { defineConfig } from 'vitest/config';
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
 
 export default defineConfig({
   test: {

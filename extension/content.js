@@ -1,11 +1,5 @@
 // Utility functions have been moved to './content/utils.js' and are now imported below.
-import {
-  copyToClipboard,
-  showNotification,
-  htmlToMarkdown,
-  sleep,
-  getSettings,
-} from './content/utils.js';
+import { showNotification, getSettings } from './content/utils.js';
 import { saveSetting } from './shared/storage.js';
 import { initYouTubeFeatures, copyYouTubeTranscript } from './content/youtube.js';
 import { initHackerNewsFeatures, performHNCopy } from './content/hackernews.js';

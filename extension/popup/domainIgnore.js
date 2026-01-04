@@ -56,7 +56,7 @@ export function updateIgnoreButtonState() {
             ignoreCurrentDomainBtn.style.borderColor = '#bfc6e0';
           }
         });
-      } catch (e) {
+      } catch {
         // Invalid URL, ignore
       }
     }
@@ -108,7 +108,7 @@ function toggleCurrentDomain() {
             updateIgnoreButtonState();
           }
         });
-      } catch (e) {
+      } catch {
         showStatus('Invalid URL', 'error');
       }
     }

@@ -147,7 +147,7 @@ export async function performHNCopy(updateButton = false) {
     } else {
       isProcessing = false;
     }
-  } catch (error) {
+  } catch {
     if (updateButton && floatingButtonController) {
       floatingButtonController.setError();
       setTimeout(() => {
