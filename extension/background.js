@@ -1,13 +1,61 @@
 // Background script for ExtractMD
 
-// Handle extension installation - auto-open options page
-chrome.runtime.onInstalled.addListener((details) => {
+// =============================================================================
+// Icon Management - Update icon based on globalEnabled state
+// =============================================================================
+async function updateIcon(enabled) {
+  const iconPath = enabled
+    ? {
+        16: 'icons/icon16.png',
+        48: 'icons/icon48.png',
+        128: 'icons/icon128.png',
+      }
+    : {
+        16: 'icons/icon16-disabled.png',
+        48: 'icons/icon48-disabled.png',
+        128: 'icons/icon128-disabled.png',
+      };
+
+  await chrome.action.setIcon({ path: iconPath });
+
+  // Update tooltip to reflect state
+  const title = enabled
+    ? 'ExtractMD: Copy Info as Markdown'
+    : 'ExtractMD: Copy Info as Markdown (Disabled)';
+  await chrome.action.setTitle({ title });
+
+  console.debug(`[ExtractMD] Icon updated: ${enabled ? 'enabled' : 'disabled'}`);
+}
+
+// Listen for storage changes to update icon when globalEnabled changes
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'sync' && changes.globalEnabled) {
+    // If the key was removed from storage, it means it's back to the default (true)
+    // If the key was set, use the new value
+    const enabled =
+      changes.globalEnabled.newValue !== undefined ? changes.globalEnabled.newValue : true;
+    updateIcon(enabled);
+  }
+});
+
+// Set correct icon on startup
+chrome.runtime.onStartup.addListener(async () => {
+  const { globalEnabled = true } = await chrome.storage.sync.get({ globalEnabled: true });
+  updateIcon(globalEnabled);
+});
+
+// Handle extension installation - auto-open options page and set initial icon
+chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
     // Mark welcome as not completed so modal shows
     chrome.storage.sync.set({ welcomeCompleted: false });
     // Open options page for onboarding
     chrome.runtime.openOptionsPage();
   }
+
+  // Set correct icon based on current state (for both install and update)
+  const { globalEnabled = true } = await chrome.storage.sync.get({ globalEnabled: true });
+  updateIcon(globalEnabled);
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
