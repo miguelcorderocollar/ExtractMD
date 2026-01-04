@@ -1,80 +1,87 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test Universal Page - No Articles</title>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/about">About</a>
-            <a href="/contact">Contact</a>
-        </nav>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+      </nav>
     </header>
-    
+
     <main>
-        <h1>Universal Extraction Test Page</h1>
-        <p>This page does not have any &lt;article&gt; tags, so the Universal extractor should be used as a fallback.</p>
-        
-        <section id="features">
-            <h2>Features</h2>
-            <p>This section tests various HTML elements for conversion:</p>
-            <ul>
-                <li>Unordered list item 1</li>
-                <li>Unordered list item 2</li>
-                <li>Unordered list item 3</li>
-            </ul>
-            <ol>
-                <li>Ordered list item 1</li>
-                <li>Ordered list item 2</li>
-                <li>Ordered list item 3</li>
-            </ol>
-        </section>
-        
-        <section id="formatting">
-            <h2>Text Formatting</h2>
-            <p>This paragraph contains <strong>bold text</strong>, <em>italic text</em>, and a <a href="https://example.com">link to example.com</a>.</p>
-            <blockquote>This is a blockquote that should be preserved in the markdown output.</blockquote>
-        </section>
-        
-        <section id="code">
-            <h2>Code Examples</h2>
-            <p>Inline code: <code>const x = 42;</code></p>
-            <pre><code class="language-javascript">function hello() {
+      <h1>Universal Extraction Test Page</h1>
+      <p>
+        This page does not have any &lt;article&gt; tags, so the Universal extractor should be used
+        as a fallback.
+      </p>
+
+      <section id="features">
+        <h2>Features</h2>
+        <p>This section tests various HTML elements for conversion:</p>
+        <ul>
+          <li>Unordered list item 1</li>
+          <li>Unordered list item 2</li>
+          <li>Unordered list item 3</li>
+        </ul>
+        <ol>
+          <li>Ordered list item 1</li>
+          <li>Ordered list item 2</li>
+          <li>Ordered list item 3</li>
+        </ol>
+      </section>
+
+      <section id="formatting">
+        <h2>Text Formatting</h2>
+        <p>
+          This paragraph contains <strong>bold text</strong>, <em>italic text</em>, and a
+          <a href="https://example.com">link to example.com</a>.
+        </p>
+        <blockquote>
+          This is a blockquote that should be preserved in the markdown output.
+        </blockquote>
+      </section>
+
+      <section id="code">
+        <h2>Code Examples</h2>
+        <p>Inline code: <code>const x = 42;</code></p>
+        <pre><code class="language-javascript">function hello() {
     console.log("Hello, World!");
     return true;
 }</code></pre>
-        </section>
-        
-        <section id="images">
-            <h2>Images</h2>
-            <p>Below is a test image:</p>
-            <img src="https://via.placeholder.com/300x200" alt="Placeholder test image">
-        </section>
-        
-        <section id="nested">
-            <h2>Nested Content</h2>
-            <div class="content-wrapper">
-                <div class="inner">
-                    <h3>Sub-heading Level 3</h3>
-                    <p>Nested paragraph content.</p>
-                    <h4>Sub-heading Level 4</h4>
-                    <p>Even more deeply nested content.</p>
-                </div>
-            </div>
-        </section>
-    </main>
-    
-    <aside>
-        <h3>Sidebar</h3>
-        <p>This sidebar content should be stripped when universalStripNav is enabled.</p>
-    </aside>
-    
-    <footer>
-        <p>&copy; 2024 Test Page. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+      </section>
 
+      <section id="images">
+        <h2>Images</h2>
+        <p>Below is a test image:</p>
+        <img src="https://via.placeholder.com/300x200" alt="Placeholder test image" />
+      </section>
+
+      <section id="nested">
+        <h2>Nested Content</h2>
+        <div class="content-wrapper">
+          <div class="inner">
+            <h3>Sub-heading Level 3</h3>
+            <p>Nested paragraph content.</p>
+            <h4>Sub-heading Level 4</h4>
+            <p>Even more deeply nested content.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside>
+      <h3>Sidebar</h3>
+      <p>This sidebar content should be stripped when universalStripNav is enabled.</p>
+    </aside>
+
+    <footer>
+      <p>&copy; 2024 Test Page. All rights reserved.</p>
+    </footer>
+  </body>
+</html>

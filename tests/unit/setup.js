@@ -12,11 +12,11 @@ global.chrome = {
       get: vi.fn((keys, callback) => {
         const result = {};
         let defaults = {};
-        
+
         if (typeof keys === 'string') {
           defaults = { [keys]: undefined };
         } else if (Array.isArray(keys)) {
-          keys.forEach(k => defaults[k] = undefined);
+          keys.forEach((k) => (defaults[k] = undefined));
         } else {
           defaults = keys || {};
         }
@@ -24,7 +24,7 @@ global.chrome = {
         for (const key of Object.keys(defaults)) {
           result[key] = mockStorage[key] !== undefined ? mockStorage[key] : defaults[key];
         }
-        
+
         if (callback) callback(result);
         return Promise.resolve(result); // Support promise-based calls if any
       }),
@@ -35,25 +35,25 @@ global.chrome = {
       }),
       remove: vi.fn((keys, callback) => {
         const keysArr = Array.isArray(keys) ? keys : [keys];
-        keysArr.forEach(k => delete mockStorage[k]);
+        keysArr.forEach((k) => delete mockStorage[k]);
         if (callback) callback();
         return Promise.resolve();
       }),
       clear: vi.fn((callback) => {
-        Object.keys(mockStorage).forEach(k => delete mockStorage[k]);
+        Object.keys(mockStorage).forEach((k) => delete mockStorage[k]);
         if (callback) callback();
         return Promise.resolve();
-      })
+      }),
     },
     local: {
       get: vi.fn((keys, callback) => {
         const result = {};
         let defaults = {};
-        
+
         if (typeof keys === 'string') {
           defaults = { [keys]: undefined };
         } else if (Array.isArray(keys)) {
-          keys.forEach(k => defaults[k] = undefined);
+          keys.forEach((k) => (defaults[k] = undefined));
         } else {
           defaults = keys || {};
         }
@@ -61,7 +61,7 @@ global.chrome = {
         for (const key of Object.keys(defaults)) {
           result[key] = mockLocalStorage[key] !== undefined ? mockLocalStorage[key] : defaults[key];
         }
-        
+
         if (callback) callback(result);
         return Promise.resolve(result);
       }),
@@ -72,23 +72,23 @@ global.chrome = {
       }),
       remove: vi.fn((keys, callback) => {
         const keysArr = Array.isArray(keys) ? keys : [keys];
-        keysArr.forEach(k => delete mockLocalStorage[k]);
+        keysArr.forEach((k) => delete mockLocalStorage[k]);
         if (callback) callback();
         return Promise.resolve();
       }),
       clear: vi.fn((callback) => {
-        Object.keys(mockLocalStorage).forEach(k => delete mockLocalStorage[k]);
+        Object.keys(mockLocalStorage).forEach((k) => delete mockLocalStorage[k]);
         if (callback) callback();
         return Promise.resolve();
-      })
+      }),
     },
     onChanged: {
-      addListener: vi.fn()
-    }
+      addListener: vi.fn(),
+    },
   },
   runtime: {
     sendMessage: vi.fn(),
-    getURL: vi.fn(path => `chrome-extension://mock-id/${path}`)
+    getURL: vi.fn((path) => `chrome-extension://mock-id/${path}`),
   },
   tabs: {
     query: vi.fn((opts, callback) => {
@@ -97,29 +97,28 @@ global.chrome = {
       return Promise.resolve(tabs);
     }),
     create: vi.fn(),
-    remove: vi.fn()
+    remove: vi.fn(),
   },
   action: {
     onClicked: {
-      addListener: vi.fn()
-    }
+      addListener: vi.fn(),
+    },
   },
   commands: {
     onCommand: {
-      addListener: vi.fn()
-    }
+      addListener: vi.fn(),
+    },
   },
   scripting: {
-    executeScript: vi.fn()
+    executeScript: vi.fn(),
   },
   notifications: {
-    create: vi.fn()
-  }
+    create: vi.fn(),
+  },
 };
 
 // Helper to reset storage between tests
 export function resetMockStorage() {
-  Object.keys(mockStorage).forEach(key => delete mockStorage[key]);
-  Object.keys(mockLocalStorage).forEach(key => delete mockLocalStorage[key]);
+  Object.keys(mockStorage).forEach((key) => delete mockStorage[key]);
+  Object.keys(mockLocalStorage).forEach((key) => delete mockLocalStorage[key]);
 }
-

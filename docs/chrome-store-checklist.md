@@ -1,4 +1,5 @@
 # Chrome Web Store Publishing Checklist
+
 **Last Updated: December 2025**
 
 This checklist covers all requirements for publishing ExtractMD to the Chrome Web Store as of December 2025.
@@ -6,6 +7,7 @@ This checklist covers all requirements for publishing ExtractMD to the Chrome We
 ## ✅ Pre-Submission Requirements
 
 ### 1. Developer Account Setup
+
 - [x] Create a Google account (if not already have one)
 - [x] Register as a Chrome Web Store developer
 - [x] Pay the one-time registration fee ($5 USD as of 2025)
@@ -15,12 +17,14 @@ This checklist covers all requirements for publishing ExtractMD to the Chrome We
 ### 2. Extension Technical Requirements
 
 #### Manifest V3 Compliance ✅
+
 - [x] Using Manifest V3 (`manifest_version: 3`)
 - [x] Service worker instead of background page (`background.service_worker`)
 - [x] Content Security Policy compliant
 - [x] No inline scripts or eval()
 
 #### Code Quality
+
 - [x] Extension tested thoroughly on latest Chrome version
 - [x] No crashes or broken features
 - [x] All permissions properly justified (see Permissions section below)
@@ -28,7 +32,9 @@ This checklist covers all requirements for publishing ExtractMD to the Chrome We
 - [x] Source maps removed from production build (or kept for debugging)
 
 #### Permissions Justification
+
 The extension currently requests:
+
 - `activeTab` ✅ - Needed to access current tab content for extraction
 - `storage` ✅ - Needed to save user settings and preferences
 - `clipboardWrite` ✅ - Needed to copy extracted Markdown to clipboard
@@ -44,12 +50,15 @@ ExtractMD includes a Universal Article Extractor that allows users to extract Ma
 ### 3. Privacy Policy & Data Disclosure ⚠️ **CRITICAL**
 
 #### Privacy Policy Required
+
 - [x] **Create a privacy policy document** ✅ See `docs/privacy-policy.md`
 - [x] Host privacy policy at a publicly accessible URL ✅ `https://extractmd.miguelcorderocollar.com/privacy`
 - [ ] Link privacy policy in Chrome Web Store listing
 
 #### Data Collection Disclosure
+
 Based on codebase analysis, the extension:
+
 - ✅ Stores user settings locally (`chrome.storage.sync`)
 - ✅ Tracks usage statistics locally (`usageStats` KPI data)
 - ✅ Does NOT send data to external servers
@@ -57,6 +66,7 @@ Based on codebase analysis, the extension:
 - ✅ Does NOT use analytics or tracking services
 
 **Privacy Policy Must Include:** ✅ All covered in `docs/privacy-policy.md`
+
 - [x] Statement that no user data is sent to external servers
 - [x] Explanation of local storage usage (settings, KPIs)
 - [x] Description of what data is stored locally
@@ -66,6 +76,7 @@ Based on codebase analysis, the extension:
 - [x] Contact information for privacy inquiries
 
 **Suggested Privacy Policy Content:**
+
 ```
 ExtractMD Privacy Policy
 
@@ -95,6 +106,7 @@ Contact: [Your email or support URL]
 ### 4. Store Listing Assets
 
 #### Required Assets
+
 - [x] Extension icons (16x16, 48x48, 128x128) ✅
 - [x] **Screenshots** (at least 1, recommended 3-5)
   - [x] Screenshot 1: Popup interface showing settings
@@ -108,6 +120,7 @@ Contact: [Your email or support URL]
   - [x] Marquee promotional tile (1400x560)
 
 #### Screenshot Requirements
+
 - Minimum 1 screenshot required
 - Recommended: 3-5 screenshots
 - Format: PNG or JPEG
@@ -118,6 +131,7 @@ Contact: [Your email or support URL]
 ### 5. Store Listing Content
 
 #### Required Fields ✅ See `docs/store-listing.md` for ready-to-use content
+
 - [x] **Name**: "ExtractMD" (max 45 characters)
 - [x] **Short description**: 132 characters max
   - Current: "Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles."
@@ -134,6 +148,7 @@ Contact: [Your email or support URL]
 - [x] **Homepage URL**: `https://extractmd.miguelcorderocollar.com/`
 
 #### Listing Best Practices
+
 - [x] Description is clear and accurate
 - [x] No misleading claims about functionality
 - [x] Keywords are relevant and not spammy
@@ -143,19 +158,21 @@ Contact: [Your email or support URL]
 ### 6. Policy Compliance
 
 #### Chrome Web Store Program Policies
+
 - [x] **Single Purpose**: Extension has a single, clear purpose ✅
   - Purpose: Extract content as Markdown from web pages
 - [x] **User Data Privacy**: Privacy policy provided and accurate - [x] **Functionality**: Extension works as described ✅
-- [x] **No Prohibited Content**: 
+- [x] **No Prohibited Content**:
   - [x] No real money gambling ✅
   - [x] No malicious code ✅
   - [x] No deceptive practices ✅
 - [x] **Affiliate Links**: N/A (extension doesn't use affiliate links) ✅
-- [x] **Spam and Placement**: 
+- [x] **Spam and Placement**:
   - [x] No keyword stuffing ✅
   - [x] Accurate metadata ✅
 
 #### Specific Policy Requirements (2025 Updates)
+
 - [x] **Affiliate Ads Policy**: N/A (not applicable)
 - [x] **Appeals Process**: Understand that only one appeal per violation is allowed
 - [ ] **Functional Elements**: All screenshots, videos, and images must be functional
@@ -163,6 +180,7 @@ Contact: [Your email or support URL]
 ### 7. Packaging & Submission
 
 #### Package Preparation
+
 - [x] Run package script: `npm run package` (automates all steps below)
   - [x] Automatically runs production build: `npm run build:prod`
   - [x] Verifies all required files are included:
@@ -182,6 +200,7 @@ Contact: [Your email or support URL]
 - [x] Verify all features work correctly
 
 #### Submission Process
+
 - [ ] Upload ZIP file via Chrome Developer Dashboard
 - [ ] Complete "Listing" tab:
   - [ ] Name, description, category
@@ -200,6 +219,7 @@ Contact: [Your email or support URL]
 ### 8. Post-Submission
 
 #### Review Process
+
 - [ ] Monitor email for review status updates
 - [ ] Check Chrome Developer Dashboard regularly
 - [ ] Be prepared to respond to reviewer questions
@@ -207,6 +227,7 @@ Contact: [Your email or support URL]
 - [ ] Understand review can take 1-3 business days (sometimes longer)
 
 #### After Approval
+
 - [ ] Monitor user reviews and ratings
 - [ ] Respond to user feedback
 - [ ] Address bug reports quickly
@@ -216,17 +237,20 @@ Contact: [Your email or support URL]
 ## 🔴 Critical Missing Items
 
 ### High Priority (Must Have Before Submission)
+
 1. **Privacy Policy** - ✅ Created and hosted at `https://extractmd.miguelcorderocollar.com/privacy`
 2. **Screenshots** - Create at least 1-3 screenshots showing extension in action
 3. **Permissions Justification** - ✅ Added explanation for `<all_urls>` permission
 4. **Production Build** - ✅ Configured (`npm run build:prod`)
 
 ### Medium Priority (Recommended)
+
 1. **Promotional Images** - Create promotional tiles for better store visibility
 2. **Enhanced Description** - Expand store listing description with more details
 3. **Support Channel** - Ensure GitHub issues page is accessible and monitored
 
 ### Low Priority (Nice to Have)
+
 1. **Video Demo** - Create a short video showing extension features
 2. **Localization** - Consider translating to other languages
 3. **Store Badges** - Add any relevant badges or certifications
@@ -253,4 +277,3 @@ Before clicking "Submit for Review", ensure:
 - [Chrome Web Store Listing Requirements](https://developer.chrome.com/docs/webstore/program-policies/listing-requirements)
 - [Manifest V3 Migration Guide](https://developer.chrome.com/docs/extensions/mv3/intro/)
 - [Chrome Extension Best Practices](https://developer.chrome.com/docs/extensions/mv3/devguide/)
-

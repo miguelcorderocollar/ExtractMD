@@ -1,7 +1,7 @@
 /**
  * <setting-input> Web Component
  * A text or number input setting with label and description
- * 
+ *
  * @example
  * <setting-input
  *   setting-id="jumpToDomainUrl"
@@ -10,7 +10,7 @@
  *   type="text"
  *   placeholder="https://chat.openai.com/">
  * </setting-input>
- * 
+ *
  * <setting-input
  *   setting-id="downloadIfTokensExceed"
  *   label="Download if Tokens Exceed"
@@ -19,13 +19,24 @@
  *   min="0"
  *   step="1">
  * </setting-input>
- * 
+ *
  * @fires change - When the input value changes (on blur or Enter)
  * @fires input - When the input value changes (real-time)
  */
 export class SettingInput extends HTMLElement {
   static get observedAttributes() {
-    return ['value', 'disabled', 'label', 'description', 'type', 'placeholder', 'min', 'max', 'step'];
+    return [
+      'value',
+      'disabled',
+      'label',
+      'description',
+      'type',
+      'placeholder',
+      'min',
+      'max',
+      'step',
+      'reset-value',
+    ];
   }
 
   constructor() {
@@ -42,6 +53,11 @@ export class SettingInput extends HTMLElement {
     if (input) {
       input.removeEventListener('change', this._handleChange);
       input.removeEventListener('input', this._handleInput);
+    }
+
+    const resetBtn = this.querySelector('.reset-btn');
+    if (resetBtn) {
+      resetBtn.removeEventListener('click', this._handleReset);
     }
   }
 
@@ -109,6 +125,10 @@ export class SettingInput extends HTMLElement {
     }
   }
 
+  get resetValue() {
+    return this.getAttribute('reset-value') || '';
+  }
+
   render() {
     const settingId = this.settingId;
     const label = this.label;
@@ -120,9 +140,11 @@ export class SettingInput extends HTMLElement {
     const min = this.getAttribute('min');
     const max = this.getAttribute('max');
     const step = this.getAttribute('step');
+    const resetValue = this.resetValue;
 
     const isNumber = type === 'number';
-    const inputClass = isNumber ? 'input-number' : 'input-text';
+    const isColor = type === 'color';
+    const inputClass = isNumber ? 'input-number' : isColor ? 'input-color' : 'input-text';
 
     // Build input attributes
     let inputAttrs = `type="${type}" id="${settingId}" class="${inputClass}"`;
@@ -133,13 +155,28 @@ export class SettingInput extends HTMLElement {
     if (max !== null) inputAttrs += ` max="${max}"`;
     if (step !== null) inputAttrs += ` step="${step}"`;
 
+    // Build input HTML - wrap only if reset button is needed
+    let inputHtml;
+    if (resetValue) {
+      inputHtml = `
+        <div class="setting-input-wrapper">
+          <input ${inputAttrs}>
+          <button type="button" class="btn btn-secondary btn-sm reset-btn" data-reset-value="${resetValue}">
+            Reset to Default
+          </button>
+        </div>
+      `;
+    } else {
+      inputHtml = `<input ${inputAttrs}>`;
+    }
+
     this.innerHTML = `
       <div class="setting-row">
         <div class="setting-info">
           <span class="setting-label">${label}</span>
           ${description ? `<span class="setting-desc">${description}</span>` : ''}
         </div>
-        <input ${inputAttrs}>
+        ${inputHtml}
       </div>
     `;
   }
@@ -150,35 +187,81 @@ export class SettingInput extends HTMLElement {
       this._handleChange = (e) => {
         // Stop the native event from bubbling to prevent duplicate events
         e.stopPropagation();
-        
+
         this.setAttribute('value', e.target.value);
-        
-        this.dispatchEvent(new CustomEvent('change', {
-          bubbles: true,
-          composed: true,
-          detail: {
-            settingId: this.settingId,
-            value: this.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value
-          }
-        }));
+
+        this.dispatchEvent(
+          new CustomEvent('change', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              settingId: this.settingId,
+              value: this.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value,
+            },
+          })
+        );
       };
 
       this._handleInput = (e) => {
         // Stop the native event from bubbling to prevent duplicate events
         e.stopPropagation();
-        
-        this.dispatchEvent(new CustomEvent('input', {
-          bubbles: true,
-          composed: true,
-          detail: {
-            settingId: this.settingId,
-            value: e.target.value
-          }
-        }));
+
+        this.dispatchEvent(
+          new CustomEvent('input', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              settingId: this.settingId,
+              value: e.target.value,
+            },
+          })
+        );
       };
 
       input.addEventListener('change', this._handleChange);
       input.addEventListener('input', this._handleInput);
+    }
+
+    // Handle reset button
+    const resetBtn = this.querySelector('.reset-btn');
+    if (resetBtn) {
+      this._handleReset = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const resetValue = resetBtn.dataset.resetValue;
+        const input = this.querySelector('input');
+
+        if (input) {
+          input.value = resetValue;
+          this.setAttribute('value', resetValue);
+
+          // Trigger synthetic input and change events
+          this.dispatchEvent(
+            new CustomEvent('input', {
+              bubbles: true,
+              composed: true,
+              detail: {
+                settingId: this.settingId,
+                value: resetValue,
+              },
+            })
+          );
+
+          this.dispatchEvent(
+            new CustomEvent('change', {
+              bubbles: true,
+              composed: true,
+              detail: {
+                settingId: this.settingId,
+                value: resetValue,
+              },
+            })
+          );
+        }
+      };
+
+      resetBtn.addEventListener('click', this._handleReset);
     }
   }
 
@@ -195,4 +278,3 @@ export class SettingInput extends HTMLElement {
 if (!customElements.get('setting-input')) {
   customElements.define('setting-input', SettingInput);
 }
-

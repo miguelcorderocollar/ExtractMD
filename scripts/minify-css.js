@@ -19,20 +19,20 @@ const outputPath = cssPath; // Overwrite original
 async function minifyCSS() {
   try {
     console.log('📦 Minifying CSS...');
-    
+
     const css = fs.readFileSync(cssPath, 'utf8');
-    
+
     const result = await transform(css, {
       loader: 'css',
       minify: true,
     });
-    
+
     fs.writeFileSync(outputPath, result.code);
-    
+
     const originalSize = (css.length / 1024).toFixed(2);
     const minifiedSize = (result.code.length / 1024).toFixed(2);
     const savings = ((1 - result.code.length / css.length) * 100).toFixed(1);
-    
+
     console.log(`✓ CSS minified successfully`);
     console.log(`  Original: ${originalSize} KB`);
     console.log(`  Minified: ${minifiedSize} KB`);
@@ -44,4 +44,3 @@ async function minifyCSS() {
 }
 
 minifyCSS();
-

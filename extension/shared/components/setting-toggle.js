@@ -1,7 +1,7 @@
 /**
  * <setting-toggle> Web Component
  * A toggle switch setting with label and description
- * 
+ *
  * @example
  * <setting-toggle
  *   setting-id="includeTimestamps"
@@ -9,7 +9,7 @@
  *   description="Add time markers to transcript lines"
  *   checked>
  * </setting-toggle>
- * 
+ *
  * @fires change - When the toggle value changes
  */
 export class SettingToggle extends HTMLElement {
@@ -37,7 +37,7 @@ export class SettingToggle extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue === newValue) return;
-    
+
     if (name === 'checked') {
       const input = this.querySelector('input');
       if (input) {
@@ -122,24 +122,26 @@ export class SettingToggle extends HTMLElement {
       this._handleChange = (e) => {
         // Stop the native event from bubbling to prevent duplicate events
         e.stopPropagation();
-        
+
         // Update attribute to reflect state
         if (e.target.checked) {
           this.setAttribute('checked', '');
         } else {
           this.removeAttribute('checked');
         }
-        
+
         // Dispatch custom event with setting info
-        this.dispatchEvent(new CustomEvent('change', {
-          bubbles: true,
-          composed: true,
-          detail: {
-            settingId: this.settingId,
-            checked: e.target.checked,
-            value: e.target.checked
-          }
-        }));
+        this.dispatchEvent(
+          new CustomEvent('change', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              settingId: this.settingId,
+              checked: e.target.checked,
+              value: e.target.checked,
+            },
+          })
+        );
       };
       input.addEventListener('change', this._handleChange);
     }
@@ -158,4 +160,3 @@ export class SettingToggle extends HTMLElement {
 if (!customElements.get('setting-toggle')) {
   customElements.define('setting-toggle', SettingToggle);
 }
-

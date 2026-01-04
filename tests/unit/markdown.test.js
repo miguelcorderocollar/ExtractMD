@@ -51,4 +51,3 @@ describe('nodeToMarkdown (DOM-based)', () => {
     expect(nodeToMarkdown(code, true)).toBe('```console.log("test")```');
   });
 });
-

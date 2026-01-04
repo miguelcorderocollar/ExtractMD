@@ -8,16 +8,16 @@ import { showStatus } from './ui.js';
  * @returns {Promise<string|null>} Domain or null
  */
 async function getCurrentDomain() {
-    try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (tab && tab.url) {
-            const url = new URL(tab.url);
-            return url.hostname;
-        }
-    } catch (e) {
-        console.error('[ExtractMD] Error getting current domain:', e);
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab && tab.url) {
+      const url = new URL(tab.url);
+      return url.hostname;
     }
-    return null;
+  } catch (e) {
+    console.error('[ExtractMD] Error getting current domain:', e);
+  }
+  return null;
 }
 
 /**
@@ -26,12 +26,15 @@ async function getCurrentDomain() {
  * @returns {Promise<boolean>} True if ignored
  */
 async function isDomainIgnored(domain) {
-    return new Promise((resolve) => {
-        chrome.storage.sync.get({ ignoredDomains: '' }, (items) => {
-            const domains = items.ignoredDomains.split('\n').map(d => d.trim()).filter(d => d.length > 0);
-            resolve(domains.includes(domain));
-        });
+  return new Promise((resolve) => {
+    chrome.storage.sync.get({ ignoredDomains: '' }, (items) => {
+      const domains = items.ignoredDomains
+        .split('\n')
+        .map((d) => d.trim())
+        .filter((d) => d.length > 0);
+      resolve(domains.includes(domain));
     });
+  });
 }
 
 /**
@@ -40,25 +43,28 @@ async function isDomainIgnored(domain) {
  * @returns {Promise<boolean>} New ignored status
  */
 async function toggleDomainIgnore(domain) {
-    return new Promise((resolve) => {
-        chrome.storage.sync.get({ ignoredDomains: '' }, (items) => {
-            let domains = items.ignoredDomains.split('\n').map(d => d.trim()).filter(d => d.length > 0);
-            
-            if (domains.includes(domain)) {
-                // Remove from ignored
-                domains = domains.filter(d => d !== domain);
-                const newValue = domains.join('\n');
-                saveSetting('ignoredDomains', newValue);
-                resolve(false);
-            } else {
-                // Add to ignored
-                domains.push(domain);
-                const newValue = domains.join('\n');
-                saveSetting('ignoredDomains', newValue);
-                resolve(true);
-            }
-        });
+  return new Promise((resolve) => {
+    chrome.storage.sync.get({ ignoredDomains: '' }, (items) => {
+      let domains = items.ignoredDomains
+        .split('\n')
+        .map((d) => d.trim())
+        .filter((d) => d.length > 0);
+
+      if (domains.includes(domain)) {
+        // Remove from ignored
+        domains = domains.filter((d) => d !== domain);
+        const newValue = domains.join('\n');
+        saveSetting('ignoredDomains', newValue);
+        resolve(false);
+      } else {
+        // Add to ignored
+        domains.push(domain);
+        const newValue = domains.join('\n');
+        saveSetting('ignoredDomains', newValue);
+        resolve(true);
+      }
     });
+  });
 }
 
 /**
@@ -66,66 +72,65 @@ async function toggleDomainIgnore(domain) {
  * @param {boolean} isIgnored - Whether domain is ignored
  */
 function updateToggleButton(isIgnored) {
-    const toggleBtn = document.getElementById('toggleDomainBtn');
-    if (!toggleBtn) return;
-    
-    if (isIgnored) {
-        toggleBtn.textContent = 'Enable';
-        toggleBtn.classList.add('ignored');
-    } else {
-        toggleBtn.textContent = 'Ignore';
-        toggleBtn.classList.remove('ignored');
-    }
+  const toggleBtn = document.getElementById('toggleDomainBtn');
+  if (!toggleBtn) return;
+
+  if (isIgnored) {
+    toggleBtn.textContent = 'Enable';
+    toggleBtn.classList.add('ignored');
+  } else {
+    toggleBtn.textContent = 'Ignore';
+    toggleBtn.classList.remove('ignored');
+  }
 }
 
 /**
  * Initialize domain toggle module
  */
 export async function initializeDomainToggle() {
-    const domainEl = document.getElementById('currentDomain');
-    const toggleBtn = document.getElementById('toggleDomainBtn');
-    
-    // Get and display current domain
-    const domain = await getCurrentDomain();
-    
-    if (domainEl) {
-        domainEl.textContent = domain || '---';
-    }
-    
-    if (!domain) {
-        if (toggleBtn) toggleBtn.style.display = 'none';
-        return;
-    }
-    
-    // Check and update ignore status
-    const isIgnored = await isDomainIgnored(domain);
-    updateToggleButton(isIgnored);
-    
-    // Handle toggle click
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', async () => {
-            const currentDomain = await getCurrentDomain();
-            if (!currentDomain) return;
-            
-            const nowIgnored = await toggleDomainIgnore(currentDomain);
-            updateToggleButton(nowIgnored);
-            
-            // Send message to content script to reinitialize
-            try {
-                const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-                if (tab && tab.id) {
-                    chrome.tabs.sendMessage(tab.id, { action: 'reinitialize' });
-                }
-            } catch (e) {
-                console.debug('[ExtractMD] Could not send reinitialize message:', e);
-            }
-            
-            if (nowIgnored) {
-                showStatus(`${currentDomain} will be ignored`, 'success');
-            } else {
-                showStatus(`${currentDomain} is now enabled`, 'success');
-            }
-        });
-    }
-}
+  const domainEl = document.getElementById('currentDomain');
+  const toggleBtn = document.getElementById('toggleDomainBtn');
 
+  // Get and display current domain
+  const domain = await getCurrentDomain();
+
+  if (domainEl) {
+    domainEl.textContent = domain || '---';
+  }
+
+  if (!domain) {
+    if (toggleBtn) toggleBtn.style.display = 'none';
+    return;
+  }
+
+  // Check and update ignore status
+  const isIgnored = await isDomainIgnored(domain);
+  updateToggleButton(isIgnored);
+
+  // Handle toggle click
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', async () => {
+      const currentDomain = await getCurrentDomain();
+      if (!currentDomain) return;
+
+      const nowIgnored = await toggleDomainIgnore(currentDomain);
+      updateToggleButton(nowIgnored);
+
+      // Send message to content script to reinitialize
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab && tab.id) {
+          chrome.tabs.sendMessage(tab.id, { action: 'reinitialize' });
+        }
+      } catch (e) {
+        console.debug('[ExtractMD] Could not send reinitialize message:', e);
+      }
+
+      if (nowIgnored) {
+        showStatus(`${currentDomain} will be ignored`, 'success');
+      } else {
+        showStatus(`${currentDomain} is now enabled`, 'success');
+      }
+    });
+  }
+}

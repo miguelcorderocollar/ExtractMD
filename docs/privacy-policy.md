@@ -12,6 +12,7 @@ ExtractMD is a Chrome browser extension that extracts and copies content as Mark
 **ExtractMD does NOT collect, transmit, or share any personal data.**
 
 ### What We Don't Do
+
 - ❌ We do NOT send any data to external servers
 - ❌ We do NOT collect personal information
 - ❌ We do NOT use analytics or tracking services
@@ -19,6 +20,7 @@ ExtractMD is a Chrome browser extension that extracts and copies content as Mark
 - ❌ We do NOT monitor your browsing activity
 
 ### What We Do Store Locally
+
 ExtractMD stores the following data **locally in your browser only**:
 
 1. **User Preferences & Settings**
@@ -35,6 +37,7 @@ ExtractMD stores the following data **locally in your browser only**:
    - These statistics are stored locally and are never transmitted
 
 All data is stored using Chrome's built-in `chrome.storage.sync` API, which means:
+
 - Data stays on your device or syncs to your personal Chrome account
 - Data is encrypted in transit when syncing between your devices
 - Only you have access to your data
@@ -42,6 +45,7 @@ All data is stored using Chrome's built-in `chrome.storage.sync` API, which mean
 ## How Content Extraction Works
 
 When you use ExtractMD to extract content:
+
 1. The extension reads the visible content of the current web page
 2. Content is processed entirely within your browser
 3. Extracted Markdown is copied to your clipboard
@@ -51,17 +55,18 @@ When you use ExtractMD to extract content:
 
 ExtractMD requests the following permissions:
 
-| Permission | Purpose |
-|------------|---------|
-| `activeTab` | Access the current tab's content when you request extraction |
-| `storage` | Save your preferences and settings locally |
-| `clipboardWrite` | Copy extracted Markdown to your clipboard |
-| `scripting` | Inject the extraction functionality into web pages |
-| `<all_urls>` | Enable the Universal Article Extractor to work on any website |
+| Permission       | Purpose                                                       |
+| ---------------- | ------------------------------------------------------------- |
+| `activeTab`      | Access the current tab's content when you request extraction  |
+| `storage`        | Save your preferences and settings locally                    |
+| `clipboardWrite` | Copy extracted Markdown to your clipboard                     |
+| `scripting`      | Inject the extraction functionality into web pages            |
+| `<all_urls>`     | Enable the Universal Article Extractor to work on any website |
 
 ### Why `<all_urls>` Permission?
 
 ExtractMD includes a Universal Article Extractor that allows you to extract Markdown from **any webpage**, not just YouTube and Hacker News. This enables extraction from:
+
 - Blog posts
 - Documentation sites
 - News articles
@@ -78,6 +83,7 @@ The extension only processes content when you explicitly request extraction. It 
 ## Your Rights
 
 You have full control over your data:
+
 - **Export Settings**: Use the Import/Export feature in the extension options
 - **Clear Statistics**: Reset usage statistics from the extension popup
 - **Delete All Data**: Uninstall the extension to remove all stored data
@@ -101,14 +107,15 @@ If we make changes to this privacy policy, we will update the "Last Updated" dat
 ## Open Source
 
 ExtractMD is open source. You can review the complete source code to verify our privacy practices:
+
 - **Repository**: [GitHub - ExtractMD](https://github.com/miguelcorderocollar/yt-transcript-extension)
 
 ## Contact
 
 If you have questions about this privacy policy or ExtractMD's data practices, please contact us:
+
 - **GitHub Issues**: [https://github.com/miguelcorderocollar/yt-transcript-extension/issues](https://github.com/miguelcorderocollar/yt-transcript-extension/issues)
 
 ---
 
 **Summary**: ExtractMD processes content entirely in your browser. No personal data is collected, transmitted, or shared. Your settings and usage statistics are stored locally and are fully under your control.
-

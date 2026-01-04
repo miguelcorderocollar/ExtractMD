@@ -45,7 +45,7 @@ export const ICONS = {
   moon: moonIcon,
   download: downloadIcon,
   lock: lockIcon,
-  checkmark: checkmarkIcon
+  checkmark: checkmarkIcon,
 };
 
 // Also export individual icons for direct imports
@@ -70,6 +70,5 @@ export {
   moonIcon,
   downloadIcon,
   lockIcon,
-  checkmarkIcon
+  checkmarkIcon,
 };
-

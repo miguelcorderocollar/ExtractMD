@@ -7,11 +7,16 @@ vi.mock('../../../../extension/content/utils.js', () => ({
   copyToClipboard: vi.fn().mockResolvedValue(undefined),
   downloadMarkdownFile: vi.fn(),
   showSuccessNotificationWithTokens: vi.fn(),
-  closeCurrentTab: vi.fn()
+  closeCurrentTab: vi.fn(),
 }));
 
 // Import mocked functions
-import { copyToClipboard, downloadMarkdownFile, showSuccessNotificationWithTokens, closeCurrentTab } from '../../../../extension/content/utils.js';
+import {
+  copyToClipboard,
+  downloadMarkdownFile,
+  showSuccessNotificationWithTokens,
+  closeCurrentTab,
+} from '../../../../extension/content/utils.js';
 
 describe('copyHandler', () => {
   beforeEach(() => {
@@ -23,7 +28,7 @@ describe('copyHandler', () => {
     const testMarkdown = '# Test\n\nThis is test content.';
     const testOptions = {
       title: 'Test Document',
-      kpiType: 'articles'
+      kpiType: 'articles',
     };
 
     it('copies to clipboard by default', async () => {
@@ -62,7 +67,7 @@ describe('copyHandler', () => {
 
     it('calls onSuccess callback if provided', async () => {
       const onSuccess = vi.fn();
-      
+
       await handleCopyOrDownload(testMarkdown, { ...testOptions, onSuccess });
 
       expect(onSuccess).toHaveBeenCalled();
@@ -70,23 +75,23 @@ describe('copyHandler', () => {
 
     it('uses custom success message if provided', async () => {
       const customMessage = 'Custom success!';
-      
+
       await handleCopyOrDownload(testMarkdown, { ...testOptions, successMessage: customMessage });
 
       expect(showSuccessNotificationWithTokens).toHaveBeenCalledWith(customMessage, testMarkdown);
     });
 
     it('opens new tab when jumpToDomain is enabled', async () => {
-      await chrome.storage.sync.set({ 
-        jumpToDomain: true, 
-        jumpToDomainUrl: 'https://example.com' 
+      await chrome.storage.sync.set({
+        jumpToDomain: true,
+        jumpToDomainUrl: 'https://example.com',
       });
 
       await handleCopyOrDownload(testMarkdown, testOptions);
 
       expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'openNewTab',
-        url: 'https://example.com'
+        url: 'https://example.com',
       });
     });
 
@@ -99,4 +104,3 @@ describe('copyHandler', () => {
     });
   });
 });
-

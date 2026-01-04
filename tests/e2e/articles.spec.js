@@ -21,10 +21,10 @@ test.describe('ExtractMD Articles', () => {
     const page = await context.newPage();
     const fixturePath = 'file://' + path.resolve(__dirname, 'fixtures/test-article.html');
     await page.goto(fixturePath);
-    
+
     // Wait for extension content script to load and create button
     await page.waitForTimeout(1000);
-    
+
     const button = page.locator('#extractmd-floating-button');
     await expect(button).toBeVisible();
   });
@@ -33,9 +33,9 @@ test.describe('ExtractMD Articles', () => {
     const page = await context.newPage();
     const fixturePath = 'file://' + path.resolve(__dirname, 'fixtures/test-multiple-articles.html');
     await page.goto(fixturePath);
-    
+
     await page.waitForTimeout(1000);
-    
+
     const button = page.locator('#extractmd-floating-button');
     await expect(button).toBeVisible();
   });
@@ -44,21 +44,20 @@ test.describe('ExtractMD Articles', () => {
     const page = await context.newPage();
     const fixturePath = 'file://' + path.resolve(__dirname, 'fixtures/test-article.html');
     await page.goto(fixturePath);
-    
+
     // Grant clipboard permissions
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    
+
     await page.waitForTimeout(1000);
-    
+
     const button = page.locator('#extractmd-floating-button');
     await button.click();
-    
+
     // Wait for copy operation
     await page.waitForTimeout(500);
-    
+
     // Check for success notification
     const notification = page.locator('div:has-text("copied")').first();
     await expect(notification).toBeVisible({ timeout: 3000 });
   });
 });
-

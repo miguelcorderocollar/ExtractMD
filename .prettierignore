@@ -1,0 +1,9 @@
+node_modules
+coverage
+dist
+packages
+playwright-report
+test-results
+pnpm-lock.yaml
+*.min.js
+*.min.css

@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom';
 
 // Mock modules before imports
 vi.mock('../../../extension/shared/storage.js', () => ({
-  incrementKpi: vi.fn()
+  incrementKpi: vi.fn(),
 }));
 
 vi.mock('../../../extension/content/utils.js', () => ({
@@ -12,7 +12,7 @@ vi.mock('../../../extension/content/utils.js', () => ({
   getSettings: vi.fn().mockResolvedValue({}),
   closeCurrentTab: vi.fn(),
   downloadMarkdownFile: vi.fn(),
-  showSuccessNotificationWithTokens: vi.fn()
+  showSuccessNotificationWithTokens: vi.fn(),
 }));
 
 vi.mock('../../../extension/content/components/FloatingButton.js', () => ({
@@ -23,12 +23,12 @@ vi.mock('../../../extension/content/components/FloatingButton.js', () => ({
     setLoading: vi.fn(),
     setSuccess: vi.fn(),
     setError: vi.fn(),
-    setNormal: vi.fn()
-  }))
+    setNormal: vi.fn(),
+  })),
 }));
 
 vi.mock('gpt-tokenizer', () => ({
-  encode: vi.fn((text) => ({ length: Math.ceil(text.length / 4) }))
+  encode: vi.fn((text) => ({ length: Math.ceil(text.length / 4) })),
 }));
 
 describe('Universal Module', () => {
@@ -37,13 +37,13 @@ describe('Universal Module', () => {
 
   beforeEach(() => {
     dom = new JSDOM('<!DOCTYPE html><html><body></body></html>', {
-      url: 'https://example.com/page'
+      url: 'https://example.com/page',
     });
     document = dom.window.document;
     global.document = document;
     global.window = dom.window;
     global.navigator = dom.window.navigator;
-    
+
     // Reset chrome mocks
     global.chrome.storage.sync.get.mockImplementation((defaults, callback) => {
       const result = { ...defaults };
@@ -63,7 +63,7 @@ describe('Universal Module', () => {
         <main>Main content area with lots of text</main>
         <footer>Footer</footer>
       `;
-      
+
       const main = document.querySelector('main');
       expect(main).toBeTruthy();
       expect(main.textContent).toContain('Main content area');
@@ -74,7 +74,7 @@ describe('Universal Module', () => {
         <div role="main">Content with role main</div>
         <nav>Navigation</nav>
       `;
-      
+
       const mainRole = document.querySelector('[role="main"]');
       expect(mainRole).toBeTruthy();
       expect(mainRole.textContent).toContain('Content with role main');
@@ -84,7 +84,7 @@ describe('Universal Module', () => {
       document.body.innerHTML = `
         <article>This is an article</article>
       `;
-      
+
       const article = document.querySelector('article');
       expect(article).toBeTruthy();
       expect(article.textContent).toContain('This is an article');
@@ -100,7 +100,7 @@ describe('Universal Module', () => {
           <p>Content</p>
         </main>
       `;
-      
+
       const headings = document.querySelectorAll('h1, h2');
       expect(headings.length).toBe(2);
     });
@@ -118,7 +118,7 @@ describe('Universal Module', () => {
           </ul>
         </main>
       `;
-      
+
       const lists = document.querySelectorAll('ul');
       expect(lists.length).toBe(2);
     });
@@ -129,7 +129,7 @@ describe('Universal Module', () => {
           <pre><code class="language-javascript">const x = 1;</code></pre>
         </main>
       `;
-      
+
       const codeBlock = document.querySelector('pre code');
       expect(codeBlock).toBeTruthy();
       expect(codeBlock.className).toContain('language-javascript');
@@ -141,7 +141,7 @@ describe('Universal Module', () => {
           <img src="test.jpg" alt="Test image">
         </main>
       `;
-      
+
       const img = document.querySelector('img');
       expect(img).toBeTruthy();
       expect(img.alt).toBe('Test image');
@@ -153,7 +153,7 @@ describe('Universal Module', () => {
           <a href="https://example.com">Link text</a>
         </main>
       `;
-      
+
       const link = document.querySelector('a');
       expect(link).toBeTruthy();
       expect(link.textContent).toBe('Link text');
@@ -166,7 +166,7 @@ describe('Universal Module', () => {
         <nav>Navigation menu</nav>
         <main>Main content</main>
       `;
-      
+
       const nav = document.querySelector('nav');
       expect(nav).toBeTruthy();
     });
@@ -176,7 +176,7 @@ describe('Universal Module', () => {
         <header>Site header</header>
         <main>Main content</main>
       `;
-      
+
       const header = document.querySelector('header');
       expect(header).toBeTruthy();
     });
@@ -186,7 +186,7 @@ describe('Universal Module', () => {
         <main>Main content</main>
         <footer>Site footer</footer>
       `;
-      
+
       const footer = document.querySelector('footer');
       expect(footer).toBeTruthy();
     });
@@ -196,7 +196,7 @@ describe('Universal Module', () => {
         <main>Main content</main>
         <aside>Sidebar</aside>
       `;
-      
+
       const aside = document.querySelector('aside');
       expect(aside).toBeTruthy();
     });
@@ -208,7 +208,7 @@ describe('Universal Module', () => {
         <div class="sidebar">Sidebar</div>
         <div class="article-content">Main article content</div>
       `;
-      
+
       const target = document.querySelector('.article-content');
       expect(target).toBeTruthy();
       expect(target.textContent).toContain('Main article content');
@@ -218,7 +218,7 @@ describe('Universal Module', () => {
       document.body.innerHTML = `
         <div id="main-content">Content by ID</div>
       `;
-      
+
       const target = document.querySelector('#main-content');
       expect(target).toBeTruthy();
     });
@@ -231,7 +231,7 @@ describe('Universal Module', () => {
           </div>
         </div>
       `;
-      
+
       const target = document.querySelector('.wrapper .content article');
       expect(target).toBeTruthy();
       expect(target.textContent).toContain('Nested article');
@@ -245,12 +245,12 @@ describe('Universal Module', () => {
         <div class="large">${'Lorem ipsum '.repeat(100)}</div>
         <div class="medium">${'Some text '.repeat(20)}</div>
       `;
-      
+
       const divs = Array.from(document.querySelectorAll('div'));
-      const largest = divs.reduce((max, el) => 
-        (el.textContent.length > max.textContent.length) ? el : max
+      const largest = divs.reduce((max, el) =>
+        el.textContent.length > max.textContent.length ? el : max
       );
-      
+
       expect(largest.className).toBe('large');
     });
   });
@@ -263,7 +263,7 @@ describe('Universal Module', () => {
         return Promise.resolve(result);
       });
 
-      const result = await new Promise(resolve => {
+      const result = await new Promise((resolve) => {
         chrome.storage.sync.get({ universalIncludeImages: true }, resolve);
       });
 
@@ -277,7 +277,7 @@ describe('Universal Module', () => {
         return Promise.resolve(result);
       });
 
-      const result = await new Promise(resolve => {
+      const result = await new Promise((resolve) => {
         chrome.storage.sync.get({ universalStripNav: true }, resolve);
       });
 
@@ -291,7 +291,7 @@ describe('Universal Module', () => {
         return Promise.resolve(result);
       });
 
-      const result = await new Promise(resolve => {
+      const result = await new Promise((resolve) => {
         chrome.storage.sync.get({ universalContentMode: 'auto' }, resolve);
       });
 
@@ -303,7 +303,7 @@ describe('Universal Module', () => {
 describe('Universal Defaults', () => {
   it('should have all universal settings in DEFAULTS', async () => {
     const { DEFAULTS } = await import('../../../extension/shared/defaults.js');
-    
+
     expect(DEFAULTS).toHaveProperty('enableUniversalIntegration', true);
     expect(DEFAULTS).toHaveProperty('universalIncludeImages', true);
     expect(DEFAULTS).toHaveProperty('universalIncludeLinks', true);
@@ -316,7 +316,7 @@ describe('Universal Defaults', () => {
 
   it('should have universal settings in SETTING_SCHEMA', async () => {
     const { SETTING_SCHEMA } = await import('../../../extension/shared/defaults.js');
-    
+
     expect(SETTING_SCHEMA).toHaveProperty('enableUniversalIntegration', 'boolean');
     expect(SETTING_SCHEMA).toHaveProperty('universalIncludeImages', 'boolean');
     expect(SETTING_SCHEMA).toHaveProperty('universalIncludeLinks', 'boolean');
@@ -327,4 +327,3 @@ describe('Universal Defaults', () => {
     expect(SETTING_SCHEMA).toHaveProperty('universalPreserveCodeBlocks', 'boolean');
   });
 });
-

@@ -7,7 +7,7 @@ chrome.action.onClicked.addListener(async (tab) => {
       type: 'basic',
       iconUrl: 'icons/icon48.png',
       title: 'YouTube Transcript Copier',
-      message: 'Please navigate to a YouTube video page to use this extension.'
+      message: 'Please navigate to a YouTube video page to use this extension.',
     });
     return;
   }
@@ -16,7 +16,7 @@ chrome.action.onClicked.addListener(async (tab) => {
     // Execute the content script to copy transcript
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      function: copyTranscript
+      function: copyTranscript,
     });
   } catch (error) {
     console.error('Error executing content script:', error);
@@ -53,7 +53,7 @@ chrome.commands.onCommand.addListener(async (command) => {
       // Execute script to trigger copy
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        function: triggerCopy
+        function: triggerCopy,
       });
     } catch (error) {
       console.error('Error executing copy command:', error);
@@ -67,7 +67,7 @@ chrome.commands.onCommand.addListener(async (command) => {
       // Execute script to trigger hide/ignore
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        function: triggerHide
+        function: triggerHide,
       });
     } catch (error) {
       console.error('Error executing hide command:', error);
@@ -92,4 +92,4 @@ function triggerHide() {
   if (window.hideExtractMDForDomain) {
     window.hideExtractMDForDomain();
   }
-} 
+}

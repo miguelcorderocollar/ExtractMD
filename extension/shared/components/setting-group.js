@@ -1,7 +1,7 @@
 /**
  * <setting-group> Web Component
  * A container for grouping related settings with a title
- * 
+ *
  * @example
  * <setting-group title="Transcript Content">
  *   <setting-toggle setting-id="includeTimestamps" label="Include Timestamps"></setting-toggle>
@@ -42,27 +42,27 @@ export class SettingGroup extends HTMLElement {
 
   render() {
     const title = this.title;
-    
+
     // Create wrapper structure
     const wrapper = document.createElement('div');
     wrapper.className = 'settings-group';
-    
+
     if (title) {
       const titleEl = document.createElement('h3');
       titleEl.className = 'group-title';
       titleEl.textContent = title;
       wrapper.appendChild(titleEl);
     }
-    
+
     // Create content container
     const content = document.createElement('div');
     content.className = 'settings-group-content';
-    
+
     // Move existing children to content container
     while (this.firstChild) {
       content.appendChild(this.firstChild);
     }
-    
+
     wrapper.appendChild(content);
     this.appendChild(wrapper);
   }
@@ -72,4 +72,3 @@ export class SettingGroup extends HTMLElement {
 if (!customElements.get('setting-group')) {
   customElements.define('setting-group', SettingGroup);
 }
-

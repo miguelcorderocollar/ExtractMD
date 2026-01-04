@@ -25,7 +25,7 @@ describe('SettingInput Web Component', () => {
         description="Test description">
       </setting-input>
     `;
-    
+
     const input = container.querySelector('setting-input');
     expect(input.querySelector('.setting-label').textContent).toBe('Test Label');
     expect(input.querySelector('.setting-desc').textContent).toBe('Test description');
@@ -35,10 +35,10 @@ describe('SettingInput Web Component', () => {
     container.innerHTML = `
       <setting-input setting-id="myInput" label="My Input"></setting-input>
     `;
-    
+
     const inputComponent = container.querySelector('setting-input');
     const inputEl = inputComponent.querySelector('input');
-    
+
     expect(inputEl).not.toBeNull();
     expect(inputEl.type).toBe('text');
     expect(inputEl.id).toBe('myInput');
@@ -55,10 +55,10 @@ describe('SettingInput Web Component', () => {
         step="5">
       </setting-input>
     `;
-    
+
     const inputComponent = container.querySelector('setting-input');
     const inputEl = inputComponent.querySelector('input');
-    
+
     expect(inputEl.type).toBe('number');
     expect(inputEl.min).toBe('0');
     expect(inputEl.max).toBe('100');
@@ -73,10 +73,10 @@ describe('SettingInput Web Component', () => {
         placeholder="https://example.com">
       </setting-input>
     `;
-    
+
     const inputComponent = container.querySelector('setting-input');
     const inputEl = inputComponent.querySelector('input');
-    
+
     expect(inputEl.placeholder).toBe('https://example.com');
   });
 
@@ -84,19 +84,19 @@ describe('SettingInput Web Component', () => {
     container.innerHTML = `
       <setting-input setting-id="testInput" label="Test"></setting-input>
     `;
-    
+
     const inputComponent = container.querySelector('setting-input');
     const inputEl = inputComponent.querySelector('input');
-    
-    const eventPromise = new Promise(resolve => {
+
+    const eventPromise = new Promise((resolve) => {
       inputComponent.addEventListener('change', (e) => {
         resolve(e.detail);
       });
     });
-    
+
     inputEl.value = 'new value';
     inputEl.dispatchEvent(new Event('change', { bubbles: true }));
-    
+
     const eventDetail = await eventPromise;
     expect(eventDetail.settingId).toBe('testInput');
     expect(eventDetail.value).toBe('new value');
@@ -106,19 +106,19 @@ describe('SettingInput Web Component', () => {
     container.innerHTML = `
       <setting-input setting-id="testInput" label="Test"></setting-input>
     `;
-    
+
     const inputComponent = container.querySelector('setting-input');
     const inputEl = inputComponent.querySelector('input');
-    
-    const eventPromise = new Promise(resolve => {
+
+    const eventPromise = new Promise((resolve) => {
       inputComponent.addEventListener('input', (e) => {
         resolve(e.detail);
       });
     });
-    
+
     inputEl.value = 'typing';
     inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-    
+
     const eventDetail = await eventPromise;
     expect(eventDetail.settingId).toBe('testInput');
     expect(eventDetail.value).toBe('typing');
@@ -128,7 +128,7 @@ describe('SettingInput Web Component', () => {
     container.innerHTML = `
       <setting-input setting-id="customInput" label="Test"></setting-input>
     `;
-    
+
     const inputComponent = container.querySelector('setting-input');
     expect(inputComponent.settingId).toBe('customInput');
   });
@@ -137,10 +137,10 @@ describe('SettingInput Web Component', () => {
     container.innerHTML = `
       <setting-input setting-id="testInput" label="Test"></setting-input>
     `;
-    
+
     const inputComponent = container.querySelector('setting-input');
     const inputEl = inputComponent.getInput();
-    
+
     expect(inputEl).not.toBeNull();
     expect(inputEl.tagName).toBe('INPUT');
   });
@@ -149,10 +149,10 @@ describe('SettingInput Web Component', () => {
     container.innerHTML = `
       <setting-input setting-id="testInput" label="Test"></setting-input>
     `;
-    
+
     const inputComponent = container.querySelector('setting-input');
     inputComponent.value = 'test value';
-    
+
     expect(inputComponent.getAttribute('value')).toBe('test value');
     expect(inputComponent.querySelector('input').value).toBe('test value');
   });
@@ -161,19 +161,19 @@ describe('SettingInput Web Component', () => {
     container.innerHTML = `
       <setting-input setting-id="numInput" label="Number" type="number"></setting-input>
     `;
-    
+
     const inputComponent = container.querySelector('setting-input');
     const inputEl = inputComponent.querySelector('input');
-    
-    const eventPromise = new Promise(resolve => {
+
+    const eventPromise = new Promise((resolve) => {
       inputComponent.addEventListener('change', (e) => {
         resolve(e.detail);
       });
     });
-    
+
     inputEl.value = '42';
     inputEl.dispatchEvent(new Event('change', { bubbles: true }));
-    
+
     const eventDetail = await eventPromise;
     expect(eventDetail.value).toBe(42);
     expect(typeof eventDetail.value).toBe('number');
@@ -183,7 +183,7 @@ describe('SettingInput Web Component', () => {
     container.innerHTML = `
       <setting-input setting-id="testInput" label="Test" disabled></setting-input>
     `;
-    
+
     const inputComponent = container.querySelector('setting-input');
     expect(inputComponent.disabled).toBe(true);
     expect(inputComponent.querySelector('input').disabled).toBe(true);

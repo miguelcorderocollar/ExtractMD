@@ -46,8 +46,8 @@
 ## Installation
 
 1. Clone the repository
-2. Install dependencies: `npm install`
-3. Build the extension: `npm run build`
+2. Install dependencies: `pnpm install`
+3. Build the extension: `pnpm run build`
 4. Load `extension/` folder in Chrome via `chrome://extensions/` (Developer mode)
 
 ## Usage
@@ -79,22 +79,22 @@
 
 ```bash
 # Run unit tests (Vitest)
-npm test
+pnpm test
 
 # Run E2E tests (Playwright)
-npm run test:e2e
+pnpm run test:e2e
 
 # Run all tests
-npm run test:all
+pnpm run test:all
 
 # Build for production
-npm run build:prod
+pnpm run build:prod
 
 # Watch mode (auto-rebuild)
-npm run watch
+pnpm run watch
 
 # Package extension for Chrome Web Store
-npm run package
+pnpm run package
 ```
 
 ### Packaging

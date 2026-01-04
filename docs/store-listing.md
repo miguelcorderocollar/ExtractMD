@@ -5,23 +5,29 @@ This document contains the ready-to-use content for the Chrome Web Store listing
 ---
 
 ## Name
+
 **ExtractMD**
 
 ## Short Description (132 characters max)
+
 > Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles.
 
-*Character count: 109*
+_Character count: 109_
 
 ## Category
+
 **Productivity** (recommended) or **Developer Tools**
 
 ## Language
+
 **English**
 
 ## Support URL
+
 https://github.com/miguelcorderocollar/yt-transcript-extension/issues
 
 ## Homepage URL
+
 https://extractmd.miguelcorderocollar.com/
 
 ---
@@ -152,7 +158,7 @@ This section contains the exact text to paste into the Chrome Web Store privacy 
 ExtractMD converts webpage content to Markdown format and copies it to the clipboard. Users click a floating button or use a keyboard shortcut to extract content from YouTube transcripts, Hacker News discussions, articles, or any webpage. The extracted Markdown is ready to paste into note-taking apps, documentation tools, or AI assistants.
 ```
 
-*Character count: ~340*
+_Character count: ~340_
 
 ---
 
@@ -207,6 +213,7 @@ ExtractMD does not use any remote code. All JavaScript is bundled locally within
 **Checkboxes:** Leave ALL checkboxes UNCHECKED
 
 ExtractMD does not collect any of the listed data types:
+
 - ❌ Personally identifiable information
 - ❌ Health information
 - ❌ Financial and payment information
@@ -218,6 +225,7 @@ ExtractMD does not collect any of the listed data types:
 - ❌ Website content
 
 **Certifications:** CHECK ALL THREE:
+
 - ✅ I do not sell or transfer user data to third parties, outside of the approved use cases
 - ✅ I do not use or transfer user data for purposes that are unrelated to my item's single purpose
 - ✅ I do not use or transfer user data to determine creditworthiness or for lending purposes
@@ -238,6 +246,6 @@ https://extractmd.miguelcorderocollar.com/privacy
 No setup required. Install and navigate to any webpage. Look for the floating ExtractMD button in the bottom-right corner. Click it to extract content as Markdown (copied to clipboard). Test on YouTube videos, Hacker News discussions, or any article. Alternatively, press Ctrl+Shift+E (Cmd+Shift+E on Mac) to extract without clicking the button.
 ```
 
-*Character count: ~250*
+_Character count: ~250_
 
 ---

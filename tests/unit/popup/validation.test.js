@@ -1,13 +1,17 @@
 import { describe, it, expect } from 'vitest';
 // Note: these need to be exported from popup.js for testing
-// Since popup.js uses inline functions inside DOMContentLoaded, 
+// Since popup.js uses inline functions inside DOMContentLoaded,
 // we'll create a simplified test that tests the logic directly
 
 describe('domain validation', () => {
-  const domainRegex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$|^localhost$|^(?:\d{1,3}\.){3}\d{1,3}$/i;
+  const domainRegex =
+    /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$|^localhost$|^(?:\d{1,3}\.){3}\d{1,3}$/i;
 
   function validateDomains(text) {
-    const domains = text.split('\n').map(d => d.trim()).filter(d => d.length > 0);
+    const domains = text
+      .split('\n')
+      .map((d) => d.trim())
+      .filter((d) => d.length > 0);
     for (const domain of domains) {
       if (!domainRegex.test(domain)) return false;
     }
@@ -45,4 +49,3 @@ describe('domain validation', () => {
     expect(validateDomains('\n\n')).toBe(true);
   });
 });
-

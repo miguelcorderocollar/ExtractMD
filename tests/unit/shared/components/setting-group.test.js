@@ -23,10 +23,10 @@ describe('SettingGroup Web Component', () => {
         <div>Content</div>
       </setting-group>
     `;
-    
+
     const group = container.querySelector('setting-group');
     const title = group.querySelector('.group-title');
-    
+
     expect(title).not.toBeNull();
     expect(title.textContent).toBe('My Group');
   });
@@ -37,10 +37,10 @@ describe('SettingGroup Web Component', () => {
         <div id="child">Child Content</div>
       </setting-group>
     `;
-    
+
     const group = container.querySelector('setting-group');
     const wrapper = group.querySelector('.settings-group');
-    
+
     expect(wrapper).not.toBeNull();
   });
 
@@ -51,11 +51,11 @@ describe('SettingGroup Web Component', () => {
         <div id="second">Second</div>
       </setting-group>
     `;
-    
+
     const group = container.querySelector('setting-group');
     const first = group.querySelector('#first');
     const second = group.querySelector('#second');
-    
+
     expect(first).not.toBeNull();
     expect(second).not.toBeNull();
     expect(first.textContent).toBe('First');
@@ -68,10 +68,10 @@ describe('SettingGroup Web Component', () => {
         <div>Content only</div>
       </setting-group>
     `;
-    
+
     const group = container.querySelector('setting-group');
     const title = group.querySelector('.group-title');
-    
+
     expect(title).toBeNull();
   });
 
@@ -81,7 +81,7 @@ describe('SettingGroup Web Component', () => {
         <div>Content</div>
       </setting-group>
     `;
-    
+
     const group = container.querySelector('setting-group');
     expect(group.title).toBe('Custom Title');
   });
@@ -92,10 +92,10 @@ describe('SettingGroup Web Component', () => {
         <div>Content</div>
       </setting-group>
     `;
-    
+
     const group = container.querySelector('setting-group');
     group.setAttribute('title', 'Updated Title');
-    
+
     const titleEl = group.querySelector('.group-title');
     expect(titleEl.textContent).toBe('Updated Title');
   });
@@ -107,11 +107,10 @@ describe('SettingGroup Web Component', () => {
         <setting-toggle setting-id="test2" label="Toggle 2"></setting-toggle>
       </setting-group>
     `;
-    
+
     const group = container.querySelector('setting-group');
     const toggles = group.querySelectorAll('setting-toggle');
-    
+
     expect(toggles.length).toBe(2);
   });
 });
-
