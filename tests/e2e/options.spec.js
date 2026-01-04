@@ -262,4 +262,29 @@ test.describe('ExtractMD Options Page', () => {
     await expect(statusMessage).toBeVisible();
     await expect(statusMessage).toContainText('positions have been reset');
   });
+
+  test('displays storage usage in Data section', async () => {
+    const page = await context.newPage();
+    await page.goto(`chrome-extension://${extensionId}/options.html`);
+
+    // Navigate to Data section where storage usage is located
+    await page.locator('.nav-item:has-text("Data")').click();
+    await page.waitForTimeout(300);
+
+    // Check Data & Statistics section is visible
+    await expect(page.locator('h2:has-text("Data & Statistics")')).toBeVisible();
+
+    // Check that storage usage display is present
+    const storageUsageElement = page.locator('#storage-usage-display');
+    await expect(storageUsageElement).toBeVisible();
+
+    // Check that it contains storage usage text
+    await expect(storageUsageElement).toContainText('Storage Used:');
+    await expect(storageUsageElement).toContainText('KB / 100 KB');
+    await expect(storageUsageElement).toContainText('%');
+
+    // Verify the text format matches expected pattern
+    const storageText = await storageUsageElement.textContent();
+    expect(storageText).toMatch(/Storage Used: \d+\.\d+ KB \/ 100 KB \(\d+%\)/);
+  });
 });

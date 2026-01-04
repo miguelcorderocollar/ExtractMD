@@ -71,6 +71,24 @@ export async function incrementKpi(type) {
 }
 
 /**
+ * Get chrome.storage.sync usage statistics
+ * @returns {Promise<{bytes: number, kb: number, percentage: number}>} Storage usage info
+ */
+export function getStorageUsage() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(null, (allData) => {
+      const json = JSON.stringify(allData);
+      const bytes = new TextEncoder().encode(json).length;
+      const quotaBytes = 102400; // Chrome sync storage quota: 100KB
+      const kb = (bytes / 1024).toFixed(1);
+      const percentage = Math.round((bytes / quotaBytes) * 100);
+
+      resolve({ bytes, kb, percentage });
+    });
+  });
+}
+
+/**
  * Pick specific keys from an object
  * @param {Object} obj - Source object
  * @param {string[]} keys - Keys to pick

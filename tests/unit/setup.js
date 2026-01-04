@@ -10,19 +10,25 @@ global.chrome = {
   storage: {
     sync: {
       get: vi.fn((keys, callback) => {
-        const result = {};
-        let defaults = {};
+        let result = {};
 
-        if (typeof keys === 'string') {
-          defaults = { [keys]: undefined };
-        } else if (Array.isArray(keys)) {
-          keys.forEach((k) => (defaults[k] = undefined));
+        if (keys === null) {
+          // get(null) should return all stored data
+          result = { ...mockStorage };
         } else {
-          defaults = keys || {};
-        }
+          let defaults = {};
 
-        for (const key of Object.keys(defaults)) {
-          result[key] = mockStorage[key] !== undefined ? mockStorage[key] : defaults[key];
+          if (typeof keys === 'string') {
+            defaults = { [keys]: undefined };
+          } else if (Array.isArray(keys)) {
+            keys.forEach((k) => (defaults[k] = undefined));
+          } else {
+            defaults = keys || {};
+          }
+
+          for (const key of Object.keys(defaults)) {
+            result[key] = mockStorage[key] !== undefined ? mockStorage[key] : defaults[key];
+          }
         }
 
         if (callback) callback(result);

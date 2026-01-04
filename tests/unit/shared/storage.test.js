@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getSettings, saveSetting, incrementKpi } from '../../../extension/shared/storage.js';
+import {
+  getSettings,
+  saveSetting,
+  incrementKpi,
+  getStorageUsage,
+} from '../../../extension/shared/storage.js';
 import { DEFAULTS } from '../../../extension/shared/defaults.js';
 import { resetMockStorage } from '../setup.js';
 
@@ -113,6 +118,70 @@ describe('shared/storage', () => {
 
       // Should not call set
       expect(chrome.storage.sync.set).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getStorageUsage', () => {
+    it('calculates storage usage for empty storage', async () => {
+      // Clear any existing data
+      resetMockStorage();
+
+      const usage = await getStorageUsage();
+
+      expect(usage).toHaveProperty('bytes');
+      expect(usage).toHaveProperty('kb');
+      expect(usage).toHaveProperty('percentage');
+
+      // Empty storage should have minimal usage (just {})
+      expect(usage.bytes).toBeGreaterThan(0);
+      expect(usage.kb).toBe('0.0');
+      expect(usage.percentage).toBe(0);
+    });
+
+    it('calculates storage usage with data', async () => {
+      // Set up some test data
+      await chrome.storage.sync.set({
+        testKey: 'testValue',
+        anotherKey: { nested: 'object' },
+        usageStats: { youtube: 5, articles: 3 },
+      });
+
+      const usage = await getStorageUsage();
+
+      expect(usage.bytes).toBeGreaterThan(0);
+      expect(typeof usage.kb).toBe('string');
+      expect(typeof usage.percentage).toBe('number');
+      expect(usage.percentage).toBeLessThanOrEqual(100);
+    });
+
+    it('calculates usage with stored data', async () => {
+      // Set up some test data that should result in measurable usage
+      const testData = { testKey: 'testValue', numberKey: 42, largeField: 'x'.repeat(500) };
+      await chrome.storage.sync.set(testData);
+
+      const usage = await getStorageUsage();
+
+      // Should have some usage (the exact amount depends on JSON serialization)
+      expect(usage.bytes).toBeGreaterThan(10);
+      expect(usage.kb).toMatch(/^\d+\.\d$/);
+      expect(usage.percentage).toBeGreaterThan(0);
+      expect(usage.percentage).toBeLessThanOrEqual(100);
+    });
+
+    it('calculates different usage for different data sizes', async () => {
+      // Test with small data
+      resetMockStorage();
+      await chrome.storage.sync.set({ small: 'x'.repeat(100) });
+      const smallUsage = await getStorageUsage();
+
+      // Clear and test with larger data
+      resetMockStorage();
+      await chrome.storage.sync.set({ large: 'x'.repeat(1000) });
+      const largeUsage = await getStorageUsage();
+
+      // Large data should have more usage
+      expect(largeUsage.bytes).toBeGreaterThan(smallUsage.bytes);
+      expect(parseFloat(largeUsage.kb)).toBeGreaterThan(parseFloat(smallUsage.kb));
     });
   });
 });

@@ -10,6 +10,7 @@ import { initializeKpi } from './kpi.js';
 import { initializeImportExport } from './importExport.js';
 import { initializeDomainIgnore } from './domainIgnore.js';
 import { initializeSaveToast } from './ui.js';
+import { initializeStorageUsage } from './storageUsage.js';
 import { initializeTheme } from '../shared/theme-manager.js';
 
 /**
@@ -25,5 +26,6 @@ document.addEventListener('DOMContentLoaded', async function () {
   initializeKpi();
   initializeImportExport();
   initializeDomainIgnore();
+  initializeStorageUsage();
   initializeSaveToast();
 });

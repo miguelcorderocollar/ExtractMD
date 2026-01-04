@@ -319,6 +319,23 @@
   display: none;
 }
 
+.storage-usage {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.storage-text {
+  display: block;
+}
+
 /* ============================================
    About Section
    ============================================ */
