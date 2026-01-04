@@ -8,8 +8,11 @@ const __dirname = path.dirname(__filename);
 export async function launchWithExtension() {
   const extensionPath = path.resolve(__dirname, '../../../extension');
 
+  // Use Playwright's bundled Chromium with 'chromium' channel for headless extension support
+  // See: https://playwright.dev/docs/chrome-extensions
   const context = await chromium.launchPersistentContext('', {
-    headless: false,
+    headless: true,
+    channel: 'chromium',
     args: [
       `--disable-extensions-except=${extensionPath}`,
       `--load-extension=${extensionPath}`,
@@ -20,38 +23,23 @@ export async function launchWithExtension() {
     ],
   });
 
-  // Wait for extension to load (with timeout to prevent hanging)
-  await Promise.race([
-    context.waitForEvent('page'),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Extension failed to load within 10s')), 10000)
-    ),
-  ]);
+  // For Manifest V3, wait for the service worker to load
+  let serviceWorker = context.serviceWorkers()[0];
+  if (!serviceWorker) {
+    serviceWorker = await context.waitForEvent('serviceworker', { timeout: 15000 });
+  }
 
   return context;
 }
 
 export async function getExtensionId(context) {
-  // Navigate to chrome://extensions to get extension ID
-  const page = await context.newPage();
-  await page.goto('chrome://extensions');
+  // For Manifest V3, get extension ID from service worker URL
+  let serviceWorker = context.serviceWorkers()[0];
+  if (!serviceWorker) {
+    serviceWorker = await context.waitForEvent('serviceworker', { timeout: 10000 });
+  }
 
-  // Get extension ID from the page
-  const extensionId = await page.evaluate(() => {
-    const extensions = document
-      .querySelector('extensions-manager')
-      ?.shadowRoot?.querySelector('extensions-item-list')
-      ?.shadowRoot?.querySelectorAll('extensions-item');
-
-    for (const ext of extensions || []) {
-      const name = ext.shadowRoot?.querySelector('#name')?.textContent;
-      if (name?.includes('ExtractMD')) {
-        return ext.getAttribute('id');
-      }
-    }
-    return null;
-  });
-
-  await page.close();
+  // Service worker URL format: chrome-extension://<extension-id>/background.js
+  const extensionId = serviceWorker.url().split('/')[2];
   return extensionId;
 }

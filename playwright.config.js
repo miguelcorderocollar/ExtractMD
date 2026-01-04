@@ -18,8 +18,10 @@ export default defineConfig({
   reporter: isCI ? [['html', { open: 'never' }], ['github']] : [['html', { open: 'on-failure' }]],
 
   use: {
-    // Extensions require headed mode - xvfb provides virtual display in CI
-    headless: false,
+    // Playwright 1.49+ supports headless extension testing with 'chromium' channel
+    // See: https://playwright.dev/docs/chrome-extensions
+    headless: true,
+    channel: 'chromium',
 
     // Capture screenshot on failure
     screenshot: 'only-on-failure',
@@ -28,7 +30,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
-  projects: [{ name: 'chromium', use: { channel: 'chrome' } }],
+  projects: [{ name: 'chromium' }],
 
   // Output directory for test artifacts
   outputDir: 'test-results/',

@@ -5,3 +5,4 @@ extension/dist/
 test-results/
 coverage/
 packages/
+playwright-report/
