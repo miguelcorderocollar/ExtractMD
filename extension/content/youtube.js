@@ -238,10 +238,6 @@ export function initYouTubeFeatures() {
       subtree: true,
     });
 
-    // Monitor for fullscreen changes
-    document.addEventListener('fullscreenchange', updateButtonVisibility);
-    document.addEventListener('webkitfullscreenchange', updateButtonVisibility);
-    document.addEventListener('mozfullscreenchange', updateButtonVisibility);
     // Monitor for YouTube player state changes (theater mode, fullscreen buttons)
     // No longer needed as FloatingButton handles this internally
   });

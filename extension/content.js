@@ -192,9 +192,6 @@ async function toggleExtractMDForDomain() {
 // Keep the old name for backward compatibility with background.js
 window.hideExtractMDForDomain = toggleExtractMDForDomain;
 
-// Make it available globally for background script
-window.hideExtractMDForDomain = hideExtractMDForDomain;
-
 // Listen for keyboard shortcut Ctrl+Shift+E (copy) and Ctrl+Shift+H (toggle hide/show)
 document.addEventListener('keydown', (e) => {
   // Check for Ctrl+Shift (or Cmd+Shift on Mac)

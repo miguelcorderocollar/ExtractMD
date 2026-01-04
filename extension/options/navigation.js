@@ -55,6 +55,17 @@ function restoreActiveSection(navItems, sections) {
       targetSection.classList.add('active');
     }
   }
+  // If no saved section or invalid saved section, ensure at least one section is active
+  const activeSections = document.querySelectorAll('.settings-section.active');
+  if (activeSections.length === 0) {
+    // Default to general section
+    const defaultNav = document.querySelector('.nav-item[data-section="general"]');
+    const defaultSection = document.getElementById('section-general');
+    if (defaultNav && defaultSection) {
+      defaultNav.classList.add('active');
+      defaultSection.classList.add('active');
+    }
+  }
 }
 
 /**

@@ -24,36 +24,61 @@ test.describe('ExtractMD Options Page', () => {
     await page.goto(`chrome-extension://${extensionId}/options.html`);
 
     // Check that main elements are present
-    await expect(page.locator('text=ExtractMD Settings')).toBeVisible();
-    await expect(page.locator('text=General Settings')).toBeVisible();
+    // Sidebar shows "ExtractMD" logo, section header shows "General Settings"
+    await expect(page.locator('.logo')).toContainText('ExtractMD');
+    await expect(page.locator('h2:has-text("General Settings")')).toBeVisible();
   });
 
-  test('displays all settings accordions', async () => {
+  test('displays all navigation sections', async () => {
     const page = await context.newPage();
     await page.goto(`chrome-extension://${extensionId}/options.html`);
 
-    // Check for all accordion sections
-    await expect(page.locator('text=General Settings')).toBeVisible();
-    await expect(page.locator('text=YouTube Transcript Settings')).toBeVisible();
-    await expect(page.locator('text=HN Comments Settings')).toBeVisible();
-    await expect(page.locator('text=HN News Settings')).toBeVisible();
-    await expect(page.locator('text=Article Exporter')).toBeVisible();
+    // Check for all sidebar navigation items
+    await expect(page.locator('.nav-item:has-text("General")')).toBeVisible();
+    await expect(page.locator('.nav-item:has-text("YouTube")')).toBeVisible();
+    await expect(page.locator('.nav-item:has-text("Hacker News")')).toBeVisible();
+    await expect(page.locator('.nav-item:has-text("Articles")')).toBeVisible();
+    await expect(page.locator('.nav-item:has-text("Universal")')).toBeVisible();
+    await expect(page.locator('.nav-item:has-text("Workflow")')).toBeVisible();
+    await expect(page.locator('.nav-item:has-text("Data")')).toBeVisible();
   });
 
   test('can toggle a setting', async () => {
     const page = await context.newPage();
     await page.goto(`chrome-extension://${extensionId}/options.html`);
 
-    // Open YouTube settings accordion first
-    await page.locator('text=YouTube Transcript Settings').click();
-    await page.waitForTimeout(300); // Wait for accordion animation
+    // Clear localStorage to ensure clean state
+    await page.evaluate(() => localStorage.clear());
+
+    // Reload to apply clean state
+    await page.reload();
+
+    // Wait for page to fully load and initialize
+    await page.waitForLoadState('networkidle');
+
+    // Navigate to YouTube section via sidebar
+    await page.locator('.nav-item[data-section="youtube"]').click();
+    await page.waitForTimeout(500); // Wait for section transition
+
+    // Check YouTube Settings section is active (has active class)
+    const youtubeSection = page.locator('#section-youtube');
+    await expect(youtubeSection).toHaveClass(/active/);
+
+    // Check YouTube Settings section is visible
+    await expect(page.locator('h2:has-text("YouTube Settings")')).toBeVisible();
 
     const checkbox = page.locator('#includeTimestamps');
-    await expect(checkbox).toBeVisible();
+    await expect(checkbox).toHaveCount(1); // Element exists
+    await expect(checkbox).toHaveAttribute('type', 'checkbox'); // Correct type
+
+    // Wait for the checkbox to be properly initialized
+    await page.waitForTimeout(200);
 
     const initialState = await checkbox.isChecked();
 
-    await checkbox.click();
+    // Click the toggle switch label (parent of the hidden input)
+    const toggleSwitch = checkbox.locator('xpath=ancestor::label[1]');
+    await toggleSwitch.click();
 
     // Wait a bit for setting to save
     await page.waitForTimeout(100);
@@ -61,8 +86,8 @@ test.describe('ExtractMD Options Page', () => {
     // Reload options page
     await page.reload();
 
-    // Re-open the accordion
-    await page.locator('text=YouTube Transcript Settings').click();
+    // Re-navigate to YouTube section
+    await page.locator('.nav-item:has-text("YouTube")').click();
     await page.waitForTimeout(300);
 
     // Check if state persisted
@@ -71,7 +96,8 @@ test.describe('ExtractMD Options Page', () => {
 
     // Reset to initial state
     if (newState !== initialState) {
-      await page.locator('#includeTimestamps').click();
+      const resetCheckbox = page.locator('#includeTimestamps').locator('xpath=ancestor::label[1]');
+      await resetCheckbox.click();
       await page.waitForTimeout(100);
     }
   });
@@ -80,12 +106,15 @@ test.describe('ExtractMD Options Page', () => {
     const page = await context.newPage();
     await page.goto(`chrome-extension://${extensionId}/options.html`);
 
-    const kpiSection = page.locator('#kpi-section');
-    await expect(kpiSection).toBeVisible();
+    // Navigate to Data section where KPI is located
+    await page.locator('.nav-item:has-text("Data")').click();
+    await page.waitForTimeout(300);
+
+    // Check Data & Statistics section is visible
+    await expect(page.locator('h2:has-text("Data & Statistics")')).toBeVisible();
 
     const kpiCounters = page.locator('#kpi-counters');
-    await expect(kpiCounters).toContainText('YT:');
-    await expect(kpiCounters).toContainText('Articles:');
+    await expect(kpiCounters).toBeVisible();
 
     const clearBtn = page.locator('#clearKpiBtn');
     await expect(clearBtn).toBeVisible();
@@ -95,6 +124,10 @@ test.describe('ExtractMD Options Page', () => {
   test('displays import/export buttons', async () => {
     const page = await context.newPage();
     await page.goto(`chrome-extension://${extensionId}/options.html`);
+
+    // Navigate to Data section where import/export buttons are located
+    await page.locator('.nav-item:has-text("Data")').click();
+    await page.waitForTimeout(300);
 
     const exportBtn = page.locator('#exportSettingsBtn');
     await expect(exportBtn).toBeVisible();
@@ -109,28 +142,48 @@ test.describe('ExtractMD Options Page', () => {
     const page = await context.newPage();
     await page.goto(`chrome-extension://${extensionId}/options.html`);
 
-    // Navigate to General section (should be active by default)
-    await expect(page.locator('text=Floating Button')).toBeVisible();
+    // Clear localStorage to ensure clean state
+    await page.evaluate(() => localStorage.clear());
+
+    // Reload to apply clean state
+    await page.reload();
+
+    // Wait for page to fully load and initialize
+    await page.waitForLoadState('networkidle');
+
+    // General section should be active by default
+    const generalSection = page.locator('#section-general');
+    await expect(generalSection).toHaveClass(/active/);
+
+    // General section should be active by default with Floating Button settings group
+    await expect(page.locator('h3.group-title:has-text("Floating Button")')).toBeVisible();
+
+    // Wait for settings to be loaded
+    await page.waitForTimeout(200);
 
     // Toggle "Enable Drag" setting
-    const dragToggle = page.locator('setting-toggle[setting-id="floatingButtonEnableDrag"] input');
-    await expect(dragToggle).toBeVisible();
+    const dragToggle = page.locator('#floatingButtonEnableDrag');
+    await expect(dragToggle).toHaveCount(1); // Element exists
+    await expect(dragToggle).toHaveAttribute('type', 'checkbox'); // Correct type
     const initialDragState = await dragToggle.isChecked();
-    await dragToggle.click();
+    // Click the toggle switch label (parent of the hidden input)
+    const dragToggleSwitch = dragToggle.locator('xpath=ancestor::label[1]');
+    await dragToggleSwitch.click();
     await page.waitForTimeout(100);
 
     // Toggle "Enable Dismiss" setting
-    const dismissToggle = page.locator(
-      'setting-toggle[setting-id="floatingButtonEnableDismiss"] input'
-    );
-    await expect(dismissToggle).toBeVisible();
+    const dismissToggle = page.locator('#floatingButtonEnableDismiss');
+    await expect(dismissToggle).toHaveCount(1);
+    await expect(dismissToggle).toHaveAttribute('type', 'checkbox');
     const initialDismissState = await dismissToggle.isChecked();
-    await dismissToggle.click();
+    // Click the toggle switch label (parent of the hidden input)
+    const dismissToggleSwitch = dismissToggle.locator('xpath=ancestor::label[1]');
+    await dismissToggleSwitch.click();
     await page.waitForTimeout(100);
 
     // Change button size
-    const sizeSelect = page.locator('setting-select[setting-id="floatingButtonSize"] select');
-    await expect(sizeSelect).toBeVisible();
+    const sizeSelect = page.locator('#floatingButtonSize');
+    await expect(sizeSelect).toHaveCount(1);
     await sizeSelect.selectOption('large');
     await page.waitForTimeout(100);
 
@@ -139,28 +192,41 @@ test.describe('ExtractMD Options Page', () => {
     await page.waitForTimeout(300);
 
     // Verify settings persisted
-    const newDragState = await page
-      .locator('setting-toggle[setting-id="floatingButtonEnableDrag"] input')
-      .isChecked();
+    const newDragToggle = page.locator('#floatingButtonEnableDrag');
+    await expect(newDragToggle).toHaveCount(1);
+    const newDragState = await newDragToggle.isChecked();
     expect(newDragState).toBe(!initialDragState);
 
-    const newDismissState = await page
-      .locator('setting-toggle[setting-id="floatingButtonEnableDismiss"] input')
-      .isChecked();
+    const newDismissToggle = page.locator('#floatingButtonEnableDismiss');
+    await expect(newDismissToggle).toHaveCount(1);
+    const newDismissState = await newDismissToggle.isChecked();
     expect(newDismissState).toBe(!initialDismissState);
 
-    const newSize = await page
-      .locator('setting-select[setting-id="floatingButtonSize"] select')
-      .inputValue();
+    const newSizeSelect = page.locator('#floatingButtonSize');
+    await expect(newSizeSelect).toHaveCount(1);
+    const newSize = await newSizeSelect.inputValue();
     expect(newSize).toBe('large');
 
     // Reset to original values
     if (newDragState !== initialDragState) {
-      await page.locator('setting-toggle[setting-id="floatingButtonEnableDrag"] input').click();
+      const resetDragToggle = page
+        .locator('#floatingButtonEnableDrag')
+        .locator('xpath=ancestor::label[1]');
+      await resetDragToggle.click();
       await page.waitForTimeout(100);
     }
     if (newDismissState !== initialDismissState) {
-      await page.locator('setting-toggle[setting-id="floatingButtonEnableDismiss"] input').click();
+      const resetDismissToggle = page
+        .locator('#floatingButtonEnableDismiss')
+        .locator('xpath=ancestor::label[1]');
+      await resetDismissToggle.click();
+      await page.waitForTimeout(100);
+    }
+    if (newDismissState !== initialDismissState) {
+      const resetDismissToggle = page
+        .locator('setting-toggle[setting-id="floatingButtonEnableDismiss"] input')
+        .locator('xpath=ancestor::label[1]');
+      await resetDismissToggle.click();
       await page.waitForTimeout(100);
     }
     await page

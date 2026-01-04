@@ -85,7 +85,7 @@ export function handleImportFile(e) {
 
       // Filter and sanitize based on schema
       for (const key in SETTING_SCHEMA) {
-        if (data.settings.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(data.settings, key)) {
           const type = SETTING_SCHEMA[key];
           const val = data.settings[key];
           if (type === 'boolean') settingsToImport[key] = !!val;
