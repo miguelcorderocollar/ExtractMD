@@ -47,24 +47,20 @@ jobs:
           path: coverage/
           retention-days: 14
 
-  # NOTE: E2E tests are skipped in CI because Chrome extensions with Manifest V3
-  # cannot be loaded in GitHub Actions' sandboxed environment.
-  # Run E2E tests locally with: npm run test:e2e
-  #
-  # e2e-tests:
-  #   name: E2E Tests
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 30
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: pnpm/action-setup@v4
-  #       with:
-  #         version: 10
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: lts/*
-  #         cache: 'pnpm'
-  #     - run: pnpm install --frozen-lockfile
-  #     - run: pnpm run build
-  #     - run: npx playwright install --with-deps chromium
-  #     - run: xvfb-run --auto-servernum npx playwright test
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
