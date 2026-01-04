@@ -1,6 +1,5 @@
 import { defineConfig } from 'vitest/config';
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
 
 export default defineConfig({
   test: {
@@ -11,8 +10,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['extension/**/*.js'],
-      exclude: ['extension/dist/**', 'tests/unit/**']
-    }
+      exclude: ['extension/dist/**', 'tests/unit/**'],
+    },
   },
   plugins: [
     {
@@ -23,8 +22,7 @@ export default defineConfig({
           const svgContent = readFileSync(id, 'utf-8').trim();
           return `export default ${JSON.stringify(svgContent)}`;
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 });
-

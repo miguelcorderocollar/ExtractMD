@@ -2,7 +2,14 @@
 // Fallback module for any website without specialized extractors
 
 import TurndownService from 'turndown';
-import { copyToClipboard, showNotification, getSettings, closeCurrentTab, downloadMarkdownFile, showSuccessNotificationWithTokens } from './utils.js';
+import {
+  copyToClipboard,
+  showNotification,
+  getSettings,
+  closeCurrentTab,
+  downloadMarkdownFile,
+  showSuccessNotificationWithTokens,
+} from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
 import { encode } from 'gpt-tokenizer';
@@ -24,28 +31,41 @@ function createTurndownService(settings) {
     strongDelimiter: '**',
     linkStyle: 'inlined',
   });
-  
+
   // Always remove these non-content elements
-  turndown.remove(['script', 'style', 'noscript', 'svg', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'select', 'textarea']);
-  
+  turndown.remove([
+    'script',
+    'style',
+    'noscript',
+    'svg',
+    'iframe',
+    'object',
+    'embed',
+    'form',
+    'input',
+    'button',
+    'select',
+    'textarea',
+  ]);
+
   // Remove images if setting is disabled
   if (!settings.universalIncludeImages) {
     turndown.remove(['img', 'picture', 'figure']);
   }
-  
+
   // Remove links if setting is disabled (keep text content)
   if (!settings.universalIncludeLinks) {
     turndown.addRule('removeLinks', {
       filter: 'a',
-      replacement: (content) => content
+      replacement: (content) => content,
     });
   }
-  
+
   // Remove navigation elements if setting is enabled
   if (settings.universalStripNav) {
     turndown.remove(['nav', 'header', 'footer', 'aside']);
   }
-  
+
   return turndown;
 }
 
@@ -62,12 +82,14 @@ function findMainContent(mode, customSelector) {
   if (mode === 'full') {
     return document.body;
   }
-  
+
   // Auto mode: try common patterns, fallback to body
-  return document.querySelector('main') 
-      || document.querySelector('[role="main"]')
-      || document.querySelector('article')
-      || document.body;
+  return (
+    document.querySelector('main') ||
+    document.querySelector('[role="main"]') ||
+    document.querySelector('article') ||
+    document.body
+  );
 }
 
 /**
@@ -77,56 +99,63 @@ export async function performUniversalCopy(updateButton = false) {
   if (isProcessing) return;
   isProcessing = true;
   if (updateButton && floatingButtonController) floatingButtonController.setLoading();
-  
+
   try {
-    const settings = await new Promise(resolve => {
-      chrome.storage.sync.get({
-        universalIncludeImages: true,
-        universalIncludeLinks: true,
-        universalIncludeUrl: true,
-        universalContentMode: 'auto',
-        universalCustomSelector: '',
-        universalStripNav: true,
-        universalPreserveCodeBlocks: true,
-        downloadInsteadOfCopy: false,
-        downloadIfTokensExceed: 0
-      }, resolve);
+    const settings = await new Promise((resolve) => {
+      chrome.storage.sync.get(
+        {
+          universalIncludeImages: true,
+          universalIncludeLinks: true,
+          universalIncludeUrl: true,
+          universalContentMode: 'auto',
+          universalCustomSelector: '',
+          universalStripNav: true,
+          universalPreserveCodeBlocks: true,
+          downloadInsteadOfCopy: false,
+          downloadIfTokensExceed: 0,
+        },
+        resolve
+      );
     });
-    
+
     // Find the content element
-    const contentElement = findMainContent(settings.universalContentMode, settings.universalCustomSelector);
-    
+    const contentElement = findMainContent(
+      settings.universalContentMode,
+      settings.universalCustomSelector
+    );
+
     if (!contentElement || !contentElement.textContent?.trim()) {
       throw new Error('No content found on this page');
     }
-    
+
     // Create Turndown service
     const turndown = createTurndownService(settings);
-    
+
     // Convert to Markdown using innerHTML (Turndown handles HTML string better)
     let md = turndown.turndown(contentElement.innerHTML);
-    
+
     // Clean up excessive whitespace
     md = md.replace(/\n{3,}/g, '\n\n').trim();
-    
+
     // If we got very little content, the page might use complex structures
     // Fallback to just extracting text content
     if (md.length < 100 && contentElement.textContent.trim().length > 100) {
-      md = contentElement.textContent.trim()
+      md = contentElement.textContent
+        .trim()
         .replace(/\s+/g, ' ')
         .replace(/\n\s*\n/g, '\n\n');
     }
-    
+
     // Add URL header if setting is enabled
     if (settings.universalIncludeUrl) {
       const pageUrl = window.location.href;
       const pageTitle = document.title || 'Page';
       md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
     }
-    
+
     // Handle copy/download based on settings
     const globalSettings = await getSettings();
-    
+
     if (settings.downloadInsteadOfCopy || window.__extractmd_force_download) {
       downloadMarkdownFile(md, document.title, 'ExtractMD');
       if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
@@ -150,14 +179,13 @@ export async function performUniversalCopy(updateButton = false) {
       if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
       showSuccessNotificationWithTokens('Page copied as Markdown!', md);
     }
-    
+
     // Increment KPI counter
     await incrementKpi('universal');
-    
+
     // Handle post-copy actions
     handlePostCopyActions(globalSettings);
     resetProcessingState(updateButton);
-    
   } catch (e) {
     console.error('[ExtractMD] Universal extraction failed:', e);
     if (updateButton && floatingButtonController) {
@@ -222,36 +250,45 @@ async function manageFloatingButtonForUniversal() {
     }
     return;
   }
-  
+
   const existingButton = document.getElementById('extractmd-floating-button');
-  
+
   // Check if there's meaningful content on the page
   const contentElement = findMainContent('auto', '');
   const hasContent = contentElement && contentElement.textContent?.trim().length > 100;
-  
+
   if (hasContent) {
     if (!existingButton) {
       // Load floating button settings
-      const buttonSettings = await new Promise(resolve => {
-        chrome.storage.sync.get({
-          floatingButtonEnableDrag: true,
-          floatingButtonEnableDismiss: true
-        }, resolve);
+      const buttonSettings = await new Promise((resolve) => {
+        chrome.storage.sync.get(
+          {
+            floatingButtonEnableDrag: true,
+            floatingButtonEnableDismiss: true,
+          },
+          resolve
+        );
       });
-      
+
       floatingButtonController = await createFloatingButton({
         domain: window.location.hostname,
         enableDrag: buttonSettings.floatingButtonEnableDrag,
         enableDismiss: buttonSettings.floatingButtonEnableDismiss,
         onClick: async () => {
           await performUniversalCopy(true);
-        }
+        },
       });
-      
+
       if (floatingButtonController) {
         floatingButtonController.appendTo(document.body);
         console.debug('[ExtractMD] Floating button created and added to DOM (Universal)');
-        showContentInfoNotification(contentElement);
+
+        // Show content info notification if setting is enabled
+        chrome.storage.sync.get({ universalShowInfoNotification: false }, function (settings) {
+          if (settings.universalShowInfoNotification) {
+            showContentInfoNotification(contentElement);
+          }
+        });
       }
     } else if (floatingButtonController) {
       floatingButtonController.show();
@@ -269,16 +306,16 @@ async function manageFloatingButtonForUniversal() {
  */
 function setupUniversalMutationObserver() {
   if (universalObserver) return;
-  
+
   let debounceTimer = null;
-  
+
   universalObserver = new MutationObserver(() => {
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       manageFloatingButtonForUniversal();
     }, 500);
   });
-  
+
   universalObserver.observe(document.body, { childList: true, subtree: true });
 }
 
@@ -286,7 +323,7 @@ function setupUniversalMutationObserver() {
  * Initialize universal extraction features
  */
 export function initUniversalFeatures() {
-  chrome.storage.sync.get({ enableUniversalIntegration: true }, function(items) {
+  chrome.storage.sync.get({ enableUniversalIntegration: true }, function (items) {
     if (items.enableUniversalIntegration === false) return;
     setupUniversalMutationObserver();
     manageFloatingButtonForUniversal();

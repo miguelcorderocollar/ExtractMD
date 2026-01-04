@@ -10,14 +10,14 @@ const distDir = 'extension/dist';
 // Clean dist directory in production mode
 async function cleanDist() {
   if (!isProduction) return;
-  
+
   try {
     const files = await readdir(distDir);
     for (const file of files) {
       const filePath = join(distDir, file);
       try {
         await unlink(filePath);
-      } catch (err) {
+      } catch {
         // Ignore errors for files that don't exist
       }
     }
@@ -38,8 +38,8 @@ const commonOptions = {
   minify: isProduction,
   sourcemap: isProduction ? false : true, // No source maps in production
   loader: {
-    '.svg': 'text' // Load SVG files as text strings
-  }
+    '.svg': 'text', // Load SVG files as text strings
+  },
 };
 
 console.log(`\n🔨 Building ExtractMD (${isProduction ? 'PRODUCTION' : 'development'})...\n`);

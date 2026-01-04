@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { 
-  getSettings, 
-  copyToClipboard, 
-  htmlToMarkdown, 
+import {
+  getSettings,
+  copyToClipboard,
+  htmlToMarkdown,
   sleep,
   setButtonLoading,
   setButtonSuccess,
   setButtonError,
-  setButtonNormal
+  setButtonNormal,
+  isFullscreen,
 } from '../../extension/content/utils.js';
 import { resetMockStorage } from './setup.js';
 
@@ -36,7 +37,7 @@ describe('utils.js', () => {
     it('calls navigator.clipboard.writeText', async () => {
       const mockWriteText = vi.fn().mockResolvedValue();
       Object.assign(navigator, {
-        clipboard: { writeText: mockWriteText }
+        clipboard: { writeText: mockWriteText },
       });
 
       await copyToClipboard('test text', true);
@@ -46,7 +47,7 @@ describe('utils.js', () => {
     it('strips timestamps when includeTimestamps is false', async () => {
       const mockWriteText = vi.fn().mockResolvedValue();
       Object.assign(navigator, {
-        clipboard: { writeText: mockWriteText }
+        clipboard: { writeText: mockWriteText },
       });
 
       // Note: original code leaves a space if it follows the timestamp
@@ -111,5 +112,64 @@ describe('utils.js', () => {
       expect(btn.style.cursor).toBe('pointer');
     });
   });
-});
 
+  describe('isFullscreen (Regression Tests)', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '';
+      // Clear native fullscreen mocks
+      Object.defineProperty(document, 'fullscreenElement', { value: null, configurable: true });
+
+      // Mock window.location
+      const originalLocation = window.location;
+      delete window.location;
+      window.location = { ...originalLocation, hostname: 'example.com' };
+    });
+
+    it('detects native fullscreen', () => {
+      Object.defineProperty(document, 'fullscreenElement', { value: {}, configurable: true });
+      expect(isFullscreen()).toBe(true);
+    });
+
+    it('does not detect YouTube theater mode via ytd-watch-flexy attribute as fullscreen', () => {
+      window.location.hostname = 'youtube.com';
+      document.body.innerHTML = '<ytd-watch-flexy theater></ytd-watch-flexy>';
+      expect(isFullscreen()).toBe(false);
+    });
+
+    it('detects YouTube fullscreen mode via ytd-watch-flexy attribute', () => {
+      window.location.hostname = 'youtube.com';
+      document.body.innerHTML = '<ytd-watch-flexy fullscreen></ytd-watch-flexy>';
+      expect(isFullscreen()).toBe(true);
+    });
+
+    it('does not detect YouTube theater mode via ytp-size-button class as fullscreen', () => {
+      window.location.hostname = 'youtube.com';
+      document.body.innerHTML =
+        '<button class="ytp-size-button" aria-pressed="true" aria-label="Modo cine (t)"></button>';
+      expect(isFullscreen()).toBe(false);
+    });
+
+    it('detects YouTube fullscreen mode via ytp-fullscreen-button class', () => {
+      window.location.hostname = 'youtube.com';
+      document.body.innerHTML =
+        '<button class="ytp-fullscreen-button" aria-pressed="true" aria-label="Pantalla completa (f)"></button>';
+      expect(isFullscreen()).toBe(true);
+    });
+
+    it('returns false on YouTube when not in any special mode', () => {
+      window.location.hostname = 'youtube.com';
+      document.body.innerHTML = `
+            <ytd-watch-flexy></ytd-watch-flexy>
+            <button class="ytp-size-button" aria-pressed="false"></button>
+            <button class="ytp-fullscreen-button" aria-pressed="false"></button>
+        `;
+      expect(isFullscreen()).toBe(false);
+    });
+
+    it('returns false on non-YouTube sites even with YT elements present', () => {
+      window.location.hostname = 'example.com';
+      document.body.innerHTML = '<ytd-watch-flexy theater></ytd-watch-flexy>';
+      expect(isFullscreen()).toBe(false);
+    });
+  });
+});

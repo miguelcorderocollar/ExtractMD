@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { formatTimeSaved, calculateTimeSaved, renderKpiCounters } from '../../../../extension/popup/kpi.js';
+import {
+  formatTimeSaved,
+  calculateTimeSaved,
+  renderKpiCounters,
+} from '../../../../extension/popup/kpi.js';
 import { resetMockStorage } from '../../setup.js';
 
 describe('popup/kpi module', () => {
@@ -35,12 +39,12 @@ describe('popup/kpi module', () => {
   describe('calculateTimeSaved', () => {
     it('calculates time saved from usage stats', () => {
       const stats = {
-        youtube: 1,    // 60s
-        articles: 1,   // 30s
+        youtube: 1, // 60s
+        articles: 1, // 30s
         hn_comments: 1, // 40s
-        hn_news: 1     // 20s
+        hn_news: 1, // 20s
       };
-      
+
       expect(calculateTimeSaved(stats)).toBe(150);
     });
 
@@ -61,7 +65,7 @@ describe('popup/kpi module', () => {
       container = document.createElement('div');
       container.id = 'kpi-counters';
       document.body.appendChild(container);
-      
+
       const timeSaved = document.createElement('div');
       timeSaved.id = 'kpi-time-saved';
       document.body.appendChild(timeSaved);
@@ -73,9 +77,9 @@ describe('popup/kpi module', () => {
 
     it('renders stats into DOM', () => {
       const stats = { youtube: 5, articles: 3, hn_comments: 2, hn_news: 1 };
-      
+
       renderKpiCounters(stats);
-      
+
       expect(container.innerHTML).toContain('YT: <b>5</b>');
       expect(container.innerHTML).toContain('Articles: <b>3</b>');
       expect(container.innerHTML).toContain('HN Comments: <b>2</b>');
@@ -84,9 +88,8 @@ describe('popup/kpi module', () => {
 
     it('handles zero stats', () => {
       renderKpiCounters({});
-      
+
       expect(container.innerHTML).toContain('YT: <b>0</b>');
     });
   });
 });
-

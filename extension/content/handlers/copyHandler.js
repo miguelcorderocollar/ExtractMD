@@ -1,8 +1,13 @@
 // Shared copy/download handler for ExtractMD
 // Consolidates copy, download, token threshold, and KPI logic
 
-import { getSettings, incrementKpi } from '../../shared/storage.js';
-import { copyToClipboard, downloadMarkdownFile, showSuccessNotificationWithTokens, closeCurrentTab } from '../utils.js';
+import { incrementKpi } from '../../shared/storage.js';
+import {
+  copyToClipboard,
+  downloadMarkdownFile,
+  showSuccessNotificationWithTokens,
+  closeCurrentTab,
+} from '../utils.js';
 import { encode } from 'gpt-tokenizer';
 
 /**
@@ -15,16 +20,22 @@ import { encode } from 'gpt-tokenizer';
  * @param {Function} [options.onSuccess] - Callback after successful copy/download
  * @returns {Promise<{action: string, tokens: number}>} Result object with action taken and token count
  */
-export async function handleCopyOrDownload(markdown, { title, kpiType, successMessage, onSuccess }) {
+export async function handleCopyOrDownload(
+  markdown,
+  { title, kpiType, successMessage, onSuccess }
+) {
   // Get user settings for copy/download behavior
-  const settings = await new Promise(resolve => {
-    chrome.storage.sync.get({
-      downloadInsteadOfCopy: false,
-      downloadIfTokensExceed: 0,
-      jumpToDomain: false,
-      jumpToDomainUrl: 'https://chat.openai.com/',
-      closeTabAfterExtraction: false
-    }, resolve);
+  const settings = await new Promise((resolve) => {
+    chrome.storage.sync.get(
+      {
+        downloadInsteadOfCopy: false,
+        downloadIfTokensExceed: 0,
+        jumpToDomain: false,
+        jumpToDomainUrl: 'https://chat.openai.com/',
+        closeTabAfterExtraction: false,
+      },
+      resolve
+    );
   });
 
   const tokens = encode(markdown).length;
@@ -76,8 +87,8 @@ export async function handleCopyOrDownload(markdown, { title, kpiType, successMe
         timestamp: Date.now(),
         title: title || 'Untitled',
         success: true,
-        downloaded: action === 'download' || action === 'download-threshold'
-      }
+        downloaded: action === 'download' || action === 'download-threshold',
+      },
     });
   } catch (e) {
     console.debug('[ExtractMD] Could not store lastExtraction:', e);

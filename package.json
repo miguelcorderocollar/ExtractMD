@@ -1,6 +1,6 @@
 {
   "name": "extractMD",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A Chrome extension that extracts and copies content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles, with a floating button and rich settings.",
   "type": "module",
   "main": "index.js",
@@ -11,13 +11,16 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
-    "test:all": "npm run test:run && npm run test:e2e",
     "build": "node build.js",
     "build:prod": "node build.js --production",
     "build:web": "node scripts/minify-css.js",
-    "watch": "esbuild extension/content.js --bundle --outfile=extension/dist/content.js --format=iife --sourcemap --watch --loader:.svg=text",
-    "package": "node scripts/package.js"
+    "watch": "node scripts/watch.js",
+    "package": "node scripts/package.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -31,15 +34,23 @@
   },
   "homepage": "https://extractmd.miguelcorderocollar.com/",
   "devDependencies": {
-    "@playwright/test": "^1.57.0",
+    "@eslint/js": "^9.39.2",
     "@vitest/coverage-v8": "^4.0.16",
     "esbuild": "^0.25.5",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.0.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.4.0",
-    "playwright": "^1.57.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4",
     "vitest": "^4.0.16"
   },
   "dependencies": {
     "gpt-tokenizer": "^3.0.1",
     "turndown": "^7.2.2"
+  },
+  "lint-staged": {
+    "*.{js,css,md,html}": "prettier --write"
   }
 }

@@ -46,8 +46,8 @@
 ## Installation
 
 1. Clone the repository
-2. Install dependencies: `npm install`
-3. Build the extension: `npm run build`
+2. Install dependencies: `pnpm install`
+3. Build the extension: `pnpm run build`
 4. Load `extension/` folder in Chrome via `chrome://extensions/` (Developer mode)
 
 ## Usage
@@ -79,22 +79,16 @@
 
 ```bash
 # Run unit tests (Vitest)
-npm test
-
-# Run E2E tests (Playwright)
-npm run test:e2e
-
-# Run all tests
-npm run test:all
+pnpm test
 
 # Build for production
-npm run build:prod
+pnpm run build:prod
 
 # Watch mode (auto-rebuild)
-npm run watch
+pnpm run watch
 
 # Package extension for Chrome Web Store
-npm run package
+pnpm run package
 ```
 
 ### Packaging
@@ -114,7 +108,7 @@ The generated ZIP file (`packages/extractmd-{version}.zip`) is ready for upload 
 
 - **Modular Design** - Shared components and utilities in `extension/shared/`
 - **Manifest V3** - Modern Chrome extension standard
-- **Test-Driven** - 203 unit tests (Vitest) + E2E tests (Playwright)
+- **Test-Driven** - 203 unit tests (Vitest)
 - **Bundled with esbuild** - Source files in `extension/`, bundled output in `extension/dist/`
 
 ## Project Structure

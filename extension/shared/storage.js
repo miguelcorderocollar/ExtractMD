@@ -10,8 +10,12 @@ import { DEFAULTS } from './defaults.js';
  */
 export function getSettings(keys = null) {
   const toGet = keys ? pick(DEFAULTS, keys) : DEFAULTS;
-  return new Promise(resolve => {
-    chrome.storage.sync.get(toGet, resolve);
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(toGet, (result) => {
+      // Merge with defaults since chrome.storage doesn't do this automatically
+      const merged = { ...DEFAULTS, ...result };
+      resolve(keys ? pick(merged, keys) : merged);
+    });
   });
 }
 
@@ -26,9 +30,11 @@ export function saveSetting(key, value) {
   const onComplete = () => {
     // Dispatch event for UI feedback (options page listens for this)
     if (typeof document !== 'undefined') {
-      document.dispatchEvent(new CustomEvent('extractmd-setting-saved', { 
-        detail: { key, value } 
-      }));
+      document.dispatchEvent(
+        new CustomEvent('extractmd-setting-saved', {
+          detail: { key, value },
+        })
+      );
     }
   };
 
@@ -51,8 +57,8 @@ export function saveSetting(key, value) {
  * @param {string} type - KPI type (youtube, articles, hn_comments, hn_news)
  */
 export async function incrementKpi(type) {
-  return new Promise(resolve => {
-    chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function (items) {
       if (items.enableUsageKpi !== false) {
         const stats = items.usageStats || {};
         stats[type] = (stats[type] || 0) + 1;
@@ -60,6 +66,24 @@ export async function incrementKpi(type) {
       } else {
         resolve();
       }
+    });
+  });
+}
+
+/**
+ * Get chrome.storage.sync usage statistics
+ * @returns {Promise<{bytes: number, kb: number, percentage: number}>} Storage usage info
+ */
+export function getStorageUsage() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(null, (allData) => {
+      const json = JSON.stringify(allData);
+      const bytes = new TextEncoder().encode(json).length;
+      const quotaBytes = 102400; // Chrome sync storage quota: 100KB
+      const kb = (bytes / 1024).toFixed(1);
+      const percentage = Math.round((bytes / quotaBytes) * 100);
+
+      resolve({ bytes, kb, percentage });
     });
   });
 }
@@ -78,4 +102,3 @@ function pick(obj, keys) {
   }
   return result;
 }
-

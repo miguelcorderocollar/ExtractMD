@@ -2,6 +2,9 @@
 // Used by YouTube, Hacker News, and Article extractors
 
 import { ICONS } from '../../shared/icons.js';
+import { DEFAULTS } from '../../shared/defaults.js';
+import { isFullscreen } from '../utils.js';
+import { ColorUtils } from '../../shared/theme-manager.js';
 
 // Default position offset from bottom-right corner
 const DEFAULT_OFFSET = { left: 0, up: 0 };
@@ -16,7 +19,7 @@ const SIZE_CONFIG = {
   small: { size: 40, radius: 10, iconSize: 18 },
   medium: { size: 48, radius: 12, iconSize: 22 },
   large: { size: 56, radius: 14, iconSize: 26 },
-  extraLarge: { size: 64, radius: 16, iconSize: 30 }
+  extraLarge: { size: 64, radius: 16, iconSize: 30 },
 };
 
 // Transparency configurations (opacity values)
@@ -24,27 +27,23 @@ const TRANSPARENCY_CONFIG = {
   low: 0.3,
   medium: 0.5,
   high: 0.7,
-  full: 1.0
+  full: 1.0,
 };
 
-// Theme colors - hardcoded since we inject into third-party pages
+// Theme colors - base colors for light/dark mode (accent colors will be loaded dynamically)
 const THEME = {
   light: {
-    accent: '#14b8a6',
-    accentHover: '#0d9488',
     success: '#22c55e',
     error: '#ef4444',
     loading: '#f59e0b',
-    iconColor: '#fafafa'
+    iconColor: '#fafafa',
   },
   dark: {
-    accent: '#2dd4bf',
-    accentHover: '#5eead4',
     success: '#4ade80',
     error: '#f87171',
     loading: '#fbbf24',
-    iconColor: '#171717'
-  }
+    iconColor: '#171717',
+  },
 };
 
 // CSS animation for loading dots
@@ -69,10 +68,26 @@ function isDarkMode() {
 
 /**
  * Get current theme colors based on system preference
+ * Uses ColorUtils from theme-manager for consistent color manipulation
+ * @param {string} accentColor - The accent color to use
  * @returns {Object}
  */
-function getThemeColors() {
-  return isDarkMode() ? THEME.dark : THEME.light;
+function getThemeColors(accentColor) {
+  const dark = isDarkMode();
+  const baseTheme = dark ? THEME.dark : THEME.light;
+
+  // Generate variants using shared ColorUtils
+  // Dark mode uses lighter accent, light mode uses base color
+  const accent = dark ? ColorUtils.lighten(accentColor, 10) : accentColor;
+  const accentHover = dark
+    ? ColorUtils.lighten(accentColor, 20)
+    : ColorUtils.darken(accentColor, 10);
+
+  return {
+    ...baseTheme,
+    accent,
+    accentHover,
+  };
 }
 
 /**
@@ -82,8 +97,8 @@ function getThemeColors() {
  */
 async function loadPositionOffset(domain) {
   if (!domain) return DEFAULT_OFFSET;
-  
-  return new Promise(resolve => {
+
+  return new Promise((resolve) => {
     chrome.storage.local.get({ floatingButtonPositions: {} }, (items) => {
       const positions = items.floatingButtonPositions || {};
       resolve(positions[domain] || DEFAULT_OFFSET);
@@ -92,26 +107,25 @@ async function loadPositionOffset(domain) {
 }
 
 /**
- * Load button size setting from storage
- * @returns {Promise<string>}
+ * Load all button settings from storage in a single call
+ * @returns {Promise<{size: string, transparency: string, accentColor: string}>}
  */
-async function loadButtonSize() {
-  return new Promise(resolve => {
-    chrome.storage.sync.get({ floatingButtonSize: 'medium' }, (items) => {
-      resolve(items.floatingButtonSize || 'medium');
-    });
-  });
-}
-
-/**
- * Load button transparency setting from storage
- * @returns {Promise<string>}
- */
-async function loadButtonTransparency() {
-  return new Promise(resolve => {
-    chrome.storage.sync.get({ floatingButtonTransparency: 'medium' }, (items) => {
-      resolve(items.floatingButtonTransparency || 'medium');
-    });
+async function loadButtonSettings() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(
+      {
+        floatingButtonSize: 'medium',
+        floatingButtonTransparency: 'medium',
+        accentColor: DEFAULTS.accentColor,
+      },
+      (items) => {
+        resolve({
+          size: items.floatingButtonSize || 'medium',
+          transparency: items.floatingButtonTransparency || 'medium',
+          accentColor: items.accentColor || DEFAULTS.accentColor,
+        });
+      }
+    );
   });
 }
 
@@ -122,7 +136,7 @@ async function loadButtonTransparency() {
  */
 function savePositionOffset(domain, offset) {
   if (!domain) return;
-  
+
   chrome.storage.local.get({ floatingButtonPositions: {} }, (items) => {
     const positions = items.floatingButtonPositions || {};
     positions[domain] = offset;
@@ -137,10 +151,13 @@ function savePositionOffset(domain, offset) {
  */
 async function addDomainToIgnoreList(domain) {
   if (!domain) return;
-  
-  return new Promise(resolve => {
+
+  return new Promise((resolve) => {
     chrome.storage.sync.get({ ignoredDomains: '' }, (items) => {
-      let domains = items.ignoredDomains.split('\n').map(d => d.trim()).filter(d => d.length > 0);
+      let domains = items.ignoredDomains
+        .split('\n')
+        .map((d) => d.trim())
+        .filter((d) => d.length > 0);
       if (!domains.includes(domain)) {
         domains.push(domain);
         const newValue = domains.join('\n');
@@ -157,7 +174,7 @@ async function addDomainToIgnoreList(domain) {
  */
 function injectAnimationStyles() {
   if (document.getElementById('extractmd-animation-styles')) return;
-  
+
   const style = document.createElement('style');
   style.id = 'extractmd-animation-styles';
   style.textContent = LOADING_ANIMATION_CSS;
@@ -179,7 +196,7 @@ export async function createFloatingButton({
   id = 'extractmd-floating-button',
   domain = '',
   enableDrag = true,
-  enableDismiss = true
+  enableDismiss = true,
 }) {
   // Check if button already exists
   const existing = document.getElementById(id);
@@ -190,27 +207,27 @@ export async function createFloatingButton({
   // Inject animation styles
   injectAnimationStyles();
 
-  // Load settings
-  let currentOffset = { ...DEFAULT_OFFSET };
-  if (domain) {
-    currentOffset = await loadPositionOffset(domain);
-  }
-  const sizeName = await loadButtonSize();
-  const sizeConfig = SIZE_CONFIG[sizeName] || SIZE_CONFIG.medium;
-  const transparencyName = await loadButtonTransparency();
-  const idleOpacity = TRANSPARENCY_CONFIG[transparencyName] || TRANSPARENCY_CONFIG.medium;
-  
-  // Get theme colors
-  const colors = getThemeColors();
+  // Load all settings in parallel for efficiency
+  const [positionOffset, settings] = await Promise.all([
+    domain ? loadPositionOffset(domain) : Promise.resolve(DEFAULT_OFFSET),
+    loadButtonSettings(),
+  ]);
+
+  let currentOffset = { ...positionOffset };
+  const sizeConfig = SIZE_CONFIG[settings.size] || SIZE_CONFIG.medium;
+  const idleOpacity = TRANSPARENCY_CONFIG[settings.transparency] || TRANSPARENCY_CONFIG.medium;
+
+  // Get theme colors using loaded accent color
+  const colors = getThemeColors(settings.accentColor);
 
   const button = document.createElement('div');
   button.id = id;
-  
+
   // Create inner content container for icon
   const contentContainer = document.createElement('div');
   contentContainer.className = 'extractmd-button-content';
   contentContainer.innerHTML = ICONS.clipboard;
-  
+
   // Set content container styles individually for jsdom compatibility
   const cs = contentContainer.style;
   cs.width = `${sizeConfig.iconSize}px`;
@@ -219,19 +236,19 @@ export async function createFloatingButton({
   cs.alignItems = 'center';
   cs.justifyContent = 'center';
   cs.color = colors.iconColor;
-  
+
   const svg = contentContainer.querySelector('svg');
   if (svg) {
     svg.style.width = '100%';
     svg.style.height = '100%';
   }
   button.appendChild(contentContainer);
-  
+
   // Create dismiss button (hidden by default)
   const dismissBtn = document.createElement('div');
   dismissBtn.className = 'extractmd-dismiss-btn';
   dismissBtn.innerHTML = '×';
-  
+
   // Set dismiss button styles individually
   const ds = dismissBtn.style;
   ds.position = 'absolute';
@@ -272,7 +289,8 @@ export async function createFloatingButton({
   bs.display = 'flex';
   bs.alignItems = 'center';
   bs.justifyContent = 'center';
-  bs.transition = 'box-shadow 0.2s ease, opacity 0.2s ease, background 0.2s ease, transform 0.2s ease';
+  bs.transition =
+    'box-shadow 0.2s ease, opacity 0.2s ease, background 0.2s ease, transform 0.2s ease';
   bs.userSelect = 'none';
   bs.opacity = idleOpacity.toString();
 
@@ -284,7 +302,7 @@ export async function createFloatingButton({
   let buttonStartBottom = initialBottom;
   let hasMoved = false;
   let justFinishedDragging = false; // Flag to prevent click after drag
-  
+
   // Hover state for dismiss button
   let hoverTimeout = null;
   let isHovering = false;
@@ -294,20 +312,20 @@ export async function createFloatingButton({
     if (!enableDrag) return; // Dragging disabled
     if (e.target === dismissBtn) return; // Don't start drag on dismiss button
     if (button.dataset.processing) return;
-    
+
     isDragging = true;
     hasMoved = false;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
-    
+
     // Get current position
     const computedStyle = window.getComputedStyle(button);
     buttonStartRight = parseInt(computedStyle.right, 10) || DEFAULT_RIGHT;
     buttonStartBottom = parseInt(computedStyle.bottom, 10) || DEFAULT_BOTTOM;
-    
+
     // Prevent text selection during drag
     e.preventDefault();
-    
+
     // Change cursor
     button.style.cursor = 'grabbing';
     button.style.transition = 'box-shadow 0.2s ease, opacity 0.2s ease, background 0.2s ease';
@@ -316,19 +334,25 @@ export async function createFloatingButton({
   // Mouse move - handle drag
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-    
+
     const deltaX = dragStartX - e.clientX; // Positive = moved left (increase right)
     const deltaY = dragStartY - e.clientY; // Positive = moved up (increase bottom)
-    
+
     // Check if we've moved enough to consider it a drag
     if (Math.abs(deltaX) > DRAG_THRESHOLD || Math.abs(deltaY) > DRAG_THRESHOLD) {
       hasMoved = true;
     }
-    
+
     // Update position
-    const newRight = Math.max(0, Math.min(window.innerWidth - sizeConfig.size - 4, buttonStartRight + deltaX));
-    const newBottom = Math.max(0, Math.min(window.innerHeight - sizeConfig.size - 4, buttonStartBottom + deltaY));
-    
+    const newRight = Math.max(
+      0,
+      Math.min(window.innerWidth - sizeConfig.size - 4, buttonStartRight + deltaX)
+    );
+    const newBottom = Math.max(
+      0,
+      Math.min(window.innerHeight - sizeConfig.size - 4, buttonStartBottom + deltaY)
+    );
+
     button.style.right = `${newRight}px`;
     button.style.bottom = `${newBottom}px`;
   };
@@ -336,34 +360,34 @@ export async function createFloatingButton({
   // Mouse up - end drag or trigger click
   const handleMouseUp = () => {
     if (!isDragging) return;
-    
+
     isDragging = false;
     button.style.cursor = 'pointer';
-    
+
     if (hasMoved) {
       // Set flag to prevent the click event that follows mouseup
       justFinishedDragging = true;
-      
+
       // Reset the flag after a short delay (after click event would have fired)
       setTimeout(() => {
         justFinishedDragging = false;
       }, 10);
-      
+
       if (domain) {
         // Calculate and save the new offset
         const computedStyle = window.getComputedStyle(button);
         const currentRight = parseInt(computedStyle.right, 10) || DEFAULT_RIGHT;
         const currentBottom = parseInt(computedStyle.bottom, 10) || DEFAULT_BOTTOM;
-        
+
         currentOffset = {
           left: currentRight - DEFAULT_RIGHT,
-          up: currentBottom - DEFAULT_BOTTOM
+          up: currentBottom - DEFAULT_BOTTOM,
         };
-        
+
         savePositionOffset(domain, currentOffset);
       }
     }
-    
+
     hasMoved = false;
   };
 
@@ -375,10 +399,10 @@ export async function createFloatingButton({
   button.addEventListener('click', (e) => {
     if (e.target === dismissBtn) return; // Don't trigger on dismiss button
     if (button.dataset.processing) return;
-    
+
     // If we just finished dragging, don't trigger click
     if (isDragging || justFinishedDragging) return;
-    
+
     onClick();
   });
 
@@ -390,7 +414,7 @@ export async function createFloatingButton({
       button.style.opacity = '1';
       button.style.background = colors.accentHover;
       button.style.transform = 'scale(1.05)';
-      
+
       // Start timer to show dismiss button (only if dismiss is enabled)
       if (domain && enableDismiss) {
         hoverTimeout = setTimeout(() => {
@@ -404,16 +428,16 @@ export async function createFloatingButton({
 
   button.addEventListener('mouseleave', () => {
     isHovering = false;
-    
+
     // Clear hover timeout
     if (hoverTimeout) {
       clearTimeout(hoverTimeout);
       hoverTimeout = null;
     }
-    
+
     // Hide dismiss button
     dismissBtn.style.display = 'none';
-    
+
     if (!button.dataset.processing) {
       button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
       button.style.opacity = idleOpacity.toString();
@@ -425,21 +449,21 @@ export async function createFloatingButton({
   // Dismiss button click handler
   dismissBtn.addEventListener('click', async (e) => {
     e.stopPropagation();
-    
+
     if (domain) {
       await addDomainToIgnoreList(domain);
-      
+
       // Set global flag to prevent mutation observers from recreating the button
       window.__extractmd_domain_ignored = true;
-      
+
       // Clear the copy function
       window.copyExtractMD = null;
-      
+
       // Remove the button
       if (button.parentNode) {
         button.parentNode.removeChild(button);
       }
-      
+
       // Clean up event listeners
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -455,6 +479,52 @@ export async function createFloatingButton({
       svg.style.cssText = 'width: 100%; height: 100%;';
     }
   };
+
+  /**
+   * Update visibility based on fullscreen/theater state
+   */
+  const updateVisibility = () => {
+    if (isFullscreen()) {
+      button.style.display = 'none';
+    } else {
+      // Only show if it wasn't explicitly hidden by other logic
+      // Most of our content scripts use display 'flex' for visible
+      if (!button.dataset.explicitHidden) {
+        button.style.display = 'flex';
+      }
+    }
+  };
+
+  // Set up listeners for fullscreen changes
+  document.addEventListener('fullscreenchange', updateVisibility);
+  document.addEventListener('webkitfullscreenchange', updateVisibility);
+  document.addEventListener('mozfullscreenchange', updateVisibility);
+  document.addEventListener('MSFullscreenChange', updateVisibility);
+
+  // For YouTube fullscreen changes (theater mode no longer hides the button)
+  if (window.location.hostname.includes('youtube.com')) {
+    const ytObserver = new MutationObserver(updateVisibility);
+    // Only observe fullscreen attribute changes (not theater)
+    const watchElement = document.querySelector('ytd-watch-flexy');
+    if (watchElement) {
+      ytObserver.observe(watchElement, {
+        attributes: true,
+        attributeFilter: ['fullscreen'], // Removed 'theater'
+      });
+    }
+    // Also observe the movie player for aria-pressed changes on fullscreen button
+    const player = document.querySelector('#movie_player');
+    if (player) {
+      ytObserver.observe(player, {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ['aria-pressed'],
+      });
+    }
+
+    // Initial check for fullscreen only
+    updateVisibility();
+  }
 
   // Controller object with state methods
   const controller = {
@@ -509,13 +579,15 @@ export async function createFloatingButton({
      * Show the button
      */
     show() {
-      button.style.display = 'flex';
+      delete button.dataset.explicitHidden;
+      updateVisibility();
     },
 
     /**
      * Hide the button
      */
     hide() {
+      button.dataset.explicitHidden = 'true';
       button.style.display = 'none';
     },
 
@@ -539,7 +611,7 @@ export async function createFloatingButton({
      */
     appendTo(parent = document.body) {
       parent.appendChild(button);
-    }
+    },
   };
 
   return controller;

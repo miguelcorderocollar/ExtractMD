@@ -5,20 +5,20 @@ describe('shared/defaults', () => {
   it('exports DEFAULTS object with all expected keys', () => {
     expect(DEFAULTS).toBeDefined();
     expect(typeof DEFAULTS).toBe('object');
-    
+
     // YouTube settings
     expect(DEFAULTS.includeTimestamps).toBe(true);
     expect(DEFAULTS.addTitleToTranscript).toBe(true);
     expect(DEFAULTS.addChannelToTranscript).toBe(true);
     expect(DEFAULTS.addUrlToTranscript).toBe(true);
-    
+
     // HN Comments settings
     expect(DEFAULTS.hnIncludeAuthor).toBe(true);
     expect(DEFAULTS.hnIncludeTime).toBe(true);
     expect(DEFAULTS.hnIncludeReplies).toBe(true);
     expect(DEFAULTS.hnIncludeUrl).toBe(true);
     expect(DEFAULTS.hnIncludeItemText).toBe(true);
-    
+
     // HN News settings
     expect(DEFAULTS.hnNewsIncludeTitle).toBe(true);
     expect(DEFAULTS.hnNewsIncludeUrl).toBe(true);
@@ -27,14 +27,15 @@ describe('shared/defaults', () => {
     expect(DEFAULTS.hnNewsIncludeAuthor).toBe(true);
     expect(DEFAULTS.hnNewsIncludeTime).toBe(true);
     expect(DEFAULTS.hnNewsIncludeComments).toBe(true);
-    
+
     // Article settings
     expect(DEFAULTS.articleExporterIncludeImages).toBe(true);
     expect(DEFAULTS.articleExporterOnlyLongest).toBe(false);
     expect(DEFAULTS.articleExporterShowInfo).toBe(true);
     expect(DEFAULTS.articleExporterIncludeUrl).toBe(true);
-    
+
     // General settings
+    expect(DEFAULTS.globalEnabled).toBe(true);
     expect(DEFAULTS.jumpToDomain).toBe(false);
     expect(DEFAULTS.jumpToDomainUrl).toBe('https://chat.openai.com/');
     expect(DEFAULTS.enableUsageKpi).toBe(true);
@@ -43,17 +44,37 @@ describe('shared/defaults', () => {
     expect(DEFAULTS.downloadIfTokensExceed).toBe(0);
     expect(DEFAULTS.showTokenCountInNotification).toBe(false);
     expect(DEFAULTS.ignoredDomains).toBe('');
-    
+
     // Integration toggles
     expect(DEFAULTS.enableYouTubeIntegration).toBe(true);
     expect(DEFAULTS.enableHackerNewsIntegration).toBe(true);
     expect(DEFAULTS.enableArticleIntegration).toBe(true);
+    expect(DEFAULTS.enableUniversalIntegration).toBe(true);
+
+    // Universal settings
+    expect(DEFAULTS.universalShowInfoNotification).toBe(false);
+    expect(DEFAULTS.universalIncludeImages).toBe(true);
+    expect(DEFAULTS.universalIncludeLinks).toBe(true);
+    expect(DEFAULTS.universalIncludeUrl).toBe(true);
+    expect(DEFAULTS.universalContentMode).toBe('auto');
+    expect(DEFAULTS.universalCustomSelector).toBe('');
+    expect(DEFAULTS.universalStripNav).toBe(true);
+    expect(DEFAULTS.universalPreserveCodeBlocks).toBe(true);
+
+    // Floating button settings
+    expect(DEFAULTS.floatingButtonEnableDrag).toBe(true);
+    expect(DEFAULTS.floatingButtonEnableDismiss).toBe(true);
+    expect(DEFAULTS.floatingButtonSize).toBe('medium');
+    expect(DEFAULTS.floatingButtonTransparency).toBe('medium');
+
+    // Theme
+    expect(DEFAULTS.accentColor).toBe('#14b8a6');
   });
 
   it('exports SETTING_SCHEMA with matching keys', () => {
     expect(SETTING_SCHEMA).toBeDefined();
     expect(typeof SETTING_SCHEMA).toBe('object');
-    
+
     // Every key in DEFAULTS should have a schema entry
     for (const key of Object.keys(DEFAULTS)) {
       expect(SETTING_SCHEMA[key]).toBeDefined();
@@ -68,4 +89,3 @@ describe('shared/defaults', () => {
     }
   });
 });
-

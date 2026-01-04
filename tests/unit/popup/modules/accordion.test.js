@@ -22,28 +22,28 @@ describe('popup/accordion module', () => {
   describe('initializeAccordion', () => {
     it('sets up click handlers on collapsible buttons', () => {
       initializeAccordion();
-      
+
       const buttons = document.querySelectorAll('.collapsible');
       const containers = document.querySelectorAll('.container');
-      
+
       // Click first button
       buttons[0].click();
-      
+
       expect(buttons[0].classList.contains('active')).toBe(true);
       expect(containers[0].classList.contains('open')).toBe(true);
     });
 
     it('toggles on second click', () => {
       initializeAccordion();
-      
+
       const button = document.querySelector('.collapsible');
       const content = document.querySelector('.container');
-      
+
       // First click - open
       button.click();
       expect(button.classList.contains('active')).toBe(true);
       expect(content.classList.contains('open')).toBe(true);
-      
+
       // Second click - close
       button.click();
       expect(button.classList.contains('active')).toBe(false);
@@ -52,13 +52,13 @@ describe('popup/accordion module', () => {
 
     it('allows multiple sections to be open', () => {
       initializeAccordion();
-      
+
       const buttons = document.querySelectorAll('.collapsible');
       const containers = document.querySelectorAll('.container');
-      
+
       buttons[0].click();
       buttons[1].click();
-      
+
       expect(buttons[0].classList.contains('active')).toBe(true);
       expect(buttons[1].classList.contains('active')).toBe(true);
       expect(containers[0].classList.contains('open')).toBe(true);
@@ -66,4 +66,3 @@ describe('popup/accordion module', () => {
     });
   });
 });
-

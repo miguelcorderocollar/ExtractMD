@@ -8,15 +8,57 @@ export async function getSettings() {
   return getSettingsFromStorage();
 }
 
+/**
+ * Robust detection of fullscreen or theater modes across websites.
+ * Includes generic native fullscreen and site-specific theater modes.
+ * @returns {boolean}
+ */
+export function isFullscreen() {
+  // Check native browser fullscreen
+  if (
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement
+  ) {
+    return true;
+  }
+
+  // YouTube specific checks (Theater Mode, etc.)
+  if (window.location.hostname.includes('youtube.com')) {
+    // Check YouTube specific attributes on the watch element
+    const watchElement = document.querySelector('ytd-watch-flexy');
+    if (watchElement) {
+      if (watchElement.hasAttribute('fullscreen')) return true;
+      // Note: theater mode is not considered fullscreen, button should show in theater mode
+    }
+
+    // Fallback to buttons using standard classes instead of localized aria-labels
+    // Only fullscreen button is considered fullscreen, theater mode should show button
+    const fullscreenButton = document.querySelector('.ytp-fullscreen-button');
+    if (fullscreenButton && fullscreenButton.getAttribute('aria-pressed') === 'true') {
+      return true;
+    }
+  }
+
+  // TODO: Add other site-specific theater or "dim lights" detections here if needed
+  // For now, native fullscreen covers most cases (Netflix, Twitch, etc.)
+
+  return false;
+}
+
 export async function copyToClipboard(text, includeTimestamps) {
   let textToCopy = text;
   if (!includeTimestamps) {
     // Remove timestamps in [mm:ss], [h:mm:ss], or [hh:mm:ss] formats
-    textToCopy = text.replace(/\[\d{1,2}(:\d{2}){1,2}\]/g, '').replace(/\n\s*\n/g, '\n').trim();
+    textToCopy = text
+      .replace(/\[\d{1,2}(:\d{2}){1,2}\]/g, '')
+      .replace(/\n\s*\n/g, '\n')
+      .trim();
   }
   try {
     await navigator.clipboard.writeText(textToCopy);
-  } catch (error) {
+  } catch {
     // Fallback method
     const textArea = document.createElement('textarea');
     textArea.value = textToCopy;
@@ -33,21 +75,21 @@ const NOTIFICATION_THEME = {
     success: { bg: '#dcfce7', text: '#22c55e', border: '#bbf7d0' },
     error: { bg: '#fee2e2', text: '#ef4444', border: '#fecaca' },
     info: { bg: '#ccfbf1', text: '#14b8a6', border: '#99f6e4' },
-    shadow: '0 4px 12px rgba(0,0,0,0.1)'
+    shadow: '0 4px 12px rgba(0,0,0,0.1)',
   },
   dark: {
     success: { bg: '#14532d', text: '#4ade80', border: '#166534' },
     error: { bg: '#450a0a', text: '#f87171', border: '#7f1d1d' },
     info: { bg: '#134e4a', text: '#2dd4bf', border: '#115e59' },
-    shadow: '0 4px 12px rgba(0,0,0,0.4)'
-  }
+    shadow: '0 4px 12px rgba(0,0,0,0.4)',
+  },
 };
 
 // SVG icons for notifications
 const NOTIFICATION_ICONS = {
   success: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
   error: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`,
-  info: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`
+  info: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
 };
 
 /**
@@ -63,7 +105,7 @@ function isDarkMode() {
  */
 function injectNotificationStyles() {
   if (document.getElementById('extractmd-notification-styles')) return;
-  
+
   const style = document.createElement('style');
   style.id = 'extractmd-notification-styles';
   style.textContent = `
@@ -86,16 +128,16 @@ function injectNotificationStyles() {
 export function showNotification(message, type = 'info', prominent = false) {
   // Inject animation styles
   injectNotificationStyles();
-  
+
   // Get theme colors
   const theme = isDarkMode() ? NOTIFICATION_THEME.dark : NOTIFICATION_THEME.light;
   const colors = theme[type] || theme.info;
   const icon = NOTIFICATION_ICONS[type] || NOTIFICATION_ICONS.info;
-  
+
   // Create notification container
   const notification = document.createElement('div');
   notification.className = 'extractmd-notification';
-  
+
   // Apply styles individually for better compatibility
   const s = notification.style;
   s.position = 'fixed';
@@ -119,7 +161,7 @@ export function showNotification(message, type = 'info', prominent = false) {
   s.textAlign = 'left';
   s.lineHeight = '1.5';
   s.animation = 'extractmd-slide-in 200ms ease forwards';
-  
+
   // Create icon container
   const iconContainer = document.createElement('div');
   iconContainer.style.cssText = `
@@ -130,7 +172,7 @@ export function showNotification(message, type = 'info', prominent = false) {
     margin-top: 1px;
   `;
   iconContainer.innerHTML = icon;
-  
+
   // Create message container
   const messageContainer = document.createElement('div');
   messageContainer.style.cssText = `
@@ -138,12 +180,12 @@ export function showNotification(message, type = 'info', prominent = false) {
     min-width: 0;
   `;
   messageContainer.innerHTML = message;
-  
+
   // Assemble notification
   notification.appendChild(iconContainer);
   notification.appendChild(messageContainer);
   document.body.appendChild(notification);
-  
+
   // Remove after delay (3s normal, 5s prominent)
   const duration = prominent ? 5000 : 3000;
   setTimeout(() => {
@@ -163,8 +205,13 @@ export function showNotification(message, type = 'info', prominent = false) {
  * @param {string} [type='success'] - Notification type (default: 'success').
  * @param {boolean} [prominent=false] - Whether to show as prominent notification.
  */
-export function showSuccessNotificationWithTokens(message, text, type = 'success', prominent = false) {
-  chrome.storage.sync.get({ showTokenCountInNotification: false }, function(items) {
+export function showSuccessNotificationWithTokens(
+  message,
+  text,
+  type = 'success',
+  prominent = false
+) {
+  chrome.storage.sync.get({ showTokenCountInNotification: false }, function (items) {
     let msg = message;
     if (items.showTokenCountInNotification) {
       const tokens = encode(text).length;
@@ -175,7 +222,7 @@ export function showSuccessNotificationWithTokens(message, text, type = 'success
 }
 
 export function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function closeCurrentTab() {
@@ -188,7 +235,9 @@ export function htmlToMarkdown(html) {
     .replace(/<a [^>]*href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)')
     .replace(/<i>(.*?)<\/i>/gi, '*$1*')
     .replace(/<b>(.*?)<\/b>/gi, '**$1**')
-    .replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/gi, function(_, code) { return '```' + code + '```'; })
+    .replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/gi, function (_, code) {
+      return '```' + code + '```';
+    })
     .replace(/<[^>]+>/g, '') // Remove any other tags
     .replace(/&quot;/g, '"')
     .replace(/&amp;/g, '&')
@@ -242,7 +291,10 @@ export function setButtonNormal(button) {
 
 export function downloadMarkdownFile(markdown, title = '', extensionName = 'ExtractMD') {
   let safeTitle = title || document.title || 'Untitled';
-  safeTitle = safeTitle.replace(/[^a-zA-Z0-9\-_ ]/g, '').replace(/\s+/g, '_').substring(0, 50);
+  safeTitle = safeTitle
+    .replace(/[^a-zA-Z0-9\-_ ]/g, '')
+    .replace(/\s+/g, '_')
+    .substring(0, 50);
   const filename = `${safeTitle}_${extensionName}.md`;
   const blob = new Blob([markdown], { type: 'text/markdown' });
   const url = URL.createObjectURL(blob);
@@ -255,4 +307,4 @@ export function downloadMarkdownFile(markdown, title = '', extensionName = 'Extr
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }, 100);
-} 
+}

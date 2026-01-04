@@ -9,12 +9,12 @@ describe('Floating Button Settings', () => {
 
   it('should have floating button settings in DEFAULTS', async () => {
     const { DEFAULTS } = await import('../../../extension/shared/defaults.js');
-    
+
     expect(DEFAULTS).toHaveProperty('floatingButtonEnableDrag');
     expect(DEFAULTS).toHaveProperty('floatingButtonEnableDismiss');
     expect(DEFAULTS).toHaveProperty('floatingButtonSize');
     expect(DEFAULTS).toHaveProperty('floatingButtonTransparency');
-    
+
     expect(DEFAULTS.floatingButtonEnableDrag).toBe(true);
     expect(DEFAULTS.floatingButtonEnableDismiss).toBe(true);
     expect(DEFAULTS.floatingButtonSize).toBe('medium');
@@ -23,7 +23,7 @@ describe('Floating Button Settings', () => {
 
   it('should save floating button settings correctly', async () => {
     const { saveSetting } = await import('../../../extension/shared/storage.js');
-    
+
     // Mock chrome.storage.sync
     const setSpy = vi.fn();
     const removeSpy = vi.fn();
@@ -31,30 +31,36 @@ describe('Floating Button Settings', () => {
       storage: {
         sync: {
           set: setSpy,
-          remove: removeSpy
-        }
-      }
+          remove: removeSpy,
+        },
+      },
     };
-    
+
     // Save a non-default value (should call set)
     saveSetting('floatingButtonSize', 'large');
     expect(setSpy).toHaveBeenCalledWith({ floatingButtonSize: 'large' }, expect.any(Function));
-    
+
     // Save a default value (should call remove to save space)
     saveSetting('floatingButtonSize', 'medium');
     expect(removeSpy).toHaveBeenCalledWith('floatingButtonSize', expect.any(Function));
-    
+
     // Save boolean settings
     saveSetting('floatingButtonEnableDrag', false);
     expect(setSpy).toHaveBeenCalledWith({ floatingButtonEnableDrag: false }, expect.any(Function));
-    
+
     saveSetting('floatingButtonEnableDismiss', false);
-    expect(setSpy).toHaveBeenCalledWith({ floatingButtonEnableDismiss: false }, expect.any(Function));
-    
+    expect(setSpy).toHaveBeenCalledWith(
+      { floatingButtonEnableDismiss: false },
+      expect.any(Function)
+    );
+
     // Save transparency setting
     saveSetting('floatingButtonTransparency', 'high');
-    expect(setSpy).toHaveBeenCalledWith({ floatingButtonTransparency: 'high' }, expect.any(Function));
-    
+    expect(setSpy).toHaveBeenCalledWith(
+      { floatingButtonTransparency: 'high' },
+      expect.any(Function)
+    );
+
     // Save default transparency (should call remove)
     saveSetting('floatingButtonTransparency', 'medium');
     expect(removeSpy).toHaveBeenCalledWith('floatingButtonTransparency', expect.any(Function));
@@ -62,7 +68,7 @@ describe('Floating Button Settings', () => {
 
   it('should load floating button settings with defaults', async () => {
     const { getSettings } = await import('../../../extension/shared/storage.js');
-    
+
     global.chrome = {
       storage: {
         sync: {
@@ -72,15 +78,20 @@ describe('Floating Button Settings', () => {
               floatingButtonEnableDrag: true,
               floatingButtonEnableDismiss: true,
               floatingButtonSize: 'medium',
-              floatingButtonTransparency: 'medium'
+              floatingButtonTransparency: 'medium',
             });
-          })
-        }
-      }
+          }),
+        },
+      },
     };
-    
-    const settings = await getSettings(['floatingButtonEnableDrag', 'floatingButtonEnableDismiss', 'floatingButtonSize', 'floatingButtonTransparency']);
-    
+
+    const settings = await getSettings([
+      'floatingButtonEnableDrag',
+      'floatingButtonEnableDismiss',
+      'floatingButtonSize',
+      'floatingButtonTransparency',
+    ]);
+
     expect(settings.floatingButtonEnableDrag).toBe(true);
     expect(settings.floatingButtonEnableDismiss).toBe(true);
     expect(settings.floatingButtonSize).toBe('medium');
@@ -89,7 +100,7 @@ describe('Floating Button Settings', () => {
 
   it('should have floating button settings in SETTING_SCHEMA', async () => {
     const { SETTING_SCHEMA } = await import('../../../extension/shared/defaults.js');
-    
+
     expect(SETTING_SCHEMA).toHaveProperty('floatingButtonEnableDrag', 'boolean');
     expect(SETTING_SCHEMA).toHaveProperty('floatingButtonEnableDismiss', 'boolean');
     expect(SETTING_SCHEMA).toHaveProperty('floatingButtonSize', 'string');
@@ -98,23 +109,22 @@ describe('Floating Button Settings', () => {
 
   it('should reset all floating button positions', async () => {
     const { resetFloatingButtonPositions } = await import('../../../extension/options/settings.js');
-    
+
     // Mock chrome.storage.local
     const removeSpy = vi.fn((key, callback) => {
       callback();
     });
-    
+
     global.chrome = {
       storage: {
         local: {
-          remove: removeSpy
-        }
-      }
+          remove: removeSpy,
+        },
+      },
     };
-    
+
     await resetFloatingButtonPositions();
-    
+
     expect(removeSpy).toHaveBeenCalledWith('floatingButtonPositions', expect.any(Function));
   });
 });
-
