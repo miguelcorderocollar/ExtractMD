@@ -11,8 +11,6 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
-    "test:all": "pnpm run test:run && pnpm run test:e2e",
     "build": "node build.js",
     "build:prod": "node build.js --production",
     "build:web": "node scripts/minify-css.js",
@@ -37,7 +35,6 @@
   "homepage": "https://extractmd.miguelcorderocollar.com/",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@playwright/test": "^1.57.0",
     "@vitest/coverage-v8": "^4.0.16",
     "esbuild": "^0.25.5",
     "eslint": "^9.39.2",
@@ -46,7 +43,6 @@
     "husky": "^9.1.7",
     "jsdom": "^27.4.0",
     "lint-staged": "^16.2.7",
-    "playwright": "^1.57.0",
     "prettier": "^3.7.4",
     "vitest": "^4.0.16"
   },

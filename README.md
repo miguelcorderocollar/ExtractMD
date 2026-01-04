@@ -81,12 +81,6 @@
 # Run unit tests (Vitest)
 pnpm test
 
-# Run E2E tests (Playwright)
-pnpm run test:e2e
-
-# Run all tests
-pnpm run test:all
-
 # Build for production
 pnpm run build:prod
 
@@ -114,7 +108,7 @@ The generated ZIP file (`packages/extractmd-{version}.zip`) is ready for upload 
 
 - **Modular Design** - Shared components and utilities in `extension/shared/`
 - **Manifest V3** - Modern Chrome extension standard
-- **Test-Driven** - 203 unit tests (Vitest) + E2E tests (Playwright)
+- **Test-Driven** - 203 unit tests (Vitest)
 - **Bundled with esbuild** - Source files in `extension/`, bundled output in `extension/dist/`
 
 ## Project Structure

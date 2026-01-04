@@ -5,10 +5,21 @@ const mockChrome = {
   storage: {
     sync: {
       get: vi.fn(),
+      set: vi.fn(),
     },
   },
   notifications: {
     create: vi.fn(),
+  },
+  runtime: {
+    onInstalled: {
+      addListener: vi.fn(),
+    },
+    openOptionsPage: vi.fn(),
+    OnInstalledReason: {
+      INSTALL: 'install',
+      UPDATE: 'update',
+    },
   },
   scripting: {
     executeScript: vi.fn(),
@@ -94,6 +105,93 @@ describe('background.js - Global Enable/Disable', () => {
         currentWindow: true,
       });
       expect(mockChrome.scripting.executeScript).toHaveBeenCalled();
+    });
+  });
+
+  describe('Extension Installation Handler', () => {
+    it('opens options page and sets welcomeCompleted to false on fresh install (non-e2e)', async () => {
+      // Mock e2e test flag as false (normal user install)
+      mockChrome.storage.sync.get.mockResolvedValue({ __e2e_test__: false });
+
+      const installListener = vi.fn();
+      mockChrome.runtime.onInstalled.addListener = installListener;
+
+      // Simulate the installation handler from background.js
+      const handleInstall = async (details) => {
+        if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+          const { __e2e_test__ } = await chrome.storage.sync.get('__e2e_test__');
+          if (__e2e_test__) {
+            return;
+          }
+          chrome.storage.sync.set({ welcomeCompleted: false });
+          chrome.runtime.openOptionsPage();
+        }
+      };
+
+      chrome.runtime.onInstalled.addListener(handleInstall);
+
+      // Simulate fresh install
+      const installDetails = { reason: chrome.runtime.OnInstalledReason.INSTALL };
+      await Promise.all(installListener.mock.calls.map(([listener]) => listener(installDetails)));
+
+      expect(mockChrome.storage.sync.get).toHaveBeenCalledWith('__e2e_test__');
+      expect(mockChrome.storage.sync.set).toHaveBeenCalledWith({ welcomeCompleted: false });
+      expect(mockChrome.runtime.openOptionsPage).toHaveBeenCalled();
+    });
+
+    it('does not open options page when __e2e_test__ flag is set', async () => {
+      // Mock e2e test flag as true
+      mockChrome.storage.sync.get.mockResolvedValue({ __e2e_test__: true });
+
+      const installListener = vi.fn();
+      mockChrome.runtime.onInstalled.addListener = installListener;
+
+      const handleInstall = async (details) => {
+        if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+          const { __e2e_test__ } = await chrome.storage.sync.get('__e2e_test__');
+          if (__e2e_test__) {
+            return;
+          }
+          chrome.storage.sync.set({ welcomeCompleted: false });
+          chrome.runtime.openOptionsPage();
+        }
+      };
+
+      chrome.runtime.onInstalled.addListener(handleInstall);
+
+      const installDetails = { reason: chrome.runtime.OnInstalledReason.INSTALL };
+      await Promise.all(installListener.mock.calls.map(([listener]) => listener(installDetails)));
+
+      expect(mockChrome.storage.sync.get).toHaveBeenCalledWith('__e2e_test__');
+      expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
+      expect(mockChrome.runtime.openOptionsPage).not.toHaveBeenCalled();
+    });
+
+    it('does not trigger installation logic on update', async () => {
+      const installListener = vi.fn();
+      mockChrome.runtime.onInstalled.addListener = installListener;
+
+      const handleInstall = async (details) => {
+        if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+          const { __e2e_test__ } = await chrome.storage.sync.get('__e2e_test__');
+          if (__e2e_test__) {
+            return;
+          }
+          chrome.storage.sync.set({ welcomeCompleted: false });
+          chrome.runtime.openOptionsPage();
+        }
+      };
+
+      chrome.runtime.onInstalled.addListener(handleInstall);
+
+      // Simulate update
+      const updateDetails = { reason: chrome.runtime.OnInstalledReason.UPDATE };
+      await Promise.all(installListener.mock.calls.map(([listener]) => listener(updateDetails)));
+
+      // Should not check flag or set welcome or open options page
+      expect(mockChrome.storage.sync.get).not.toHaveBeenCalled();
+      expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
+      expect(mockChrome.runtime.openOptionsPage).not.toHaveBeenCalled();
     });
   });
 });
