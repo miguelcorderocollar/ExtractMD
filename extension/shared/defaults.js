@@ -48,6 +48,7 @@ export const DEFAULTS = {
   enableUniversalIntegration: true,
 
   // Universal (HTML-to-MD fallback)
+  universalShowInfoNotification: false,
   universalIncludeImages: true,
   universalIncludeLinks: true,
   universalIncludeUrl: true,
@@ -101,6 +102,7 @@ export const SETTING_SCHEMA = {
   enableHackerNewsIntegration: 'boolean',
   enableArticleIntegration: 'boolean',
   enableUniversalIntegration: 'boolean',
+  universalShowInfoNotification: 'boolean',
   universalIncludeImages: 'boolean',
   universalIncludeLinks: 'boolean',
   universalIncludeUrl: 'boolean',

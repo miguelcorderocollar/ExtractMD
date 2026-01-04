@@ -43,6 +43,7 @@ const SETTING_ELEMENTS = {
   articleExporterIncludeUrl: { id: 'articleExporterIncludeUrl', type: 'checkbox' },
 
   // Universal settings
+  universalShowInfoNotification: { id: 'universalShowInfoNotification', type: 'checkbox' },
   universalIncludeImages: { id: 'universalIncludeImages', type: 'checkbox' },
   universalIncludeLinks: { id: 'universalIncludeLinks', type: 'checkbox' },
   universalIncludeUrl: { id: 'universalIncludeUrl', type: 'checkbox' },

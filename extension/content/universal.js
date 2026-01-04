@@ -282,7 +282,13 @@ async function manageFloatingButtonForUniversal() {
       if (floatingButtonController) {
         floatingButtonController.appendTo(document.body);
         console.debug('[ExtractMD] Floating button created and added to DOM (Universal)');
-        showContentInfoNotification(contentElement);
+
+        // Show content info notification if setting is enabled
+        chrome.storage.sync.get({ universalShowInfoNotification: false }, function (settings) {
+          if (settings.universalShowInfoNotification) {
+            showContentInfoNotification(contentElement);
+          }
+        });
       }
     } else if (floatingButtonController) {
       floatingButtonController.show();

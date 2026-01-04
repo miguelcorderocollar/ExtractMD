@@ -49,6 +49,26 @@ describe('shared/defaults', () => {
     expect(DEFAULTS.enableYouTubeIntegration).toBe(true);
     expect(DEFAULTS.enableHackerNewsIntegration).toBe(true);
     expect(DEFAULTS.enableArticleIntegration).toBe(true);
+    expect(DEFAULTS.enableUniversalIntegration).toBe(true);
+
+    // Universal settings
+    expect(DEFAULTS.universalShowInfoNotification).toBe(false);
+    expect(DEFAULTS.universalIncludeImages).toBe(true);
+    expect(DEFAULTS.universalIncludeLinks).toBe(true);
+    expect(DEFAULTS.universalIncludeUrl).toBe(true);
+    expect(DEFAULTS.universalContentMode).toBe('auto');
+    expect(DEFAULTS.universalCustomSelector).toBe('');
+    expect(DEFAULTS.universalStripNav).toBe(true);
+    expect(DEFAULTS.universalPreserveCodeBlocks).toBe(true);
+
+    // Floating button settings
+    expect(DEFAULTS.floatingButtonEnableDrag).toBe(true);
+    expect(DEFAULTS.floatingButtonEnableDismiss).toBe(true);
+    expect(DEFAULTS.floatingButtonSize).toBe('medium');
+    expect(DEFAULTS.floatingButtonTransparency).toBe('medium');
+
+    // Theme
+    expect(DEFAULTS.accentColor).toBe('#14b8a6');
   });
 
   it('exports SETTING_SCHEMA with matching keys', () => {
