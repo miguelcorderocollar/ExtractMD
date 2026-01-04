@@ -1,7 +1,7 @@
 /**
  * <setting-input> Web Component
  * A text or number input setting with label and description
- * 
+ *
  * @example
  * <setting-input
  *   setting-id="jumpToDomainUrl"
@@ -10,7 +10,7 @@
  *   type="text"
  *   placeholder="https://chat.openai.com/">
  * </setting-input>
- * 
+ *
  * <setting-input
  *   setting-id="downloadIfTokensExceed"
  *   label="Download if Tokens Exceed"
@@ -19,13 +19,23 @@
  *   min="0"
  *   step="1">
  * </setting-input>
- * 
+ *
  * @fires change - When the input value changes (on blur or Enter)
  * @fires input - When the input value changes (real-time)
  */
 export class SettingInput extends HTMLElement {
   static get observedAttributes() {
-    return ['value', 'disabled', 'label', 'description', 'type', 'placeholder', 'min', 'max', 'step'];
+    return [
+      'value',
+      'disabled',
+      'label',
+      'description',
+      'type',
+      'placeholder',
+      'min',
+      'max',
+      'step',
+    ];
   }
 
   constructor() {
@@ -150,31 +160,35 @@ export class SettingInput extends HTMLElement {
       this._handleChange = (e) => {
         // Stop the native event from bubbling to prevent duplicate events
         e.stopPropagation();
-        
+
         this.setAttribute('value', e.target.value);
-        
-        this.dispatchEvent(new CustomEvent('change', {
-          bubbles: true,
-          composed: true,
-          detail: {
-            settingId: this.settingId,
-            value: this.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value
-          }
-        }));
+
+        this.dispatchEvent(
+          new CustomEvent('change', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              settingId: this.settingId,
+              value: this.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value,
+            },
+          })
+        );
       };
 
       this._handleInput = (e) => {
         // Stop the native event from bubbling to prevent duplicate events
         e.stopPropagation();
-        
-        this.dispatchEvent(new CustomEvent('input', {
-          bubbles: true,
-          composed: true,
-          detail: {
-            settingId: this.settingId,
-            value: e.target.value
-          }
-        }));
+
+        this.dispatchEvent(
+          new CustomEvent('input', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              settingId: this.settingId,
+              value: e.target.value,
+            },
+          })
+        );
       };
 
       input.addEventListener('change', this._handleChange);
@@ -195,4 +209,3 @@ export class SettingInput extends HTMLElement {
 if (!customElements.get('setting-input')) {
   customElements.define('setting-input', SettingInput);
 }
-

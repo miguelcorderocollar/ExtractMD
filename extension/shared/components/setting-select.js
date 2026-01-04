@@ -1,11 +1,11 @@
 /**
  * <setting-select> Web Component
  * A dropdown select setting with label and description
- * 
+ *
  * Options can be provided in two ways:
  * 1. As child elements: <option value="a">A</option>
  * 2. Via setOptions() method after creation
- * 
+ *
  * @example
  * <setting-select
  *   setting-id="universalContentMode"
@@ -16,7 +16,7 @@
  *   <option value="main">Main Element Only</option>
  *   <option value="full">Full Page</option>
  * </setting-select>
- * 
+ *
  * @fires change - When the select value changes
  */
 export class SettingSelect extends HTMLElement {
@@ -33,7 +33,7 @@ export class SettingSelect extends HTMLElement {
   connectedCallback() {
     // Capture options immediately if present
     this._captureOptions();
-    
+
     if (this._options.length > 0) {
       this.render();
       this.setupEventListeners();
@@ -116,10 +116,10 @@ export class SettingSelect extends HTMLElement {
     const optionElements = this.querySelectorAll(':scope > option');
     if (optionElements.length > 0) {
       const currentValue = this.getAttribute('value') || '';
-      this._options = Array.from(optionElements).map(opt => ({
+      this._options = Array.from(optionElements).map((opt) => ({
         value: opt.value,
         text: opt.textContent,
-        selected: opt.value === currentValue
+        selected: opt.value === currentValue,
       }));
     }
   }
@@ -131,9 +131,12 @@ export class SettingSelect extends HTMLElement {
     const currentValue = this.getAttribute('value') || '';
     const disabled = this.disabled;
 
-    const optionsHtml = this._options.map(opt => 
-      `<option value="${opt.value}" ${opt.value === currentValue ? 'selected' : ''}>${opt.text}</option>`
-    ).join('');
+    const optionsHtml = this._options
+      .map(
+        (opt) =>
+          `<option value="${opt.value}" ${opt.value === currentValue ? 'selected' : ''}>${opt.text}</option>`
+      )
+      .join('');
 
     this.innerHTML = `
       <div class="setting-row">
@@ -146,7 +149,7 @@ export class SettingSelect extends HTMLElement {
         </select>
       </div>
     `;
-    
+
     this._rendered = true;
   }
 
@@ -156,17 +159,19 @@ export class SettingSelect extends HTMLElement {
       this._handleChange = (e) => {
         // Stop the native event from bubbling to prevent duplicate events
         e.stopPropagation();
-        
+
         this.setAttribute('value', e.target.value);
-        
-        this.dispatchEvent(new CustomEvent('change', {
-          bubbles: true,
-          composed: true,
-          detail: {
-            settingId: this.settingId,
-            value: e.target.value
-          }
-        }));
+
+        this.dispatchEvent(
+          new CustomEvent('change', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              settingId: this.settingId,
+              value: e.target.value,
+            },
+          })
+        );
       };
       select.addEventListener('change', this._handleChange);
     }
@@ -185,10 +190,10 @@ export class SettingSelect extends HTMLElement {
    * @param {Array<{value: string, text: string}>} options
    */
   setOptions(options) {
-    this._options = options.map(opt => ({
+    this._options = options.map((opt) => ({
       value: opt.value,
       text: opt.text,
-      selected: opt.value === this.getAttribute('value')
+      selected: opt.value === this.getAttribute('value'),
     }));
     this.render();
     this.setupEventListeners();

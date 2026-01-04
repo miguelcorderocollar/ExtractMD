@@ -1,11 +1,13 @@
 # ExtractMD Testing Infrastructure - Implementation Summary
 
 ## Overview
+
 Successfully implemented a comprehensive testing infrastructure for the ExtractMD Chrome extension using Vitest for unit tests and Playwright for E2E tests.
 
 ## What Was Implemented
 
 ### 1. Testing Framework Setup ✅
+
 - **Vitest** configured for unit tests with jsdom environment
 - **Playwright** configured for E2E browser extension testing
 - Chrome API mocks for testing without browser
@@ -19,6 +21,7 @@ Successfully implemented a comprehensive testing infrastructure for the ExtractM
 ### 2. Unit Tests Created ✅
 
 #### Utils Tests (`tests/unit/utils.test.js`)
+
 - ✅ getSettings returns defaults and stored values
 - ✅ copyToClipboard with/without timestamps
 - ✅ htmlToMarkdown conversion
@@ -27,6 +30,7 @@ Successfully implemented a comprehensive testing infrastructure for the ExtractM
 - **12 tests passing**
 
 #### Markdown Conversion Tests (`tests/unit/markdown.test.js`)
+
 - ✅ Headers (h1-h6) conversion
 - ✅ Paragraphs with inline formatting
 - ✅ Unordered and ordered lists
@@ -36,28 +40,33 @@ Successfully implemented a comprehensive testing infrastructure for the ExtractM
 - **8 tests passing**
 
 #### Storage Tests (`tests/unit/storage.test.js`)
+
 - ✅ saveSetting stores when different from default
 - ✅ saveSetting removes when matches default
 - ✅ Unknown keys saved for future compatibility
 - **3 tests passing**
 
 #### Popup Tests (`tests/unit/popup/`)
+
 - **settings.test.js**: DEFAULTS object validation (2 tests)
 - **validation.test.js**: Domain validation regex (6 tests)
 - **kpi.test.js**: Time formatting and calculation (6 tests)
 - **14 tests passing**
 
 #### Shared Module Tests (`tests/unit/shared/`) - NEW
+
 - **defaults.test.js**: DEFAULTS and SETTING_SCHEMA validation (3 tests)
 - **storage.test.js**: getSettings, saveSetting, incrementKpi (9 tests)
 - **12 tests passing**
 
 #### Content Component Tests (`tests/unit/content/`) - NEW
+
 - **components/FloatingButton.test.js**: FloatingButton component (15 tests)
 - **handlers/copyHandler.test.js**: Copy/download handler (8 tests)
 - **23 tests passing**
 
 ### 3. Code Improvements ✅
+
 - Exported `nodeToMarkdown` and `extractArticleMarkdown` from articles.js for testing
 - Exported `DEFAULTS` and `saveSetting` from popup.js for testing
 - Fixed list rendering bug (items weren't separated by newlines)
@@ -65,34 +74,41 @@ Successfully implemented a comprehensive testing infrastructure for the ExtractM
 ### 4. E2E Test Infrastructure ✅
 
 #### Fixtures Created
+
 - `test-article.html` - Single article page
 - `test-multiple-articles.html` - Multiple articles for "longest" setting
 - `test-hn-item.html` - HN comments page structure
 - `test-hn-news.html` - HN frontpage structure
 
 #### E2E Test Files
+
 - `popup.spec.js` - Popup UI interactions
 - `articles.spec.js` - Article extraction tests
 - `hackernews.spec.js` - HN extraction tests
 - `youtube.spec.js` - YouTube extraction tests (with skip flags for real tests)
 
 #### Helper Functions
+
 - `launchWithExtension()` - Loads Chrome with extension
 - `getExtensionId()` - Retrieves extension ID dynamically
 
 ### 5. Test Coverage Report ✅
+
 Current test counts:
+
 - **72 unit tests passing** (up from 37)
 - **10 test suites passing** (up from 6)
 
 ## Files Created
 
 ### Configuration
+
 - ✅ `vitest.config.js`
 - ✅ `playwright.config.js`
 - ✅ Updated `package.json` with test scripts
 
 ### Unit Tests
+
 - ✅ `tests/unit/setup.js` - Chrome API mocks
 - ✅ `tests/unit/utils.test.js`
 - ✅ `tests/unit/markdown.test.js`
@@ -106,6 +122,7 @@ Current test counts:
 - ✅ `tests/unit/content/handlers/copyHandler.test.js` - NEW
 
 ### E2E Tests
+
 - ✅ `tests/e2e/helpers/extension.js`
 - ✅ `tests/e2e/fixtures/test-article.html`
 - ✅ `tests/e2e/fixtures/test-multiple-articles.html`
@@ -128,6 +145,7 @@ Current test counts:
 ## How to Run Tests
 
 ### Unit Tests
+
 ```bash
 # Watch mode (recommended for development)
 npm test
@@ -140,6 +158,7 @@ npm run test:coverage
 ```
 
 ### E2E Tests
+
 ```bash
 # Run Playwright tests
 npm run test:e2e
@@ -151,11 +170,13 @@ npm run test:all
 ## Refactoring Progress
 
 ### Phase 1: Testing Infrastructure ✅ COMPLETE
+
 - Vitest + Playwright configured
 - Chrome API mocks created
 - 37 unit tests passing → now 72
 
 ### Phase 2: Shared Defaults/Storage ✅ COMPLETE
+
 - Created `extension/shared/defaults.js` - Single source of truth for all settings
 - Created `extension/shared/storage.js` - getSettings, saveSetting, incrementKpi
 - Updated popup.js to import from shared modules
@@ -164,18 +185,21 @@ npm run test:all
 - 12 new tests added
 
 ### Phase 3: FloatingButton Component ✅ COMPLETE
+
 - Created `extension/content/components/FloatingButton.js`
 - Integrated into youtube.js, hackernews.js, articles.js
 - Eliminated ~150 lines of duplicated code
 - 15 tests added
 
 ### Phase 4: Copy Handler ✅ COMPLETE
+
 - Created `extension/content/handlers/copyHandler.js`
 - Consolidates copy/download/threshold/KPI logic
 - 8 tests added
 - Integration with content scripts ready for future use
 
 ### Phase 5: Popup Refactor ✅ COMPLETE
+
 - popup.js split into 7 focused modules:
   - `popup/index.js` - Entry point (~25 lines)
   - `popup/settings.js` - Settings load/save (~150 lines)
@@ -189,6 +213,7 @@ npm run test:all
 - 24 new tests added for popup modules
 
 ### Phase 6: Extract CSS ✅ COMPLETE
+
 - Created `extension/popup.css` with CSS variables for theming
 - popup.html reduced from ~500 lines to ~265 lines
 - Better caching and maintainability

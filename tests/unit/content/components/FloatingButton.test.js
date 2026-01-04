@@ -7,7 +7,7 @@ describe('FloatingButton component', () => {
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
-    
+
     // Mock chrome.storage.local
     global.chrome = {
       storage: {
@@ -15,21 +15,25 @@ describe('FloatingButton component', () => {
           get: vi.fn((keys, callback) => {
             callback({ floatingButtonPositions: {} });
           }),
-          set: vi.fn()
+          set: vi.fn(),
         },
         sync: {
           get: vi.fn((keys, callback) => {
-            callback({ ignoredDomains: '', floatingButtonSize: 'medium', floatingButtonTransparency: 'medium' });
+            callback({
+              ignoredDomains: '',
+              floatingButtonSize: 'medium',
+              floatingButtonTransparency: 'medium',
+            });
           }),
           set: vi.fn((data, callback) => {
             if (callback) callback();
-          })
-        }
-      }
+          }),
+        },
+      },
     };
 
     // Mock matchMedia for dark mode detection
-    global.matchMedia = vi.fn().mockImplementation(query => ({
+    global.matchMedia = vi.fn().mockImplementation((query) => ({
       matches: false, // Default to light mode
       media: query,
       addEventListener: vi.fn(),
@@ -40,7 +44,7 @@ describe('FloatingButton component', () => {
   afterEach(() => {
     // Clean up any buttons and injected styles
     const buttons = document.querySelectorAll('#extractmd-floating-button');
-    buttons.forEach(b => b.remove());
+    buttons.forEach((b) => b.remove());
     const styles = document.getElementById('extractmd-animation-styles');
     if (styles) styles.remove();
     container.remove();
@@ -51,7 +55,7 @@ describe('FloatingButton component', () => {
     it('creates a button element with correct structure', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller).not.toBeNull();
       expect(controller.element).toBeDefined();
       expect(controller.element.id).toBe('extractmd-floating-button');
@@ -60,7 +64,7 @@ describe('FloatingButton component', () => {
     it('renders clipboard SVG icon by default', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       // SVG is inside the content container - jsdom converts SVG to data URI
       const contentContainer = controller.element.querySelector('.extractmd-button-content');
       expect(contentContainer).not.toBeNull();
@@ -73,7 +77,7 @@ describe('FloatingButton component', () => {
     it('uses custom id when provided', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, id: 'custom-button' });
-      
+
       expect(controller.element.id).toBe('custom-button');
     });
 
@@ -81,9 +85,9 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const first = await createFloatingButton({ onClick });
       first.appendTo(document.body);
-      
+
       const second = await createFloatingButton({ onClick });
-      
+
       expect(second).toBeNull();
     });
 
@@ -91,16 +95,16 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       controller.appendTo(document.body);
-      
+
       controller.element.click();
-      
+
       expect(onClick).toHaveBeenCalledTimes(1);
     });
 
     it('accepts domain parameter', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
-      
+
       expect(controller).not.toBeNull();
       expect(controller.element).toBeDefined();
     });
@@ -108,7 +112,7 @@ describe('FloatingButton component', () => {
     it('injects animation styles into document head', async () => {
       const onClick = vi.fn();
       await createFloatingButton({ onClick });
-      
+
       const styleEl = document.getElementById('extractmd-animation-styles');
       expect(styleEl).not.toBeNull();
       expect(styleEl.textContent).toContain('extractmd-bounce');
@@ -119,7 +123,7 @@ describe('FloatingButton component', () => {
     it('creates button with teal accent background color', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller).not.toBeNull();
       // Light mode uses #14b8a6 - jsdom converts to rgb
       expect(controller.element.style.background).toBe('rgb(20, 184, 166)');
@@ -128,7 +132,7 @@ describe('FloatingButton component', () => {
     it('creates button with rounded square shape (not circular)', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       // Medium size has 12px border radius
       expect(controller.element.style.borderRadius).toBe('12px');
     });
@@ -136,7 +140,7 @@ describe('FloatingButton component', () => {
     it('button has reduced opacity by default (medium transparency)', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller.element.style.opacity).toBe('0.5');
     });
   });
@@ -145,7 +149,7 @@ describe('FloatingButton component', () => {
     it('uses medium size (48px) by default', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller.element.style.width).toBe('48px');
       expect(controller.element.style.height).toBe('48px');
       expect(controller.element.style.borderRadius).toBe('12px');
@@ -156,10 +160,10 @@ describe('FloatingButton component', () => {
       chrome.storage.sync.get = vi.fn((keys, callback) => {
         callback({ floatingButtonSize: 'small', floatingButtonTransparency: 'medium' });
       });
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller.element.style.width).toBe('40px');
       expect(controller.element.style.height).toBe('40px');
       expect(controller.element.style.borderRadius).toBe('10px');
@@ -170,10 +174,10 @@ describe('FloatingButton component', () => {
       chrome.storage.sync.get = vi.fn((keys, callback) => {
         callback({ floatingButtonSize: 'large', floatingButtonTransparency: 'medium' });
       });
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller.element.style.width).toBe('56px');
       expect(controller.element.style.height).toBe('56px');
       expect(controller.element.style.borderRadius).toBe('14px');
@@ -184,10 +188,10 @@ describe('FloatingButton component', () => {
       chrome.storage.sync.get = vi.fn((keys, callback) => {
         callback({ floatingButtonSize: 'extraSmall', floatingButtonTransparency: 'medium' });
       });
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller.element.style.width).toBe('32px');
       expect(controller.element.style.height).toBe('32px');
       expect(controller.element.style.borderRadius).toBe('8px');
@@ -198,10 +202,10 @@ describe('FloatingButton component', () => {
       chrome.storage.sync.get = vi.fn((keys, callback) => {
         callback({ floatingButtonSize: 'extraLarge', floatingButtonTransparency: 'medium' });
       });
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller.element.style.width).toBe('64px');
       expect(controller.element.style.height).toBe('64px');
       expect(controller.element.style.borderRadius).toBe('16px');
@@ -212,7 +216,7 @@ describe('FloatingButton component', () => {
     it('uses medium transparency (0.5) by default', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller.element.style.opacity).toBe('0.5');
     });
 
@@ -220,10 +224,10 @@ describe('FloatingButton component', () => {
       chrome.storage.sync.get = vi.fn((keys, callback) => {
         callback({ floatingButtonSize: 'medium', floatingButtonTransparency: 'low' });
       });
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller.element.style.opacity).toBe('0.3');
     });
 
@@ -231,10 +235,10 @@ describe('FloatingButton component', () => {
       chrome.storage.sync.get = vi.fn((keys, callback) => {
         callback({ floatingButtonSize: 'medium', floatingButtonTransparency: 'high' });
       });
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller.element.style.opacity).toBe('0.7');
     });
 
@@ -242,10 +246,10 @@ describe('FloatingButton component', () => {
       chrome.storage.sync.get = vi.fn((keys, callback) => {
         callback({ floatingButtonSize: 'medium', floatingButtonTransparency: 'full' });
       });
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       expect(controller.element.style.opacity).toBe('1');
     });
 
@@ -253,14 +257,14 @@ describe('FloatingButton component', () => {
       chrome.storage.sync.get = vi.fn((keys, callback) => {
         callback({ floatingButtonSize: 'medium', floatingButtonTransparency: 'low' });
       });
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       // Set to loading (opacity 1)
       controller.setLoading();
       expect(controller.element.style.opacity).toBe('1');
-      
+
       // Reset to normal (should use configured transparency)
       controller.setNormal();
       expect(controller.element.style.opacity).toBe('0.3');
@@ -275,10 +279,10 @@ describe('FloatingButton component', () => {
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
       }));
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       // Light mode accent is #14b8a6 = rgb(20, 184, 166)
       expect(controller.element.style.background).toBe('rgb(20, 184, 166)');
     });
@@ -290,10 +294,10 @@ describe('FloatingButton component', () => {
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
       }));
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       // Dark mode accent is #2dd4bf = rgb(45, 212, 191)
       expect(controller.element.style.background).toBe('rgb(45, 212, 191)');
     });
@@ -303,9 +307,9 @@ describe('FloatingButton component', () => {
     it('setLoading updates button to loading state with animated dots', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       controller.setLoading();
-      
+
       // Should contain loading dots SVG
       expect(controller.element.innerHTML).toContain('extractmd-dot');
       expect(controller.element.dataset.processing).toBe('true');
@@ -315,9 +319,9 @@ describe('FloatingButton component', () => {
     it('setLoading uses warning color for background', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       controller.setLoading();
-      
+
       // Light mode loading color is #f59e0b = rgb(245, 158, 11)
       expect(controller.element.style.background).toBe('rgb(245, 158, 11)');
     });
@@ -325,9 +329,9 @@ describe('FloatingButton component', () => {
     it('setSuccess updates button to success state with checkmark', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       controller.setSuccess();
-      
+
       // Should contain checkmark polyline - decode URL-encoded content
       const contentContainer = controller.element.querySelector('.extractmd-button-content');
       expect(contentContainer).not.toBeNull();
@@ -340,9 +344,9 @@ describe('FloatingButton component', () => {
     it('setSuccess uses success color for background', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       controller.setSuccess();
-      
+
       // Light mode success color is #22c55e = rgb(34, 197, 94)
       expect(controller.element.style.background).toBe('rgb(34, 197, 94)');
     });
@@ -350,9 +354,9 @@ describe('FloatingButton component', () => {
     it('setError updates button to error state with X icon', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       controller.setError();
-      
+
       // Should contain X lines - check innerHTML (may be URL-encoded)
       const contentContainer = controller.element.querySelector('.extractmd-button-content');
       expect(contentContainer).not.toBeNull();
@@ -365,9 +369,9 @@ describe('FloatingButton component', () => {
     it('setError uses error color for background', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       controller.setError();
-      
+
       // Light mode error color is #ef4444 = rgb(239, 68, 68)
       expect(controller.element.style.background).toBe('rgb(239, 68, 68)');
     });
@@ -375,10 +379,10 @@ describe('FloatingButton component', () => {
     it('setNormal resets button to initial state with clipboard icon', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       controller.setLoading();
       controller.setNormal();
-      
+
       // Should contain clipboard path again - decode URL-encoded content
       const contentContainer = controller.element.querySelector('.extractmd-button-content');
       expect(contentContainer).not.toBeNull();
@@ -395,18 +399,18 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       controller.element.style.display = 'none';
-      
+
       controller.show();
-      
+
       expect(controller.element.style.display).toBe('flex');
     });
 
     it('hide makes button invisible', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       controller.hide();
-      
+
       expect(controller.element.style.display).toBe('none');
     });
   });
@@ -415,9 +419,9 @@ describe('FloatingButton component', () => {
     it('appendTo adds button to specified parent', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
-      
+
       controller.appendTo(container);
-      
+
       expect(container.contains(controller.element)).toBe(true);
     });
 
@@ -425,9 +429,9 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       controller.appendTo(container);
-      
+
       controller.remove();
-      
+
       expect(container.contains(controller.element)).toBe(false);
     });
   });
@@ -437,28 +441,28 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
       controller.appendTo(document.body);
-      
+
       // Simulate drag: mousedown, move significantly, mouseup
       const mousedownEvent = new MouseEvent('mousedown', {
         clientX: 100,
         clientY: 100,
-        bubbles: true
+        bubbles: true,
       });
       controller.element.dispatchEvent(mousedownEvent);
-      
+
       // Move significantly (more than DRAG_THRESHOLD of 5px)
       const mousemoveEvent = new MouseEvent('mousemove', {
         clientX: 150,
         clientY: 150,
-        bubbles: true
+        bubbles: true,
       });
       document.dispatchEvent(mousemoveEvent);
-      
+
       const mouseupEvent = new MouseEvent('mouseup', {
-        bubbles: true
+        bubbles: true,
       });
       document.dispatchEvent(mouseupEvent);
-      
+
       // Click should not be triggered after drag
       expect(onClick).not.toHaveBeenCalled();
     });
@@ -467,30 +471,30 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
       controller.appendTo(document.body);
-      
+
       // Simulate drag
       const mousedownEvent = new MouseEvent('mousedown', {
         clientX: 100,
         clientY: 100,
-        bubbles: true
+        bubbles: true,
       });
       controller.element.dispatchEvent(mousedownEvent);
-      
+
       const mousemoveEvent = new MouseEvent('mousemove', {
         clientX: 150,
         clientY: 150,
-        bubbles: true
+        bubbles: true,
       });
       document.dispatchEvent(mousemoveEvent);
-      
+
       const mouseupEvent = new MouseEvent('mouseup', {
-        bubbles: true
+        bubbles: true,
       });
       document.dispatchEvent(mouseupEvent);
-      
+
       // Wait for async storage operations
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       // Check that storage.local.set was called
       expect(chrome.storage.local.set).toHaveBeenCalled();
     });
@@ -500,15 +504,15 @@ describe('FloatingButton component', () => {
       chrome.storage.local.get = vi.fn((keys, callback) => {
         callback({
           floatingButtonPositions: {
-            'example.com': { left: 50, up: 100 }
-          }
+            'example.com': { left: 50, up: 100 },
+          },
         });
       });
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
       controller.appendTo(document.body);
-      
+
       // Check that storage.local.get was called
       expect(chrome.storage.local.get).toHaveBeenCalled();
     });
@@ -518,7 +522,7 @@ describe('FloatingButton component', () => {
     it('creates dismiss button element', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
-      
+
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
       expect(dismissBtn).not.toBeNull();
       expect(dismissBtn.innerHTML).toBe('×');
@@ -528,7 +532,7 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
       controller.appendTo(document.body);
-      
+
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
       // The dismiss button should exist
       expect(dismissBtn).not.toBeNull();
@@ -538,46 +542,46 @@ describe('FloatingButton component', () => {
 
     it('dismiss button appears after hover timeout', async () => {
       vi.useFakeTimers();
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
       controller.appendTo(document.body);
-      
+
       // Simulate mouseenter
       const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
       controller.element.dispatchEvent(mouseenterEvent);
-      
+
       // Advance timer past HOVER_DELAY_MS (500ms)
       vi.advanceTimersByTime(600);
-      
+
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
       expect(dismissBtn.style.display).toBe('block');
-      
+
       vi.useRealTimers();
     });
 
     it('dismiss button hides on mouseleave', async () => {
       vi.useFakeTimers();
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
       controller.appendTo(document.body);
-      
+
       // Show dismiss button
       const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
       controller.element.dispatchEvent(mouseenterEvent);
       vi.advanceTimersByTime(600);
-      
+
       // Verify it's visible
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
       expect(dismissBtn.style.display).toBe('block');
-      
+
       // Simulate mouseleave
       const mouseleaveEvent = new MouseEvent('mouseleave', { bubbles: true });
       controller.element.dispatchEvent(mouseleaveEvent);
-      
+
       expect(dismissBtn.style.display).toBe('none');
-      
+
       vi.useRealTimers();
     });
 
@@ -585,16 +589,16 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
       controller.appendTo(document.body);
-      
+
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
       dismissBtn.style.display = 'block'; // Make it visible for clicking
-      
+
       // Click dismiss button
       dismissBtn.click();
-      
+
       // Wait for async operations
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       // Check that storage.sync.set was called with the domain
       expect(chrome.storage.sync.set).toHaveBeenCalled();
       const setCall = chrome.storage.sync.set.mock.calls[0][0];
@@ -605,16 +609,16 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
       controller.appendTo(document.body);
-      
+
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
       dismissBtn.style.display = 'block';
-      
+
       // Click dismiss button
       dismissBtn.click();
-      
+
       // Wait for async operations
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       // Button should be removed
       expect(document.body.contains(controller.element)).toBe(false);
     });
@@ -623,39 +627,39 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
       controller.appendTo(document.body);
-      
+
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
       dismissBtn.style.display = 'block';
-      
+
       // Click dismiss button
       dismissBtn.click();
-      
+
       // Wait for async operations
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       // Main onClick should not be called
       expect(onClick).not.toHaveBeenCalled();
     });
 
     it('does not show dismiss button when no domain provided', async () => {
       vi.useFakeTimers();
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick }); // No domain
       controller.appendTo(document.body);
-      
+
       // Simulate mouseenter
       const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
       controller.element.dispatchEvent(mouseenterEvent);
-      
+
       // Advance timer past HOVER_DELAY_MS
       vi.advanceTimersByTime(600);
-      
+
       // Dismiss button should still be hidden (no domain = no dismiss functionality)
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
       // Check that display is still none (not changed to block)
       expect(dismissBtn.style.display).not.toBe('block');
-      
+
       vi.useRealTimers();
     });
   });
@@ -665,14 +669,14 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       controller.appendTo(document.body);
-      
+
       // Initial opacity (default is medium = 0.5)
       expect(controller.element.style.opacity).toBe('0.5');
-      
+
       // Simulate mouseenter
       const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
       controller.element.dispatchEvent(mouseenterEvent);
-      
+
       // After hover, opacity is set directly via style.opacity
       expect(controller.element.style.opacity).toBe('1');
     });
@@ -681,12 +685,12 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       controller.appendTo(document.body);
-      
+
       // Hover
       const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
       controller.element.dispatchEvent(mouseenterEvent);
       expect(controller.element.style.opacity).toBe('1');
-      
+
       // Leave (should return to default medium = 0.5)
       const mouseleaveEvent = new MouseEvent('mouseleave', { bubbles: true });
       controller.element.dispatchEvent(mouseleaveEvent);
@@ -697,11 +701,11 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       controller.appendTo(document.body);
-      
+
       // Simulate mouseenter
       const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
       controller.element.dispatchEvent(mouseenterEvent);
-      
+
       expect(controller.element.style.transform).toBe('scale(1.05)');
     });
 
@@ -709,11 +713,11 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       controller.appendTo(document.body);
-      
+
       // Simulate mouseenter
       const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
       controller.element.dispatchEvent(mouseenterEvent);
-      
+
       // Light mode hover is #0d9488 - jsdom converts to rgb
       expect(controller.element.style.background).toBe('rgb(13, 148, 136)');
     });
@@ -724,7 +728,7 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'example.com' });
       controller.appendTo(document.body);
-      
+
       // The button element should exist and be properly structured
       expect(controller.element).toBeDefined();
       expect(controller.element.id).toBe('extractmd-floating-button');
@@ -737,15 +741,15 @@ describe('FloatingButton component', () => {
       chrome.storage.local.get = vi.fn((keys, callback) => {
         callback({
           floatingButtonPositions: {
-            'test-domain.com': { left: 30, up: 50 }
-          }
+            'test-domain.com': { left: 30, up: 50 },
+          },
         });
       });
-      
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick, domain: 'test-domain.com' });
       controller.appendTo(document.body);
-      
+
       // Verify storage was called to load the position
       expect(chrome.storage.local.get).toHaveBeenCalled();
       // The button should be created (position is applied via cssText which jsdom may not parse fully)

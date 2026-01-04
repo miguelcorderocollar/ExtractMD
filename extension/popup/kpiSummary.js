@@ -5,22 +5,22 @@
  * @param {Object} stats - Usage stats object
  */
 function renderKpiSummary(stats) {
-    const kpiCounters = document.getElementById('kpi-counters');
-    if (!kpiCounters) return;
-    
-    const youtube = stats.youtube || 0;
-    const articles = stats.articles || 0;
-    const hnComments = stats.hn_comments || 0;
-    const hnNews = stats.hn_news || 0;
-    const universal = stats.universal || 0;
-    const total = youtube + articles + hnComments + hnNews + universal;
-    
-    if (total === 0) {
-        kpiCounters.innerHTML = '<span class="kpi-empty">No extractions yet</span>';
-        return;
-    }
-    
-    kpiCounters.innerHTML = `
+  const kpiCounters = document.getElementById('kpi-counters');
+  if (!kpiCounters) return;
+
+  const youtube = stats.youtube || 0;
+  const articles = stats.articles || 0;
+  const hnComments = stats.hn_comments || 0;
+  const hnNews = stats.hn_news || 0;
+  const universal = stats.universal || 0;
+  const total = youtube + articles + hnComments + hnNews + universal;
+
+  if (total === 0) {
+    kpiCounters.innerHTML = '<span class="kpi-empty">No extractions yet</span>';
+    return;
+  }
+
+  kpiCounters.innerHTML = `
         <span class="kpi-item" title="YouTube transcript copies">
             <span class="kpi-label">YT</span>
             <span class="kpi-value">${youtube}</span>
@@ -48,30 +48,30 @@ function renderKpiSummary(stats) {
  * Load and display KPI counters from storage
  */
 export function loadKpiSummary() {
-    chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
-        const kpiSection = document.getElementById('kpi-section');
-        
-        // Hide section if KPIs are disabled
-        if (kpiSection) {
-            kpiSection.style.display = items.enableUsageKpi === false ? 'none' : 'block';
-        }
-        
-        if (items.enableUsageKpi !== false) {
-            renderKpiSummary(items.usageStats || {});
-        }
-    });
+  chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function (items) {
+    const kpiSection = document.getElementById('kpi-section');
+
+    // Hide section if KPIs are disabled
+    if (kpiSection) {
+      kpiSection.style.display = items.enableUsageKpi === false ? 'none' : 'block';
+    }
+
+    if (items.enableUsageKpi !== false) {
+      renderKpiSummary(items.usageStats || {});
+    }
+  });
 }
 
 /**
  * Initialize KPI summary module
  */
 export function initializeKpiSummary() {
-    loadKpiSummary();
-    
-    // Listen for storage changes to update in real-time
-    chrome.storage.onChanged.addListener((changes, areaName) => {
-        if (areaName === 'sync' && (changes.usageStats || changes.enableUsageKpi)) {
-            loadKpiSummary();
-        }
-    });
+  loadKpiSummary();
+
+  // Listen for storage changes to update in real-time
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'sync' && (changes.usageStats || changes.enableUsageKpi)) {
+      loadKpiSummary();
+    }
+  });
 }

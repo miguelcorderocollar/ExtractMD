@@ -10,12 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2024-12-XX
 
 ### Added
+
 - **YouTube Integration**: Extract video transcripts as Markdown with customizable formatting (timestamps, title, channel, URL)
 - **Hacker News Integration**: Copy news lists or full comment threads as Markdown
 - **Article Extraction**: Convert readable articles to Markdown with optional image support
 - **Universal Extractor**: Fallback HTML-to-Markdown converter for any webpage with configurable content selection
 - **Floating Button Interface**: Visual button with states (idle, loading, success, error) that appears on supported pages
-- **Keyboard Shortcuts**: 
+- **Keyboard Shortcuts**:
   - `Ctrl+Shift+E` (or `Cmd+Shift+E` on Mac) to trigger extraction
   - `Ctrl+Shift+H` (or `Cmd+Shift+H` on Mac) to toggle button visibility for current domain
 - **Smart Auto-Download**: Automatically download content as `.md` file when it exceeds configurable token threshold
@@ -41,11 +42,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Packaging Script**: Automated Chrome Web Store package generation with validation
 
 ### Changed
+
 - Initial release
 
 ### Security
+
 - All processing happens locally in the browser
 - No data collection or external server communication
 - No analytics or tracking
 - Open source codebase for transparency
-

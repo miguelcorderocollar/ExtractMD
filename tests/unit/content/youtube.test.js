@@ -10,19 +10,19 @@ vi.mock('../../../extension/content/utils.js', () => ({
   closeCurrentTab: vi.fn(),
   downloadMarkdownFile: vi.fn(),
   showSuccessNotificationWithTokens: vi.fn(),
-  isFullscreen: vi.fn()
+  isFullscreen: vi.fn(),
 }));
 
 vi.mock('../../../extension/shared/storage.js', () => ({
-  incrementKpi: vi.fn()
+  incrementKpi: vi.fn(),
 }));
 
 vi.mock('../../../extension/content/components/FloatingButton.js', () => ({
-  createFloatingButton: vi.fn()
+  createFloatingButton: vi.fn(),
 }));
 
 vi.mock('gpt-tokenizer', () => ({
-  encode: vi.fn(() => ({ length: 0 }))
+  encode: vi.fn(() => ({ length: 0 })),
 }));
 
 describe('YouTube content script logic', () => {

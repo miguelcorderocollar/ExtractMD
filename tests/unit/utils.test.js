@@ -8,7 +8,7 @@ import {
   setButtonSuccess,
   setButtonError,
   setButtonNormal,
-  isFullscreen
+  isFullscreen,
 } from '../../extension/content/utils.js';
 import { resetMockStorage } from './setup.js';
 
@@ -37,7 +37,7 @@ describe('utils.js', () => {
     it('calls navigator.clipboard.writeText', async () => {
       const mockWriteText = vi.fn().mockResolvedValue();
       Object.assign(navigator, {
-        clipboard: { writeText: mockWriteText }
+        clipboard: { writeText: mockWriteText },
       });
 
       await copyToClipboard('test text', true);
@@ -47,7 +47,7 @@ describe('utils.js', () => {
     it('strips timestamps when includeTimestamps is false', async () => {
       const mockWriteText = vi.fn().mockResolvedValue();
       Object.assign(navigator, {
-        clipboard: { writeText: mockWriteText }
+        clipboard: { writeText: mockWriteText },
       });
 
       // Note: original code leaves a space if it follows the timestamp
@@ -144,13 +144,15 @@ describe('utils.js', () => {
 
     it('detects YouTube theater mode via ytp-size-button class', () => {
       window.location.hostname = 'youtube.com';
-      document.body.innerHTML = '<button class="ytp-size-button" aria-pressed="true" aria-label="Modo cine (t)"></button>';
+      document.body.innerHTML =
+        '<button class="ytp-size-button" aria-pressed="true" aria-label="Modo cine (t)"></button>';
       expect(isFullscreen()).toBe(true);
     });
 
     it('detects YouTube fullscreen mode via ytp-fullscreen-button class', () => {
       window.location.hostname = 'youtube.com';
-      document.body.innerHTML = '<button class="ytp-fullscreen-button" aria-pressed="true" aria-label="Pantalla completa (f)"></button>';
+      document.body.innerHTML =
+        '<button class="ytp-fullscreen-button" aria-pressed="true" aria-label="Pantalla completa (f)"></button>';
       expect(isFullscreen()).toBe(true);
     });
 
@@ -171,4 +173,3 @@ describe('utils.js', () => {
     });
   });
 });
-

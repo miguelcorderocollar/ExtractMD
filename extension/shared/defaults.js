@@ -7,14 +7,14 @@ export const DEFAULTS = {
   addTitleToTranscript: true,
   addChannelToTranscript: true,
   addUrlToTranscript: true,
-  
+
   // HN Comments
   hnIncludeAuthor: true,
   hnIncludeTime: true,
   hnIncludeReplies: true,
   hnIncludeUrl: true,
   hnIncludeItemText: true,
-  
+
   // HN News
   hnNewsIncludeTitle: true,
   hnNewsIncludeUrl: true,
@@ -23,13 +23,13 @@ export const DEFAULTS = {
   hnNewsIncludeAuthor: true,
   hnNewsIncludeTime: true,
   hnNewsIncludeComments: true,
-  
+
   // Articles
   articleExporterIncludeImages: true,
   articleExporterOnlyLongest: false,
   articleExporterShowInfo: true,
   articleExporterIncludeUrl: true,
-  
+
   // General
   jumpToDomain: false,
   jumpToDomainUrl: 'https://chat.openai.com/',
@@ -39,27 +39,27 @@ export const DEFAULTS = {
   downloadIfTokensExceed: 0,
   showTokenCountInNotification: false,
   ignoredDomains: '',
-  
+
   // Integration toggles
   enableYouTubeIntegration: true,
   enableHackerNewsIntegration: true,
   enableArticleIntegration: true,
   enableUniversalIntegration: true,
-  
+
   // Universal (HTML-to-MD fallback)
   universalIncludeImages: true,
   universalIncludeLinks: true,
   universalIncludeUrl: true,
-  universalContentMode: 'auto',  // 'auto' | 'full' | 'main' | 'selector'
+  universalContentMode: 'auto', // 'auto' | 'full' | 'main' | 'selector'
   universalCustomSelector: '',
   universalStripNav: true,
   universalPreserveCodeBlocks: true,
-  
+
   // Floating button behavior
   floatingButtonEnableDrag: true,
   floatingButtonEnableDismiss: true,
-  floatingButtonSize: 'medium',  // 'small' | 'medium' | 'large'
-  floatingButtonTransparency: 'medium'  // 'low' | 'medium' | 'high' | 'full'
+  floatingButtonSize: 'medium', // 'small' | 'medium' | 'large'
+  floatingButtonTransparency: 'medium', // 'low' | 'medium' | 'high' | 'full'
 };
 
 // Schema for validation during import
@@ -106,6 +106,5 @@ export const SETTING_SCHEMA = {
   floatingButtonEnableDrag: 'boolean',
   floatingButtonEnableDismiss: 'boolean',
   floatingButtonSize: 'string',
-  floatingButtonTransparency: 'string'
+  floatingButtonTransparency: 'string',
 };
-

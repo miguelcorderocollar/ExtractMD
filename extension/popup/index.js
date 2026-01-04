@@ -13,10 +13,10 @@ export { saveSetting } from '../shared/storage.js';
 /**
  * Initialize all popup modules when DOM is ready
  */
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all modules
-    initializeQuickActions();
-    initializeDomainToggle();
-    initializeLastExtraction();
-    initializeKpiSummary();
+document.addEventListener('DOMContentLoaded', function () {
+  // Initialize all modules
+  initializeQuickActions();
+  initializeDomainToggle();
+  initializeLastExtraction();
+  initializeKpiSummary();
 });

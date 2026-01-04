@@ -3,15 +3,8 @@
   "name": "ExtractMD",
   "version": "1.0",
   "description": "Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles.",
-  "permissions": [
-    "activeTab",
-    "storage",
-    "clipboardWrite",
-    "scripting"
-  ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
+  "permissions": ["activeTab", "storage", "clipboardWrite", "scripting"],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
   },
@@ -57,4 +50,4 @@
     "open_in_tab": true
   },
   "homepage_url": "https://extractmd.miguelcorderocollar.com/"
-} 
+}

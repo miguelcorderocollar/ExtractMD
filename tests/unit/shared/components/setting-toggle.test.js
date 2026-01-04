@@ -25,7 +25,7 @@ describe('SettingToggle Web Component', () => {
         description="Test description">
       </setting-toggle>
     `;
-    
+
     const toggle = container.querySelector('setting-toggle');
     expect(toggle.querySelector('.setting-label').textContent).toBe('Test Label');
     expect(toggle.querySelector('.setting-desc').textContent).toBe('Test description');
@@ -35,7 +35,7 @@ describe('SettingToggle Web Component', () => {
     container.innerHTML = `
       <setting-toggle setting-id="mySetting" label="My Setting"></setting-toggle>
     `;
-    
+
     const toggle = container.querySelector('setting-toggle');
     const input = toggle.querySelector('input[type="checkbox"]');
     expect(input).not.toBeNull();
@@ -46,7 +46,7 @@ describe('SettingToggle Web Component', () => {
     container.innerHTML = `
       <setting-toggle setting-id="testSetting" label="Test" checked></setting-toggle>
     `;
-    
+
     const toggle = container.querySelector('setting-toggle');
     expect(toggle.checked).toBe(true);
     expect(toggle.querySelector('input').checked).toBe(true);
@@ -56,7 +56,7 @@ describe('SettingToggle Web Component', () => {
     container.innerHTML = `
       <setting-toggle setting-id="testSetting" label="Test"></setting-toggle>
     `;
-    
+
     const toggle = container.querySelector('setting-toggle');
     expect(toggle.checked).toBe(false);
     expect(toggle.querySelector('input').checked).toBe(false);
@@ -66,10 +66,10 @@ describe('SettingToggle Web Component', () => {
     container.innerHTML = `
       <setting-toggle setting-id="testSetting" label="Test"></setting-toggle>
     `;
-    
+
     const toggle = container.querySelector('setting-toggle');
     toggle.checked = true;
-    
+
     expect(toggle.hasAttribute('checked')).toBe(true);
     expect(toggle.querySelector('input').checked).toBe(true);
   });
@@ -78,19 +78,19 @@ describe('SettingToggle Web Component', () => {
     container.innerHTML = `
       <setting-toggle setting-id="testSetting" label="Test"></setting-toggle>
     `;
-    
+
     const toggle = container.querySelector('setting-toggle');
     const input = toggle.querySelector('input');
-    
-    const eventPromise = new Promise(resolve => {
+
+    const eventPromise = new Promise((resolve) => {
       toggle.addEventListener('change', (e) => {
         resolve(e.detail);
       });
     });
-    
+
     input.checked = true;
     input.dispatchEvent(new Event('change', { bubbles: true }));
-    
+
     const eventDetail = await eventPromise;
     expect(eventDetail.settingId).toBe('testSetting');
     expect(eventDetail.checked).toBe(true);
@@ -100,7 +100,7 @@ describe('SettingToggle Web Component', () => {
     container.innerHTML = `
       <setting-toggle setting-id="customId" label="Test"></setting-toggle>
     `;
-    
+
     const toggle = container.querySelector('setting-toggle');
     expect(toggle.settingId).toBe('customId');
   });
@@ -109,10 +109,10 @@ describe('SettingToggle Web Component', () => {
     container.innerHTML = `
       <setting-toggle setting-id="testSetting" label="Test"></setting-toggle>
     `;
-    
+
     const toggle = container.querySelector('setting-toggle');
     const input = toggle.getInput();
-    
+
     expect(input).not.toBeNull();
     expect(input.tagName).toBe('INPUT');
     expect(input.type).toBe('checkbox');
@@ -122,7 +122,7 @@ describe('SettingToggle Web Component', () => {
     container.innerHTML = `
       <setting-toggle setting-id="testSetting" label="Test" disabled></setting-toggle>
     `;
-    
+
     const toggle = container.querySelector('setting-toggle');
     expect(toggle.disabled).toBe(true);
     expect(toggle.querySelector('input').disabled).toBe(true);
@@ -132,7 +132,7 @@ describe('SettingToggle Web Component', () => {
     container.innerHTML = `
       <setting-toggle setting-id="testSetting" label="Test Only"></setting-toggle>
     `;
-    
+
     const toggle = container.querySelector('setting-toggle');
     expect(toggle.querySelector('.setting-label').textContent).toBe('Test Only');
     expect(toggle.querySelector('.setting-desc')).toBeNull();

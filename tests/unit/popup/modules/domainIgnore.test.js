@@ -42,4 +42,3 @@ describe('popup/domainIgnore module', () => {
     });
   });
 });
-

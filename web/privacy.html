@@ -1,311 +1,389 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Privacy Policy - ExtractMD</title>
-    <meta name="description" content="ExtractMD Privacy Policy. Learn how we handle your data - spoiler: we don't collect any.">
-    <meta name="author" content="ExtractMD">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="format-detection" content="telephone=no">
-    
+    <meta
+      name="description"
+      content="ExtractMD Privacy Policy. Learn how we handle your data - spoiler: we don't collect any."
+    />
+    <meta name="author" content="ExtractMD" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="format-detection" content="telephone=no" />
+
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://extractmd.miguelcorderocollar.com/privacy">
-    
+    <link rel="canonical" href="https://extractmd.miguelcorderocollar.com/privacy" />
+
     <!-- Open Graph -->
-    <meta property="og:title" content="Privacy Policy - ExtractMD">
-    <meta property="og:description" content="ExtractMD Privacy Policy. Your data stays in your browser.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://extractmd.miguelcorderocollar.com/privacy">
-    <meta property="og:image" content="https://extractmd.miguelcorderocollar.com/images/promotional-banner.png">
-    <meta property="og:site_name" content="ExtractMD">
-    <meta property="og:locale" content="en_US">
-    
+    <meta property="og:title" content="Privacy Policy - ExtractMD" />
+    <meta
+      property="og:description"
+      content="ExtractMD Privacy Policy. Your data stays in your browser."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://extractmd.miguelcorderocollar.com/privacy" />
+    <meta
+      property="og:image"
+      content="https://extractmd.miguelcorderocollar.com/images/promotional-banner.png"
+    />
+    <meta property="og:site_name" content="ExtractMD" />
+    <meta property="og:locale" content="en_US" />
+
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Privacy Policy - ExtractMD">
-    <meta name="twitter:description" content="ExtractMD Privacy Policy. Your data stays in your browser.">
-    
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Privacy Policy - ExtractMD" />
+    <meta
+      name="twitter:description"
+      content="ExtractMD Privacy Policy. Your data stays in your browser."
+    />
+
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="128x128" href="favicon.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="favicon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
-    <link rel="manifest" href="manifest.json">
-    
-    <link rel="stylesheet" href="styles.css">
-    
+    <link rel="icon" type="image/png" sizes="128x128" href="favicon.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon.png" />
+    <link rel="manifest" href="manifest.json" />
+
+    <link rel="stylesheet" href="styles.css" />
+
     <!-- Theme initialization (prevents flash) -->
     <script>
-        (function() {
-            const saved = localStorage.getItem('theme');
-            if (saved) {
-                document.documentElement.setAttribute('data-theme', saved);
-            }
-        })();
+      (function () {
+        const saved = localStorage.getItem('theme');
+        if (saved) {
+          document.documentElement.setAttribute('data-theme', saved);
+        }
+      })();
     </script>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Header -->
     <header class="site-header">
-        <div class="container">
-            <nav class="nav">
-                <a href="/" class="logo">
-                    <img src="favicon.png" alt="ExtractMD" class="logo-icon">
-                    ExtractMD
-                </a>
-                <div class="nav-links">
-                    <a href="/#features" class="nav-link nav-link-text">Features</a>
-                    <a href="privacy" class="nav-link nav-link-text">Privacy</a>
-                    <a href="https://github.com/miguelcorderocollar/yt-transcript-extension" class="nav-link nav-link-github" target="_blank" rel="noopener">
-                        <span class="nav-link-text">GitHub</span>
-                        <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                        </svg>
-                    </a>
-                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-                        <!-- Sun icon (shown in dark mode) - Source: extension/images/icons/sun.svg -->
-                        <svg class="icon-sun" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="5"/>
-                            <line x1="12" y1="1" x2="12" y2="3"/>
-                            <line x1="12" y1="21" x2="12" y2="23"/>
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                            <line x1="1" y1="12" x2="3" y2="12"/>
-                            <line x1="21" y1="12" x2="23" y2="12"/>
-                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                        </svg>
-                        <!-- Moon icon (shown in light mode) - Source: extension/images/icons/moon.svg -->
-                        <svg class="icon-moon" viewBox="0 0 24 24">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                        </svg>
-                    </button>
-                </div>
-            </nav>
-        </div>
+      <div class="container">
+        <nav class="nav">
+          <a href="/" class="logo">
+            <img src="favicon.png" alt="ExtractMD" class="logo-icon" />
+            ExtractMD
+          </a>
+          <div class="nav-links">
+            <a href="/#features" class="nav-link nav-link-text">Features</a>
+            <a href="privacy" class="nav-link nav-link-text">Privacy</a>
+            <a
+              href="https://github.com/miguelcorderocollar/yt-transcript-extension"
+              class="nav-link nav-link-github"
+              target="_blank"
+              rel="noopener"
+            >
+              <span class="nav-link-text">GitHub</span>
+              <svg
+                class="nav-link-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                />
+              </svg>
+            </a>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+              <!-- Sun icon (shown in dark mode) - Source: extension/images/icons/sun.svg -->
+              <svg class="icon-sun" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+              <!-- Moon icon (shown in light mode) - Source: extension/images/icons/moon.svg -->
+              <svg class="icon-moon" viewBox="0 0 24 24">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            </button>
+          </div>
+        </nav>
+      </div>
     </header>
 
     <!-- Privacy Policy Content -->
     <main class="privacy-page">
-        <div class="container">
-            <div class="privacy-content">
-                <h1>Privacy Policy</h1>
-                <p class="privacy-meta">
-                    <strong>Effective Date:</strong> January 2026<br>
-                    <strong>Last Updated:</strong> January 2026
-                </p>
+      <div class="container">
+        <div class="privacy-content">
+          <h1>Privacy Policy</h1>
+          <p class="privacy-meta">
+            <strong>Effective Date:</strong> January 2026<br />
+            <strong>Last Updated:</strong> January 2026
+          </p>
 
-                <h2>Overview</h2>
-                <p>
-                    ExtractMD is a Chrome browser extension that extracts and copies content as Markdown from web pages including YouTube, Hacker News, and general articles. This privacy policy explains how ExtractMD handles user data.
-                </p>
+          <h2>Overview</h2>
+          <p>
+            ExtractMD is a Chrome browser extension that extracts and copies content as Markdown
+            from web pages including YouTube, Hacker News, and general articles. This privacy policy
+            explains how ExtractMD handles user data.
+          </p>
 
-                <h2>Data Collection</h2>
-                <p><strong>ExtractMD does NOT collect, transmit, or share any personal data.</strong></p>
+          <h2>Data Collection</h2>
+          <p><strong>ExtractMD does NOT collect, transmit, or share any personal data.</strong></p>
 
-                <h3>What We Don't Do</h3>
-                <ul class="no-collect-list">
-                    <li>We do NOT send any data to external servers</li>
-                    <li>We do NOT collect personal information</li>
-                    <li>We do NOT use analytics or tracking services</li>
-                    <li>We do NOT share data with third parties</li>
-                    <li>We do NOT monitor your browsing activity</li>
-                </ul>
+          <h3>What We Don't Do</h3>
+          <ul class="no-collect-list">
+            <li>We do NOT send any data to external servers</li>
+            <li>We do NOT collect personal information</li>
+            <li>We do NOT use analytics or tracking services</li>
+            <li>We do NOT share data with third parties</li>
+            <li>We do NOT monitor your browsing activity</li>
+          </ul>
 
-                <h3>What We Do Store Locally</h3>
-                <p>ExtractMD stores the following data <strong>locally in your browser only</strong>:</p>
+          <h3>What We Do Store Locally</h3>
+          <p>ExtractMD stores the following data <strong>locally in your browser only</strong>:</p>
 
-                <ul class="do-store-list">
-                    <li>
-                        <strong>User Preferences & Settings</strong><br>
-                        Theme preferences (light/dark mode), integration visibility settings (YouTube, Hacker News, Articles, Universal), output format preferences, floating button position and behavior, ignored domains list.
-                    </li>
-                    <li>
-                        <strong>Usage Statistics (KPIs)</strong><br>
-                        Number of extractions performed (by type), token counts for extracted content, last extraction timestamp. These statistics are stored locally and are never transmitted.
-                    </li>
-                </ul>
+          <ul class="do-store-list">
+            <li>
+              <strong>User Preferences & Settings</strong><br />
+              Theme preferences (light/dark mode), integration visibility settings (YouTube, Hacker
+              News, Articles, Universal), output format preferences, floating button position and
+              behavior, ignored domains list.
+            </li>
+            <li>
+              <strong>Usage Statistics (KPIs)</strong><br />
+              Number of extractions performed (by type), token counts for extracted content, last
+              extraction timestamp. These statistics are stored locally and are never transmitted.
+            </li>
+          </ul>
 
-                <p>
-                    All data is stored using Chrome's built-in <code>chrome.storage.sync</code> API, which means:
-                </p>
-                <ul>
-                    <li>Data stays on your device or syncs to your personal Chrome account</li>
-                    <li>Data is encrypted in transit when syncing between your devices</li>
-                    <li>Only you have access to your data</li>
-                </ul>
+          <p>
+            All data is stored using Chrome's built-in <code>chrome.storage.sync</code> API, which
+            means:
+          </p>
+          <ul>
+            <li>Data stays on your device or syncs to your personal Chrome account</li>
+            <li>Data is encrypted in transit when syncing between your devices</li>
+            <li>Only you have access to your data</li>
+          </ul>
 
-                <h2>How Content Extraction Works</h2>
-                <p>When you use ExtractMD to extract content:</p>
-                <ol>
-                    <li>The extension reads the visible content of the current web page</li>
-                    <li>Content is processed entirely within your browser</li>
-                    <li>Extracted Markdown is copied to your clipboard</li>
-                    <li><strong>No content is ever sent to external servers</strong></li>
-                </ol>
+          <h2>How Content Extraction Works</h2>
+          <p>When you use ExtractMD to extract content:</p>
+          <ol>
+            <li>The extension reads the visible content of the current web page</li>
+            <li>Content is processed entirely within your browser</li>
+            <li>Extracted Markdown is copied to your clipboard</li>
+            <li><strong>No content is ever sent to external servers</strong></li>
+          </ol>
 
-                <h2>Permissions Explained</h2>
-                <p>ExtractMD requests the following permissions:</p>
+          <h2>Permissions Explained</h2>
+          <p>ExtractMD requests the following permissions:</p>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Permission</th>
-                            <th>Purpose</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>activeTab</code></td>
-                            <td>Access the current tab's content when you request extraction</td>
-                        </tr>
-                        <tr>
-                            <td><code>storage</code></td>
-                            <td>Save your preferences and settings locally</td>
-                        </tr>
-                        <tr>
-                            <td><code>clipboardWrite</code></td>
-                            <td>Copy extracted Markdown to your clipboard</td>
-                        </tr>
-                        <tr>
-                            <td><code>scripting</code></td>
-                            <td>Inject the extraction functionality into web pages</td>
-                        </tr>
-                        <tr>
-                            <td><code>&lt;all_urls&gt;</code></td>
-                            <td>Enable the Universal Article Extractor to work on any website</td>
-                        </tr>
-                    </tbody>
-                </table>
+          <table>
+            <thead>
+              <tr>
+                <th>Permission</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>activeTab</code></td>
+                <td>Access the current tab's content when you request extraction</td>
+              </tr>
+              <tr>
+                <td><code>storage</code></td>
+                <td>Save your preferences and settings locally</td>
+              </tr>
+              <tr>
+                <td><code>clipboardWrite</code></td>
+                <td>Copy extracted Markdown to your clipboard</td>
+              </tr>
+              <tr>
+                <td><code>scripting</code></td>
+                <td>Inject the extraction functionality into web pages</td>
+              </tr>
+              <tr>
+                <td><code>&lt;all_urls&gt;</code></td>
+                <td>Enable the Universal Article Extractor to work on any website</td>
+              </tr>
+            </tbody>
+          </table>
 
-                <h3>Why <code>&lt;all_urls&gt;</code> Permission?</h3>
-                <p>
-                    ExtractMD includes a Universal Article Extractor that allows you to extract Markdown from <strong>any webpage</strong>, not just YouTube and Hacker News. This enables extraction from:
-                </p>
-                <ul>
-                    <li>Blog posts</li>
-                    <li>Documentation sites</li>
-                    <li>News articles</li>
-                    <li>Any other web content</li>
-                </ul>
-                <p>
-                    The extension only processes content when you explicitly request extraction. It does not automatically access, monitor, or collect any browsing data.
-                </p>
+          <h3>Why <code>&lt;all_urls&gt;</code> Permission?</h3>
+          <p>
+            ExtractMD includes a Universal Article Extractor that allows you to extract Markdown
+            from <strong>any webpage</strong>, not just YouTube and Hacker News. This enables
+            extraction from:
+          </p>
+          <ul>
+            <li>Blog posts</li>
+            <li>Documentation sites</li>
+            <li>News articles</li>
+            <li>Any other web content</li>
+          </ul>
+          <p>
+            The extension only processes content when you explicitly request extraction. It does not
+            automatically access, monitor, or collect any browsing data.
+          </p>
 
-                <h2>Data Retention</h2>
-                <ul>
-                    <li><strong>Settings:</strong> Stored until you uninstall the extension or clear browser data</li>
-                    <li><strong>Usage Statistics:</strong> Stored locally until you reset them via the extension popup</li>
-                    <li><strong>Extracted Content:</strong> Only exists in your clipboard; not stored by the extension</li>
-                </ul>
+          <h2>Data Retention</h2>
+          <ul>
+            <li>
+              <strong>Settings:</strong> Stored until you uninstall the extension or clear browser
+              data
+            </li>
+            <li>
+              <strong>Usage Statistics:</strong> Stored locally until you reset them via the
+              extension popup
+            </li>
+            <li>
+              <strong>Extracted Content:</strong> Only exists in your clipboard; not stored by the
+              extension
+            </li>
+          </ul>
 
-                <h2>Your Rights</h2>
-                <p>You have full control over your data:</p>
-                <ul>
-                    <li><strong>Export Settings:</strong> Use the Import/Export feature in the extension options</li>
-                    <li><strong>Clear Statistics:</strong> Reset usage statistics from the extension popup</li>
-                    <li><strong>Delete All Data:</strong> Uninstall the extension to remove all stored data</li>
-                    <li><strong>View Data:</strong> All settings are visible in the extension options page</li>
-                </ul>
+          <h2>Your Rights</h2>
+          <p>You have full control over your data:</p>
+          <ul>
+            <li>
+              <strong>Export Settings:</strong> Use the Import/Export feature in the extension
+              options
+            </li>
+            <li>
+              <strong>Clear Statistics:</strong> Reset usage statistics from the extension popup
+            </li>
+            <li>
+              <strong>Delete All Data:</strong> Uninstall the extension to remove all stored data
+            </li>
+            <li>
+              <strong>View Data:</strong> All settings are visible in the extension options page
+            </li>
+          </ul>
 
-                <h2>Data Security</h2>
-                <ul>
-                    <li>All data processing happens locally in your browser</li>
-                    <li>No data is transmitted over the internet (except Chrome's built-in sync)</li>
-                    <li>No external servers or databases are used</li>
-                    <li>The extension source code is open for review</li>
-                </ul>
+          <h2>Data Security</h2>
+          <ul>
+            <li>All data processing happens locally in your browser</li>
+            <li>No data is transmitted over the internet (except Chrome's built-in sync)</li>
+            <li>No external servers or databases are used</li>
+            <li>The extension source code is open for review</li>
+          </ul>
 
-                <h2>Children's Privacy</h2>
-                <p>
-                    ExtractMD does not knowingly collect any personal information from children under 13 years of age. The extension does not collect personal information from any users.
-                </p>
+          <h2>Children's Privacy</h2>
+          <p>
+            ExtractMD does not knowingly collect any personal information from children under 13
+            years of age. The extension does not collect personal information from any users.
+          </p>
 
-                <h2>Changes to This Policy</h2>
-                <p>
-                    If we make changes to this privacy policy, we will update the "Last Updated" date at the top of this document. Continued use of ExtractMD after changes constitutes acceptance of the updated policy.
-                </p>
+          <h2>Changes to This Policy</h2>
+          <p>
+            If we make changes to this privacy policy, we will update the "Last Updated" date at the
+            top of this document. Continued use of ExtractMD after changes constitutes acceptance of
+            the updated policy.
+          </p>
 
-                <h2>Open Source</h2>
-                <p>
-                    ExtractMD is open source. You can review the complete source code to verify our privacy practices:
-                </p>
-                <p>
-                    <a href="https://github.com/miguelcorderocollar/yt-transcript-extension" target="_blank" rel="noopener">
-                        GitHub - ExtractMD Repository
-                    </a>
-                </p>
+          <h2>Open Source</h2>
+          <p>
+            ExtractMD is open source. You can review the complete source code to verify our privacy
+            practices:
+          </p>
+          <p>
+            <a
+              href="https://github.com/miguelcorderocollar/yt-transcript-extension"
+              target="_blank"
+              rel="noopener"
+            >
+              GitHub - ExtractMD Repository
+            </a>
+          </p>
 
-                <h2>Contact</h2>
-                <p>
-                    If you have questions about this privacy policy or ExtractMD's data practices, please contact us:
-                </p>
-                <p>
-                    <a href="https://github.com/miguelcorderocollar/yt-transcript-extension/issues" target="_blank" rel="noopener">
-                        Open an Issue on GitHub
-                    </a>
-                </p>
+          <h2>Contact</h2>
+          <p>
+            If you have questions about this privacy policy or ExtractMD's data practices, please
+            contact us:
+          </p>
+          <p>
+            <a
+              href="https://github.com/miguelcorderocollar/yt-transcript-extension/issues"
+              target="_blank"
+              rel="noopener"
+            >
+              Open an Issue on GitHub
+            </a>
+          </p>
 
-                <hr style="margin: 48px 0 24px; border: none; border-top: 1px solid var(--border);">
+          <hr style="margin: 48px 0 24px; border: none; border-top: 1px solid var(--border)" />
 
-                <p style="font-size: 14px; color: var(--text-muted); text-align: center;">
-                    <strong>Summary:</strong> ExtractMD processes content entirely in your browser. No personal data is collected, transmitted, or shared. Your settings and usage statistics are stored locally and are fully under your control.
-                </p>
-            </div>
+          <p style="font-size: 14px; color: var(--text-muted); text-align: center">
+            <strong>Summary:</strong> ExtractMD processes content entirely in your browser. No
+            personal data is collected, transmitted, or shared. Your settings and usage statistics
+            are stored locally and are fully under your control.
+          </p>
         </div>
+      </div>
     </main>
 
     <!-- Footer -->
     <footer class="site-footer">
-        <div class="container">
-            <div class="footer-content">
-                <span class="footer-logo">ExtractMD</span>
-                <div class="footer-links">
-                    <a href="privacy" class="footer-link">Privacy Policy</a>
-                    <a href="https://github.com/miguelcorderocollar/yt-transcript-extension" class="footer-link" target="_blank" rel="noopener">GitHub</a>
-                    <a href="https://github.com/miguelcorderocollar/yt-transcript-extension/issues" class="footer-link" target="_blank" rel="noopener">Support</a>
-                </div>
-            </div>
-            <p class="footer-copy">
-                &copy; 2026 ExtractMD. Open source under MIT License.
-            </p>
+      <div class="container">
+        <div class="footer-content">
+          <span class="footer-logo">ExtractMD</span>
+          <div class="footer-links">
+            <a href="privacy" class="footer-link">Privacy Policy</a>
+            <a
+              href="https://github.com/miguelcorderocollar/yt-transcript-extension"
+              class="footer-link"
+              target="_blank"
+              rel="noopener"
+              >GitHub</a
+            >
+            <a
+              href="https://github.com/miguelcorderocollar/yt-transcript-extension/issues"
+              class="footer-link"
+              target="_blank"
+              rel="noopener"
+              >Support</a
+            >
+          </div>
         </div>
+        <p class="footer-copy">&copy; 2026 ExtractMD. Open source under MIT License.</p>
+      </div>
     </footer>
 
     <!-- Theme Toggle Script -->
     <script>
-        (function() {
-            const toggle = document.getElementById('theme-toggle');
-            if (!toggle) return;
+      (function () {
+        const toggle = document.getElementById('theme-toggle');
+        if (!toggle) return;
 
-            // Get current effective theme
-            function getEffectiveTheme() {
-                const saved = localStorage.getItem('theme');
-                if (saved) return saved;
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
+        // Get current effective theme
+        function getEffectiveTheme() {
+          const saved = localStorage.getItem('theme');
+          if (saved) return saved;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
 
-            // Toggle theme
-            toggle.addEventListener('click', function() {
-                const current = getEffectiveTheme();
-                const next = current === 'dark' ? 'light' : 'dark';
-                
-                document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem('theme', next);
-            });
+        // Toggle theme
+        toggle.addEventListener('click', function () {
+          const current = getEffectiveTheme();
+          const next = current === 'dark' ? 'light' : 'dark';
 
-            // Listen for system theme changes (only if no manual preference)
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-                if (!localStorage.getItem('theme')) {
-                    // No manual preference, let CSS handle it
-                    document.documentElement.removeAttribute('data-theme');
-                }
-            });
-        })();
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('theme', next);
+        });
+
+        // Listen for system theme changes (only if no manual preference)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+          if (!localStorage.getItem('theme')) {
+            // No manual preference, let CSS handle it
+            document.documentElement.removeAttribute('data-theme');
+          }
+        });
+      })();
     </script>
-</body>
+  </body>
 </html>
-

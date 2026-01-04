@@ -1,12 +1,12 @@
 /**
  * ExtractMD Web Components
- * 
+ *
  * Reusable custom elements for the popup and options pages.
  * Import this file to register all components.
- * 
+ *
  * @example
  * import '../shared/components/index.js';
- * 
+ *
  * // Now you can use:
  * // <setting-toggle>
  * // <setting-select>
@@ -21,4 +21,3 @@ export { SettingGroup } from './setting-group.js';
 
 // Components are self-registering when imported
 // This file just serves as a convenient entry point
-

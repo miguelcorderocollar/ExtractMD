@@ -1,55 +1,48 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Test HN Item Page</title>
-</head>
-<body>
+  </head>
+  <body>
     <table class="fatitem">
-        <tr class="athing">
-            <td class="title">
-                <span class="titleline">
-                    <a href="https://example.com/article">Test Article Title</a>
-                </span>
-            </td>
-        </tr>
-        <tr>
-            <td class="subtext">
-                <span class="hnuser">testuser</span>
-                <span class="age"><a>2 hours ago</a></span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="toptext">
-                    This is the main post content that should be extracted.
-                </div>
-            </td>
-        </tr>
+      <tr class="athing">
+        <td class="title">
+          <span class="titleline">
+            <a href="https://example.com/article">Test Article Title</a>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="subtext">
+          <span class="hnuser">testuser</span>
+          <span class="age"><a>2 hours ago</a></span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="toptext">This is the main post content that should be extracted.</div>
+        </td>
+      </tr>
     </table>
-    
+
     <!-- Comments -->
     <tr class="athing comtr" id="comment1">
-        <td class="ind"><img width="0"></td>
-        <td>
-            <div class="commtext">
-                This is the first comment.
-            </div>
-            <span class="hnuser">commenter1</span>
-            <span class="age"><a>1 hour ago</a></span>
-        </td>
+      <td class="ind"><img width="0" /></td>
+      <td>
+        <div class="commtext">This is the first comment.</div>
+        <span class="hnuser">commenter1</span>
+        <span class="age"><a>1 hour ago</a></span>
+      </td>
     </tr>
-    
-    <tr class="athing comtr" id="comment2">
-        <td class="ind"><img width="40"></td>
-        <td>
-            <div class="commtext">
-                This is a reply to the first comment.
-            </div>
-            <span class="hnuser">commenter2</span>
-            <span class="age"><a>30 minutes ago</a></span>
-        </td>
-    </tr>
-</body>
-</html>
 
+    <tr class="athing comtr" id="comment2">
+      <td class="ind"><img width="40" /></td>
+      <td>
+        <div class="commtext">This is a reply to the first comment.</div>
+        <span class="hnuser">commenter2</span>
+        <span class="age"><a>30 minutes ago</a></span>
+      </td>
+    </tr>
+  </body>
+</html>

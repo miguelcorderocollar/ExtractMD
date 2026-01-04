@@ -17,7 +17,12 @@
     "build:prod": "node build.js --production",
     "build:web": "node scripts/minify-css.js",
     "watch": "node scripts/watch.js",
-    "package": "node scripts/package.js"
+    "package": "node scripts/package.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -31,15 +36,25 @@
   },
   "homepage": "https://extractmd.miguelcorderocollar.com/",
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.57.0",
     "@vitest/coverage-v8": "^4.0.16",
     "esbuild": "^0.25.5",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.0.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.4.0",
+    "lint-staged": "^16.2.7",
     "playwright": "^1.57.0",
+    "prettier": "^3.7.4",
     "vitest": "^4.0.16"
   },
   "dependencies": {
     "gpt-tokenizer": "^3.0.1",
     "turndown": "^7.2.2"
+  },
+  "lint-staged": {
+    "*.{js,css,md,html}": "prettier --write"
   }
 }

@@ -10,7 +10,7 @@ import { DEFAULTS } from './defaults.js';
  */
 export function getSettings(keys = null) {
   const toGet = keys ? pick(DEFAULTS, keys) : DEFAULTS;
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     chrome.storage.sync.get(toGet, resolve);
   });
 }
@@ -26,9 +26,11 @@ export function saveSetting(key, value) {
   const onComplete = () => {
     // Dispatch event for UI feedback (options page listens for this)
     if (typeof document !== 'undefined') {
-      document.dispatchEvent(new CustomEvent('extractmd-setting-saved', { 
-        detail: { key, value } 
-      }));
+      document.dispatchEvent(
+        new CustomEvent('extractmd-setting-saved', {
+          detail: { key, value },
+        })
+      );
     }
   };
 
@@ -51,8 +53,8 @@ export function saveSetting(key, value) {
  * @param {string} type - KPI type (youtube, articles, hn_comments, hn_news)
  */
 export async function incrementKpi(type) {
-  return new Promise(resolve => {
-    chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function(items) {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get({ usageStats: {}, enableUsageKpi: true }, function (items) {
       if (items.enableUsageKpi !== false) {
         const stats = items.usageStats || {};
         stats[type] = (stats[type] || 0) + 1;
@@ -78,4 +80,3 @@ function pick(obj, keys) {
   }
   return result;
 }
-

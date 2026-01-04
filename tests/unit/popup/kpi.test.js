@@ -3,17 +3,17 @@ import { describe, it, expect } from 'vitest';
 describe('KPI functions', () => {
   function formatTimeSaved(totalSeconds) {
     if (totalSeconds < 60) return `${totalSeconds}s`;
-    
+
     const minutes = totalSeconds / 60;
     if (minutes < 60) {
       return `${Math.round(minutes)}m`;
     }
-    
+
     const hours = minutes / 60;
     if (hours < 24) {
       return `${hours.toFixed(1).replace('.0', '')}h`;
     }
-    
+
     const days = hours / 24;
     return `${days.toFixed(1).replace('.0', '')}d`;
   }
@@ -48,30 +48,29 @@ describe('KPI functions', () => {
       youtube: 60,
       articles: 30,
       hn_comments: 40,
-      hn_news: 20
+      hn_news: 20,
     };
 
     it('calculates correct totals', () => {
       const stats = { youtube: 1, articles: 1, hn_comments: 1, hn_news: 1 };
-      const total = 
+      const total =
         (stats.youtube || 0) * estimates.youtube +
         (stats.articles || 0) * estimates.articles +
         (stats.hn_comments || 0) * estimates.hn_comments +
         (stats.hn_news || 0) * estimates.hn_news;
-      
+
       expect(total).toBe(150); // 60+30+40+20
     });
 
     it('handles missing stats', () => {
       const stats = { youtube: 5 };
-      const total = 
+      const total =
         (stats.youtube || 0) * estimates.youtube +
         (stats.articles || 0) * estimates.articles +
         (stats.hn_comments || 0) * estimates.hn_comments +
         (stats.hn_news || 0) * estimates.hn_news;
-      
+
       expect(total).toBe(300); // 5*60
     });
   });
 });
-

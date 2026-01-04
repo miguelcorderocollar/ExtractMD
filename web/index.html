@@ -1,470 +1,584 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ExtractMD - Convert Any Webpage to Markdown</title>
-    <meta name="description" content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube transcripts, Hacker News, and articles.">
-    <meta name="keywords" content="markdown, chrome extension, youtube transcript, hacker news, article extractor, clipboard">
-    <meta name="author" content="ExtractMD">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="format-detection" content="telephone=no">
-    
+    <meta
+      name="description"
+      content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube transcripts, Hacker News, and articles."
+    />
+    <meta
+      name="keywords"
+      content="markdown, chrome extension, youtube transcript, hacker news, article extractor, clipboard"
+    />
+    <meta name="author" content="ExtractMD" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="format-detection" content="telephone=no" />
+
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://extractmd.miguelcorderocollar.com/">
-    
+    <link rel="canonical" href="https://extractmd.miguelcorderocollar.com/" />
+
     <!-- Resource Hints -->
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="favicon.png" as="image" type="image/png">
-    <link rel="preload" href="styles.css" as="style">
-    
+    <link rel="preload" href="favicon.png" as="image" type="image/png" />
+    <link rel="preload" href="styles.css" as="style" />
+
     <!-- Open Graph -->
-    <meta property="og:title" content="ExtractMD - Convert Any Webpage to Markdown">
-    <meta property="og:description" content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://extractmd.miguelcorderocollar.com">
-    <meta property="og:image" content="https://extractmd.miguelcorderocollar.com/images/promotional-banner.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="ExtractMD">
-    <meta property="og:locale" content="en_US">
-    
+    <meta property="og:title" content="ExtractMD - Convert Any Webpage to Markdown" />
+    <meta
+      property="og:description"
+      content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://extractmd.miguelcorderocollar.com" />
+    <meta
+      property="og:image"
+      content="https://extractmd.miguelcorderocollar.com/images/promotional-banner.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="ExtractMD" />
+    <meta property="og:locale" content="en_US" />
+
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="ExtractMD - Convert Any Webpage to Markdown">
-    <meta name="twitter:description" content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles.">
-    <meta name="twitter:image" content="https://extractmd.miguelcorderocollar.com/images/promotional-banner.png">
-    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ExtractMD - Convert Any Webpage to Markdown" />
+    <meta
+      name="twitter:description"
+      content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, and articles."
+    />
+    <meta
+      name="twitter:image"
+      content="https://extractmd.miguelcorderocollar.com/images/promotional-banner.png"
+    />
+
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="128x128" href="favicon.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="favicon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
-    <link rel="manifest" href="manifest.json">
-    
+    <link rel="icon" type="image/png" sizes="128x128" href="favicon.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon.png" />
+    <link rel="manifest" href="manifest.json" />
+
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "ExtractMD",
-      "applicationCategory": "BrowserExtension",
-      "operatingSystem": "Chrome",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "5",
-        "ratingCount": "1"
-      },
-      "description": "Extract and copy content as Markdown from any webpage. Built-in support for YouTube transcripts, Hacker News, and articles.",
-      "url": "https://extractmd.miguelcorderocollar.com",
-      "screenshot": "https://extractmd.miguelcorderocollar.com/images/promotional-banner.png",
-      "featureList": [
-        "YouTube transcript extraction",
-        "Hacker News content extraction",
-        "Article extraction",
-        "Universal webpage extraction",
-        "One-click Markdown conversion",
-        "Keyboard shortcuts",
-        "Privacy-first (no data collection)"
-      ]
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "ExtractMD",
+        "applicationCategory": "BrowserExtension",
+        "operatingSystem": "Chrome",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5",
+          "ratingCount": "1"
+        },
+        "description": "Extract and copy content as Markdown from any webpage. Built-in support for YouTube transcripts, Hacker News, and articles.",
+        "url": "https://extractmd.miguelcorderocollar.com",
+        "screenshot": "https://extractmd.miguelcorderocollar.com/images/promotional-banner.png",
+        "featureList": [
+          "YouTube transcript extraction",
+          "Hacker News content extraction",
+          "Article extraction",
+          "Universal webpage extraction",
+          "One-click Markdown conversion",
+          "Keyboard shortcuts",
+          "Privacy-first (no data collection)"
+        ]
+      }
     </script>
-    
-    <link rel="stylesheet" href="styles.css">
-    
+
+    <link rel="stylesheet" href="styles.css" />
+
     <!-- Theme initialization (prevents flash) -->
     <script>
-        (function() {
-            const saved = localStorage.getItem('theme');
-            if (saved) {
-                document.documentElement.setAttribute('data-theme', saved);
-            }
-        })();
+      (function () {
+        const saved = localStorage.getItem('theme');
+        if (saved) {
+          document.documentElement.setAttribute('data-theme', saved);
+        }
+      })();
     </script>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Header -->
     <header class="site-header">
-        <div class="container">
-            <nav class="nav">
-                <a href="/" class="logo">
-                    <img src="favicon.png" alt="ExtractMD" class="logo-icon" loading="eager" width="32" height="32">
-                    ExtractMD
-                </a>
-                <div class="nav-links">
-                    <a href="#features" class="nav-link nav-link-text">Features</a>
-                    <a href="privacy" class="nav-link nav-link-text">Privacy</a>
-                    <a href="https://github.com/miguelcorderocollar/yt-transcript-extension" class="nav-link nav-link-github" target="_blank" rel="noopener">
-                        <span class="nav-link-text">GitHub</span>
-                        <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                        </svg>
-                    </a>
-                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-                        <!-- Sun icon (shown in dark mode) - Source: extension/images/icons/sun.svg -->
-                        <svg class="icon-sun" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="5"/>
-                            <line x1="12" y1="1" x2="12" y2="3"/>
-                            <line x1="12" y1="21" x2="12" y2="23"/>
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                            <line x1="1" y1="12" x2="3" y2="12"/>
-                            <line x1="21" y1="12" x2="23" y2="12"/>
-                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                        </svg>
-                        <!-- Moon icon (shown in light mode) - Source: extension/images/icons/moon.svg -->
-                        <svg class="icon-moon" viewBox="0 0 24 24">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                        </svg>
-                    </button>
-                </div>
-            </nav>
-        </div>
+      <div class="container">
+        <nav class="nav">
+          <a href="/" class="logo">
+            <img
+              src="favicon.png"
+              alt="ExtractMD"
+              class="logo-icon"
+              loading="eager"
+              width="32"
+              height="32"
+            />
+            ExtractMD
+          </a>
+          <div class="nav-links">
+            <a href="#features" class="nav-link nav-link-text">Features</a>
+            <a href="privacy" class="nav-link nav-link-text">Privacy</a>
+            <a
+              href="https://github.com/miguelcorderocollar/yt-transcript-extension"
+              class="nav-link nav-link-github"
+              target="_blank"
+              rel="noopener"
+            >
+              <span class="nav-link-text">GitHub</span>
+              <svg
+                class="nav-link-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                />
+              </svg>
+            </a>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+              <!-- Sun icon (shown in dark mode) - Source: extension/images/icons/sun.svg -->
+              <svg class="icon-sun" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+              <!-- Moon icon (shown in light mode) - Source: extension/images/icons/moon.svg -->
+              <svg class="icon-moon" viewBox="0 0 24 24">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            </button>
+          </div>
+        </nav>
+      </div>
     </header>
 
     <!-- Hero -->
     <section class="hero">
-        <div class="container">
-            <span class="hero-badge">Chrome Extension</span>
-            <h1>Convert Any Webpage<br>to Markdown</h1>
-            <p class="hero-tagline">
-                Extract and copy content as clean, formatted Markdown with a single click. 
-                Perfect for notes, documentation, and AI tools.
-            </p>
-            <div class="hero-cta">
-                <div class="install-btn-wrapper">
-                    <button class="btn btn-primary" id="install-btn" disabled title="Pending approval">
-                        <!-- Source: extension/images/icons/download.svg -->
-                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        Install from Chrome Web Store
-                    </button>
-                    <p class="install-hint">Pending approval</p>
-                </div>
-                <a href="https://www.youtube.com/watch?v=o5Iil3PIqi0&feature=youtu.be" class="btn btn-secondary" target="_blank" rel="noopener">
-                    <!-- Play icon -->
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="5 3 19 12 5 21 5 3"/>
-                    </svg>
-                    Watch Demo
-                </a>
-                <a href="https://github.com/miguelcorderocollar/yt-transcript-extension" class="btn btn-secondary" target="_blank" rel="noopener">
-                    <!-- Source: extension/images/icons/github.svg -->
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                    </svg>
-                    View on GitHub
-                </a>
-            </div>
+      <div class="container">
+        <span class="hero-badge">Chrome Extension</span>
+        <h1>Convert Any Webpage<br />to Markdown</h1>
+        <p class="hero-tagline">
+          Extract and copy content as clean, formatted Markdown with a single click. Perfect for
+          notes, documentation, and AI tools.
+        </p>
+        <div class="hero-cta">
+          <div class="install-btn-wrapper">
+            <button class="btn btn-primary" id="install-btn" disabled title="Pending approval">
+              <!-- Source: extension/images/icons/download.svg -->
+              <svg
+                class="btn-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Install from Chrome Web Store
+            </button>
+            <p class="install-hint">Pending approval</p>
+          </div>
+          <a
+            href="https://www.youtube.com/watch?v=o5Iil3PIqi0&feature=youtu.be"
+            class="btn btn-secondary"
+            target="_blank"
+            rel="noopener"
+          >
+            <!-- Play icon -->
+            <svg
+              class="btn-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+            Watch Demo
+          </a>
+          <a
+            href="https://github.com/miguelcorderocollar/yt-transcript-extension"
+            class="btn btn-secondary"
+            target="_blank"
+            rel="noopener"
+          >
+            <!-- Source: extension/images/icons/github.svg -->
+            <svg
+              class="btn-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+              />
+            </svg>
+            View on GitHub
+          </a>
         </div>
-        
-        <!-- Hero Screenshot -->
-        <div class="hero-image">
-            <div class="screenshot-container">
-                <img src="images/promotional-banner.png" alt="ExtractMD popup and settings interface" class="hero-screenshot" loading="lazy" width="1200" height="630" decoding="async">
-            </div>
+      </div>
+
+      <!-- Hero Screenshot -->
+      <div class="hero-image">
+        <div class="screenshot-container">
+          <img
+            src="images/promotional-banner.png"
+            alt="ExtractMD popup and settings interface"
+            class="hero-screenshot"
+            loading="lazy"
+            width="1200"
+            height="630"
+            decoding="async"
+          />
         </div>
+      </div>
     </section>
 
     <!-- Features -->
     <section class="features" id="features">
-        <div class="container">
-            <div class="section-header">
-                <h2>Built-in Integrations</h2>
-                <p>Optimized extractors for popular platforms</p>
-            </div>
-            
-            <div class="feature-grid">
-                <!-- YouTube -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <!-- Source: extension/images/icons/youtube.svg -->
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
-                            <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    <h3>YouTube Videos</h3>
-                    <p>Extract full video transcripts with timestamps, video title, channel name, and URL. Smart formatting for easy reading.</p>
-                </div>
-                
-                <!-- Hacker News -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <!-- Source: extension/images/icons/hackernews.svg -->
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                            <rect x="2" y="2" width="20" height="20" rx="3"/>
-                            <path d="M7 6l5 7v5M17 6l-5 7"/>
-                        </svg>
-                    </div>
-                    <h3>Hacker News</h3>
-                    <p>Copy news lists with titles, scores, and links. Extract full comment threads with proper formatting.</p>
-                </div>
-                
-                <!-- Articles -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <!-- Source: extension/images/icons/article.svg -->
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10 9 9 9 8 9"/>
-                        </svg>
-                    </div>
-                    <h3>Articles & Blogs</h3>
-                    <p>Convert any article to clean Markdown. Optionally include images with alt text. Preserves headings, lists, and formatting.</p>
-                </div>
-                
-                <!-- Universal -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <!-- Source: extension/images/icons/universal.svg -->
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="2" y1="12" x2="22" y2="12"/>
-                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                        </svg>
-                    </div>
-                    <h3>Universal Extractor</h3>
-                    <p>Works on ANY webpage. Auto-detects main content area. Custom CSS selector support for advanced users.</p>
-                </div>
-            </div>
+      <div class="container">
+        <div class="section-header">
+          <h2>Built-in Integrations</h2>
+          <p>Optimized extractors for popular platforms</p>
         </div>
+
+        <div class="feature-grid">
+          <!-- YouTube -->
+          <div class="feature-card">
+            <div class="feature-icon">
+              <!-- Source: extension/images/icons/youtube.svg -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <path
+                  d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
+                />
+                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="currentColor" />
+              </svg>
+            </div>
+            <h3>YouTube Videos</h3>
+            <p>
+              Extract full video transcripts with timestamps, video title, channel name, and URL.
+              Smart formatting for easy reading.
+            </p>
+          </div>
+
+          <!-- Hacker News -->
+          <div class="feature-card">
+            <div class="feature-icon">
+              <!-- Source: extension/images/icons/hackernews.svg -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <rect x="2" y="2" width="20" height="20" rx="3" />
+                <path d="M7 6l5 7v5M17 6l-5 7" />
+              </svg>
+            </div>
+            <h3>Hacker News</h3>
+            <p>
+              Copy news lists with titles, scores, and links. Extract full comment threads with
+              proper formatting.
+            </p>
+          </div>
+
+          <!-- Articles -->
+          <div class="feature-card">
+            <div class="feature-icon">
+              <!-- Source: extension/images/icons/article.svg -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+            </div>
+            <h3>Articles & Blogs</h3>
+            <p>
+              Convert any article to clean Markdown. Optionally include images with alt text.
+              Preserves headings, lists, and formatting.
+            </p>
+          </div>
+
+          <!-- Universal -->
+          <div class="feature-card">
+            <div class="feature-icon">
+              <!-- Source: extension/images/icons/universal.svg -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path
+                  d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                />
+              </svg>
+            </div>
+            <h3>Universal Extractor</h3>
+            <p>
+              Works on ANY webpage. Auto-detects main content area. Custom CSS selector support for
+              advanced users.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- How It Works -->
     <section class="how-it-works">
-        <div class="container">
-            <div class="section-header">
-                <h2>How It Works</h2>
-                <p>Extract content in three simple steps</p>
-            </div>
-            
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Navigate</h3>
-                    <p>Go to any webpage you want to extract</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>Click</h3>
-                    <p>Click the floating ExtractMD button</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>Paste</h3>
-                    <p>Markdown is copied to your clipboard</p>
-                </div>
-            </div>
+      <div class="container">
+        <div class="section-header">
+          <h2>How It Works</h2>
+          <p>Extract content in three simple steps</p>
         </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h3>Navigate</h3>
+            <p>Go to any webpage you want to extract</p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <h3>Click</h3>
+            <p>Click the floating ExtractMD button</p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <h3>Paste</h3>
+            <p>Markdown is copied to your clipboard</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Key Features -->
     <section class="features">
-        <div class="container">
-            <div class="section-header">
-                <h2>Key Features</h2>
-                <p>Everything you need for efficient content extraction</p>
-            </div>
-            
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <!-- Source: extension/images/icons/settings.svg (simplified version) -->
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M12 1v4"/>
-                            <path d="M12 19v4"/>
-                            <path d="M1 12h4"/>
-                            <path d="M19 12h4"/>
-                        </svg>
-                    </div>
-                    <h3>One-Click Extraction</h3>
-                    <p>A floating button appears on supported pages. Click it, and content is copied to your clipboard.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <!-- Source: extension/images/icons/lock.svg -->
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                        </svg>
-                    </div>
-                    <h3>Keyboard Shortcut</h3>
-                    <p>Press Ctrl+Shift+E (Cmd+Shift+E on Mac) to extract content instantly.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <!-- Source: extension/images/icons/download.svg -->
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                    </div>
-                    <h3>Auto-Download</h3>
-                    <p>When content exceeds your token limit, it automatically downloads as a .md file.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <!-- Source: extension/images/icons/settings.svg -->
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                        </svg>
-                    </div>
-                    <h3>Highly Configurable</h3>
-                    <p>Theme, button position, per-integration toggles, content selection mode, and more.</p>
-                </div>
-            </div>
+      <div class="container">
+        <div class="section-header">
+          <h2>Key Features</h2>
+          <p>Everything you need for efficient content extraction</p>
         </div>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <!-- Source: extension/images/icons/settings.svg (simplified version) -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 1v4" />
+                <path d="M12 19v4" />
+                <path d="M1 12h4" />
+                <path d="M19 12h4" />
+              </svg>
+            </div>
+            <h3>One-Click Extraction</h3>
+            <p>
+              A floating button appears on supported pages. Click it, and content is copied to your
+              clipboard.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <!-- Source: extension/images/icons/lock.svg -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <h3>Keyboard Shortcut</h3>
+            <p>Press Ctrl+Shift+E (Cmd+Shift+E on Mac) to extract content instantly.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <!-- Source: extension/images/icons/download.svg -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </div>
+            <h3>Auto-Download</h3>
+            <p>When content exceeds your token limit, it automatically downloads as a .md file.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <!-- Source: extension/images/icons/settings.svg -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                />
+              </svg>
+            </div>
+            <h3>Highly Configurable</h3>
+            <p>
+              Theme, button position, per-integration toggles, content selection mode, and more.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Privacy Highlights -->
     <section class="privacy-highlights">
-        <div class="container">
-            <div class="section-header">
-                <h2>Privacy First</h2>
-                <p>Your data never leaves your browser</p>
-            </div>
-            
-            <div class="privacy-terminal">
-                <div class="terminal-header">
-                    <div class="terminal-dots">
-                        <span></span><span></span><span></span>
-                    </div>
-                    <span class="terminal-title">privacy.config</span>
-                </div>
-                <div class="terminal-body">
-                    <div class="config-line">
-                        <span class="config-key">data_collection</span>
-                        <span class="config-colon">:</span>
-                        <span class="config-value config-false">false</span>
-                    </div>
-                    <div class="config-line">
-                        <span class="config-key">external_servers</span>
-                        <span class="config-colon">:</span>
-                        <span class="config-value config-false">false</span>
-                    </div>
-                    <div class="config-line">
-                        <span class="config-key">analytics</span>
-                        <span class="config-colon">:</span>
-                        <span class="config-value config-false">false</span>
-                    </div>
-                    <div class="config-line">
-                        <span class="config-key">tracking</span>
-                        <span class="config-colon">:</span>
-                        <span class="config-value config-false">false</span>
-                    </div>
-                    <div class="config-line">
-                        <span class="config-key">open_source</span>
-                        <span class="config-colon">:</span>
-                        <span class="config-value config-true">true</span>
-                    </div>
-                    <div class="config-line">
-                        <span class="config-key">local_only</span>
-                        <span class="config-colon">:</span>
-                        <span class="config-value config-true">true</span>
-                    </div>
-                </div>
-            </div>
-            
-            <p class="privacy-link">
-                <a href="privacy">Read the full Privacy Policy →</a>
-            </p>
+      <div class="container">
+        <div class="section-header">
+          <h2>Privacy First</h2>
+          <p>Your data never leaves your browser</p>
         </div>
+
+        <div class="privacy-terminal">
+          <div class="terminal-header">
+            <div class="terminal-dots"><span></span><span></span><span></span></div>
+            <span class="terminal-title">privacy.config</span>
+          </div>
+          <div class="terminal-body">
+            <div class="config-line">
+              <span class="config-key">data_collection</span>
+              <span class="config-colon">:</span>
+              <span class="config-value config-false">false</span>
+            </div>
+            <div class="config-line">
+              <span class="config-key">external_servers</span>
+              <span class="config-colon">:</span>
+              <span class="config-value config-false">false</span>
+            </div>
+            <div class="config-line">
+              <span class="config-key">analytics</span>
+              <span class="config-colon">:</span>
+              <span class="config-value config-false">false</span>
+            </div>
+            <div class="config-line">
+              <span class="config-key">tracking</span>
+              <span class="config-colon">:</span>
+              <span class="config-value config-false">false</span>
+            </div>
+            <div class="config-line">
+              <span class="config-key">open_source</span>
+              <span class="config-colon">:</span>
+              <span class="config-value config-true">true</span>
+            </div>
+            <div class="config-line">
+              <span class="config-key">local_only</span>
+              <span class="config-colon">:</span>
+              <span class="config-value config-true">true</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="privacy-link">
+          <a href="privacy">Read the full Privacy Policy →</a>
+        </p>
+      </div>
     </section>
 
     <!-- CTA -->
     <section class="cta-section">
-        <div class="container">
-            <h2>Ready to Extract Smarter?</h2>
-            <p>Install ExtractMD and start copying content as Markdown in seconds.</p>
-            <div class="install-btn-wrapper">
-                <button class="btn btn-primary" id="install-btn-footer" disabled title="Pending approval">
-                    <!-- Source: extension/images/icons/download.svg -->
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Install from Chrome Web Store
-                </button>
-                <p class="install-hint">Pending approval</p>
-            </div>
+      <div class="container">
+        <h2>Ready to Extract Smarter?</h2>
+        <p>Install ExtractMD and start copying content as Markdown in seconds.</p>
+        <div class="install-btn-wrapper">
+          <button class="btn btn-primary" id="install-btn-footer" disabled title="Pending approval">
+            <!-- Source: extension/images/icons/download.svg -->
+            <svg
+              class="btn-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Install from Chrome Web Store
+          </button>
+          <p class="install-hint">Pending approval</p>
         </div>
+      </div>
     </section>
 
     <!-- Footer -->
     <footer class="site-footer">
-        <div class="container">
-            <div class="footer-content">
-                <span class="footer-logo">ExtractMD</span>
-                <div class="footer-links">
-                    <a href="privacy" class="footer-link">Privacy Policy</a>
-                    <a href="https://github.com/miguelcorderocollar/yt-transcript-extension" class="footer-link" target="_blank" rel="noopener">GitHub</a>
-                    <a href="https://github.com/miguelcorderocollar/yt-transcript-extension/issues" class="footer-link" target="_blank" rel="noopener">Support</a>
-                </div>
-            </div>
-            <p class="footer-copy">
-                &copy; 2026 ExtractMD. Open source under MIT License.
-            </p>
+      <div class="container">
+        <div class="footer-content">
+          <span class="footer-logo">ExtractMD</span>
+          <div class="footer-links">
+            <a href="privacy" class="footer-link">Privacy Policy</a>
+            <a
+              href="https://github.com/miguelcorderocollar/yt-transcript-extension"
+              class="footer-link"
+              target="_blank"
+              rel="noopener"
+              >GitHub</a
+            >
+            <a
+              href="https://github.com/miguelcorderocollar/yt-transcript-extension/issues"
+              class="footer-link"
+              target="_blank"
+              rel="noopener"
+              >Support</a
+            >
+          </div>
         </div>
+        <p class="footer-copy">&copy; 2026 ExtractMD. Open source under MIT License.</p>
+      </div>
     </footer>
 
     <!-- Theme Toggle Script -->
     <script>
-        (function() {
-            const toggle = document.getElementById('theme-toggle');
-            if (!toggle) return;
+      (function () {
+        const toggle = document.getElementById('theme-toggle');
+        if (!toggle) return;
 
-            // Get current effective theme
-            function getEffectiveTheme() {
-                const saved = localStorage.getItem('theme');
-                if (saved) return saved;
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
+        // Get current effective theme
+        function getEffectiveTheme() {
+          const saved = localStorage.getItem('theme');
+          if (saved) return saved;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
 
-            // Toggle theme
-            toggle.addEventListener('click', function() {
-                const current = getEffectiveTheme();
-                const next = current === 'dark' ? 'light' : 'dark';
-                
-                document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem('theme', next);
-            });
+        // Toggle theme
+        toggle.addEventListener('click', function () {
+          const current = getEffectiveTheme();
+          const next = current === 'dark' ? 'light' : 'dark';
 
-            // Listen for system theme changes (only if no manual preference)
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-                if (!localStorage.getItem('theme')) {
-                    // No manual preference, let CSS handle it
-                    document.documentElement.removeAttribute('data-theme');
-                }
-            });
-        })();
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('theme', next);
+        });
+
+        // Listen for system theme changes (only if no manual preference)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+          if (!localStorage.getItem('theme')) {
+            // No manual preference, let CSS handle it
+            document.documentElement.removeAttribute('data-theme');
+          }
+        });
+      })();
     </script>
-</body>
+  </body>
 </html>
-

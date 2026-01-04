@@ -12,7 +12,7 @@ describe('shared/storage', () => {
   describe('getSettings', () => {
     it('returns all defaults when called without arguments', async () => {
       const settings = await getSettings();
-      
+
       expect(chrome.storage.sync.get).toHaveBeenCalledWith(DEFAULTS, expect.any(Function));
       expect(settings).toEqual(DEFAULTS);
     });
@@ -20,7 +20,7 @@ describe('shared/storage', () => {
     it('returns only requested keys when specified', async () => {
       const keys = ['includeTimestamps', 'jumpToDomain'];
       const settings = await getSettings(keys);
-      
+
       expect(chrome.storage.sync.get).toHaveBeenCalledWith(
         { includeTimestamps: true, jumpToDomain: false },
         expect.any(Function)
@@ -32,9 +32,9 @@ describe('shared/storage', () => {
     it('returns stored values instead of defaults', async () => {
       // Pre-populate storage
       await chrome.storage.sync.set({ includeTimestamps: false });
-      
+
       const settings = await getSettings(['includeTimestamps']);
-      
+
       expect(settings.includeTimestamps).toBe(false);
     });
   });
@@ -43,27 +43,30 @@ describe('shared/storage', () => {
     it('saves value to storage when it differs from default', () => {
       const key = 'includeTimestamps';
       const newValue = !DEFAULTS[key];
-      
+
       saveSetting(key, newValue);
-      
-      expect(chrome.storage.sync.set).toHaveBeenCalledWith({ [key]: newValue }, expect.any(Function));
+
+      expect(chrome.storage.sync.set).toHaveBeenCalledWith(
+        { [key]: newValue },
+        expect.any(Function)
+      );
     });
 
     it('removes value from storage when it matches default', () => {
       const key = 'includeTimestamps';
       const defaultValue = DEFAULTS[key];
-      
+
       saveSetting(key, defaultValue);
-      
+
       expect(chrome.storage.sync.remove).toHaveBeenCalledWith(key, expect.any(Function));
     });
 
     it('saves unknown keys anyway for future compatibility', () => {
       const key = 'futureKey';
       const value = 'futureValue';
-      
+
       saveSetting(key, value);
-      
+
       expect(chrome.storage.sync.set).toHaveBeenCalledWith({ [key]: value }, expect.any(Function));
     });
   });
@@ -71,7 +74,7 @@ describe('shared/storage', () => {
   describe('incrementKpi', () => {
     it('increments the specified KPI type', async () => {
       await incrementKpi('youtube');
-      
+
       // Check that storage.set was called with the incremented value
       expect(chrome.storage.sync.set).toHaveBeenCalledWith(
         { usageStats: { youtube: 1 } },
@@ -82,9 +85,9 @@ describe('shared/storage', () => {
     it('increments existing counter', async () => {
       // Pre-populate with existing stats
       await chrome.storage.sync.set({ usageStats: { youtube: 5 } });
-      
+
       await incrementKpi('youtube');
-      
+
       // Should be 5 + 1 = 6
       expect(chrome.storage.sync.set).toHaveBeenLastCalledWith(
         { usageStats: { youtube: 6 } },
@@ -96,12 +99,11 @@ describe('shared/storage', () => {
       // Disable KPI tracking
       await chrome.storage.sync.set({ enableUsageKpi: false });
       vi.clearAllMocks();
-      
+
       await incrementKpi('youtube');
-      
+
       // Should not call set
       expect(chrome.storage.sync.set).not.toHaveBeenCalled();
     });
   });
 });
-

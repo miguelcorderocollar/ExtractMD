@@ -14,12 +14,12 @@ import { initializeSaveToast } from './ui.js';
 /**
  * Initialize all options page modules when DOM is ready
  */
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all modules
-    initializeSettings();
-    initializeNavigation();
-    initializeKpi();
-    initializeImportExport();
-    initializeDomainIgnore();
-    initializeSaveToast();
+document.addEventListener('DOMContentLoaded', function () {
+  // Initialize all modules
+  initializeSettings();
+  initializeNavigation();
+  initializeKpi();
+  initializeImportExport();
+  initializeDomainIgnore();
+  initializeSaveToast();
 });

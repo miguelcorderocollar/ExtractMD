@@ -17,7 +17,7 @@ const SIZE_CONFIG = {
   small: { size: 40, radius: 10, iconSize: 18 },
   medium: { size: 48, radius: 12, iconSize: 22 },
   large: { size: 56, radius: 14, iconSize: 26 },
-  extraLarge: { size: 64, radius: 16, iconSize: 30 }
+  extraLarge: { size: 64, radius: 16, iconSize: 30 },
 };
 
 // Transparency configurations (opacity values)
@@ -25,7 +25,7 @@ const TRANSPARENCY_CONFIG = {
   low: 0.3,
   medium: 0.5,
   high: 0.7,
-  full: 1.0
+  full: 1.0,
 };
 
 // Theme colors - hardcoded since we inject into third-party pages
@@ -36,7 +36,7 @@ const THEME = {
     success: '#22c55e',
     error: '#ef4444',
     loading: '#f59e0b',
-    iconColor: '#fafafa'
+    iconColor: '#fafafa',
   },
   dark: {
     accent: '#2dd4bf',
@@ -44,8 +44,8 @@ const THEME = {
     success: '#4ade80',
     error: '#f87171',
     loading: '#fbbf24',
-    iconColor: '#171717'
-  }
+    iconColor: '#171717',
+  },
 };
 
 // CSS animation for loading dots
@@ -84,7 +84,7 @@ function getThemeColors() {
 async function loadPositionOffset(domain) {
   if (!domain) return DEFAULT_OFFSET;
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     chrome.storage.local.get({ floatingButtonPositions: {} }, (items) => {
       const positions = items.floatingButtonPositions || {};
       resolve(positions[domain] || DEFAULT_OFFSET);
@@ -97,7 +97,7 @@ async function loadPositionOffset(domain) {
  * @returns {Promise<string>}
  */
 async function loadButtonSize() {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     chrome.storage.sync.get({ floatingButtonSize: 'medium' }, (items) => {
       resolve(items.floatingButtonSize || 'medium');
     });
@@ -109,7 +109,7 @@ async function loadButtonSize() {
  * @returns {Promise<string>}
  */
 async function loadButtonTransparency() {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     chrome.storage.sync.get({ floatingButtonTransparency: 'medium' }, (items) => {
       resolve(items.floatingButtonTransparency || 'medium');
     });
@@ -139,9 +139,12 @@ function savePositionOffset(domain, offset) {
 async function addDomainToIgnoreList(domain) {
   if (!domain) return;
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     chrome.storage.sync.get({ ignoredDomains: '' }, (items) => {
-      let domains = items.ignoredDomains.split('\n').map(d => d.trim()).filter(d => d.length > 0);
+      let domains = items.ignoredDomains
+        .split('\n')
+        .map((d) => d.trim())
+        .filter((d) => d.length > 0);
       if (!domains.includes(domain)) {
         domains.push(domain);
         const newValue = domains.join('\n');
@@ -180,7 +183,7 @@ export async function createFloatingButton({
   id = 'extractmd-floating-button',
   domain = '',
   enableDrag = true,
-  enableDismiss = true
+  enableDismiss = true,
 }) {
   // Check if button already exists
   const existing = document.getElementById(id);
@@ -273,7 +276,8 @@ export async function createFloatingButton({
   bs.display = 'flex';
   bs.alignItems = 'center';
   bs.justifyContent = 'center';
-  bs.transition = 'box-shadow 0.2s ease, opacity 0.2s ease, background 0.2s ease, transform 0.2s ease';
+  bs.transition =
+    'box-shadow 0.2s ease, opacity 0.2s ease, background 0.2s ease, transform 0.2s ease';
   bs.userSelect = 'none';
   bs.opacity = idleOpacity.toString();
 
@@ -327,8 +331,14 @@ export async function createFloatingButton({
     }
 
     // Update position
-    const newRight = Math.max(0, Math.min(window.innerWidth - sizeConfig.size - 4, buttonStartRight + deltaX));
-    const newBottom = Math.max(0, Math.min(window.innerHeight - sizeConfig.size - 4, buttonStartBottom + deltaY));
+    const newRight = Math.max(
+      0,
+      Math.min(window.innerWidth - sizeConfig.size - 4, buttonStartRight + deltaX)
+    );
+    const newBottom = Math.max(
+      0,
+      Math.min(window.innerHeight - sizeConfig.size - 4, buttonStartBottom + deltaY)
+    );
 
     button.style.right = `${newRight}px`;
     button.style.bottom = `${newBottom}px`;
@@ -358,7 +368,7 @@ export async function createFloatingButton({
 
         currentOffset = {
           left: currentRight - DEFAULT_RIGHT,
-          up: currentBottom - DEFAULT_BOTTOM
+          up: currentBottom - DEFAULT_BOTTOM,
         };
 
         savePositionOffset(domain, currentOffset);
@@ -484,12 +494,19 @@ export async function createFloatingButton({
     // Observe attributes on the watch element if it exists
     const watchElement = document.querySelector('ytd-watch-flexy');
     if (watchElement) {
-      ytObserver.observe(watchElement, { attributes: true, attributeFilter: ['theater', 'fullscreen'] });
+      ytObserver.observe(watchElement, {
+        attributes: true,
+        attributeFilter: ['theater', 'fullscreen'],
+      });
     }
     // Also observe the movie player for aria-pressed changes
     const player = document.querySelector('#movie_player');
     if (player) {
-      ytObserver.observe(player, { attributes: true, subtree: true, attributeFilter: ['aria-pressed'] });
+      ytObserver.observe(player, {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ['aria-pressed'],
+      });
     }
 
     // Initial check
@@ -581,7 +598,7 @@ export async function createFloatingButton({
      */
     appendTo(parent = document.body) {
       parent.appendChild(button);
-    }
+    },
   };
 
   return controller;

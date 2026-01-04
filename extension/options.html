@@ -1,421 +1,721 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ExtractMD Settings</title>
-    <link rel="stylesheet" href="shared/theme.css">
-    <link rel="stylesheet" href="options.css">
-</head>
-<body>
+    <link rel="stylesheet" href="shared/theme.css" />
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
     <div class="options-layout">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1 class="logo">ExtractMD</h1>
-                <span class="version">v1.0</span>
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1 class="logo">ExtractMD</h1>
+          <span class="version">v1.0</span>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-section="general">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+              />
+            </svg>
+            <span>General</span>
+          </button>
+          <button class="nav-item" data-section="youtube">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
+              />
+              <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+            </svg>
+            <span>YouTube</span>
+          </button>
+          <button class="nav-item" data-section="hackernews">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="2" y="2" width="20" height="20" rx="3" />
+              <path d="M7 6l5 7v5M17 6l-5 7" />
+            </svg>
+            <span>Hacker News</span>
+          </button>
+          <button class="nav-item" data-section="articles">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            <span>Articles</span>
+          </button>
+          <button class="nav-item" data-section="universal">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path
+                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+              />
+            </svg>
+            <span>Universal</span>
+          </button>
+
+          <div class="nav-divider"></div>
+
+          <button class="nav-item" data-section="workflow">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="16 3 21 3 21 8" />
+              <line x1="4" y1="20" x2="21" y2="3" />
+              <polyline points="21 16 21 21 16 21" />
+              <line x1="15" y1="15" x2="21" y2="21" />
+              <line x1="4" y1="4" x2="9" y2="9" />
+            </svg>
+            <span>Workflow</span>
+          </button>
+          <button class="nav-item" data-section="data">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7" />
+              <line x1="16" y1="19" x2="22" y2="19" />
+              <line x1="19" y1="16" x2="19" y2="22" />
+            </svg>
+            <span>Data</span>
+          </button>
+          <button class="nav-item" data-section="about">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4" />
+              <path d="M12 8h.01" />
+            </svg>
+            <span>About</span>
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="content">
+        <!-- General Section -->
+        <section id="section-general" class="settings-section active">
+          <div class="section-header">
+            <h2>General Settings</h2>
+            <p>Enable or disable integrations and manage ignored domains</p>
+          </div>
+
+          <setting-group title="Integrations">
+            <setting-toggle
+              setting-id="enableYouTubeIntegration"
+              label="YouTube Integration"
+              description="Extract transcripts from YouTube videos"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="enableHackerNewsIntegration"
+              label="Hacker News Integration"
+              description="Extract comments and news from HN"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="enableArticleIntegration"
+              label="Article Integration"
+              description="Extract articles from any webpage"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="enableUniversalIntegration"
+              label="Universal Integration"
+              description="Fallback extraction for any webpage"
+              checked
+            ></setting-toggle>
+          </setting-group>
+
+          <setting-group title="Floating Button">
+            <setting-toggle
+              setting-id="floatingButtonEnableDrag"
+              label="Enable Drag"
+              description="Allow repositioning the button by dragging"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="floatingButtonEnableDismiss"
+              label="Enable Dismiss"
+              description="Show X button on hover to hide on this domain"
+              checked
+            ></setting-toggle>
+            <setting-select
+              setting-id="floatingButtonSize"
+              label="Button Size"
+              description="Size of the floating extraction button"
+              value="medium"
+            >
+              <option value="extraSmall">Extra Small (32px)</option>
+              <option value="small">Small (40px)</option>
+              <option value="medium">Medium (48px)</option>
+              <option value="large">Large (56px)</option>
+              <option value="extraLarge">Extra Large (64px)</option>
+            </setting-select>
+            <setting-select
+              setting-id="floatingButtonTransparency"
+              label="Button Transparency"
+              description="Transparency level when button is idle"
+              value="medium"
+            >
+              <option value="low">Low (30%)</option>
+              <option value="medium">Medium (50%)</option>
+              <option value="high">High (70%)</option>
+              <option value="full">Full (100%)</option>
+            </setting-select>
+          </setting-group>
+
+          <div class="settings-group">
+            <h3 class="group-title">Ignored Domains</h3>
+            <div class="setting-block">
+              <div class="setting-block-header">
+                <span class="setting-desc">ExtractMD will not activate on these domains</span>
+                <button id="ignoreCurrentDomainBtn" class="btn btn-secondary btn-sm">
+                  Add Current Domain
+                </button>
+              </div>
+              <textarea
+                id="ignoredDomains"
+                class="input-textarea"
+                placeholder="example.com&#10;another-site.org"
+              ></textarea>
+              <span id="domainValidationError" class="validation-error"
+                >Invalid domain format detected</span
+              >
             </div>
-            
-            <nav class="sidebar-nav">
-                <button class="nav-item active" data-section="general">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                    </svg>
-                    <span>General</span>
+          </div>
+        </section>
+
+        <!-- YouTube Section -->
+        <section id="section-youtube" class="settings-section">
+          <div class="section-header">
+            <h2>YouTube Settings</h2>
+            <p>Configure how video transcripts are extracted</p>
+          </div>
+
+          <setting-group title="Transcript Content">
+            <setting-toggle
+              setting-id="includeTimestamps"
+              label="Include Timestamps"
+              description="Add time markers to transcript lines"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="addTitleToTranscript"
+              label="Include Video Title"
+              description="Add the video title as a header"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="addChannelToTranscript"
+              label="Include Channel Name"
+              description="Add the channel name to the output"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="addUrlToTranscript"
+              label="Include Video URL"
+              description="Add a link back to the video"
+              checked
+            ></setting-toggle>
+          </setting-group>
+        </section>
+
+        <!-- Hacker News Section -->
+        <section id="section-hackernews" class="settings-section">
+          <div class="section-header">
+            <h2>Hacker News Settings</h2>
+            <p>Configure comment threads and news feed extraction</p>
+          </div>
+
+          <setting-group title="Comments Page">
+            <setting-toggle
+              setting-id="hnIncludeAuthor"
+              label="Include Author"
+              description="Show username for each comment"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="hnIncludeTime"
+              label="Include Time"
+              description="Show when comments were posted"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="hnIncludeReplies"
+              label="Include Replies"
+              description="Extract threaded reply structure"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="hnIncludeUrl"
+              label="Include Page URL"
+              description="Add link to the HN discussion"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="hnIncludeItemText"
+              label="Include Post Body"
+              description="Extract the original post text"
+              checked
+            ></setting-toggle>
+          </setting-group>
+
+          <setting-group title="News Feed">
+            <setting-toggle
+              setting-id="hnNewsIncludeTitle"
+              label="Include Title"
+              description="Show the story title"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="hnNewsIncludeUrl"
+              label="Include URL"
+              description="Link to the external article"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="hnNewsIncludeSite"
+              label="Include Site"
+              description="Show the domain name"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="hnNewsIncludePoints"
+              label="Include Points"
+              description="Show the upvote count"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="hnNewsIncludeAuthor"
+              label="Include Author"
+              description="Show who submitted the story"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="hnNewsIncludeTime"
+              label="Include Time"
+              description="Show submission time"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="hnNewsIncludeComments"
+              label="Include Comment Count"
+              description="Show number of comments"
+              checked
+            ></setting-toggle>
+          </setting-group>
+        </section>
+
+        <!-- Articles Section -->
+        <section id="section-articles" class="settings-section">
+          <div class="section-header">
+            <h2>Article Settings</h2>
+            <p>Configure how web articles are extracted</p>
+          </div>
+
+          <setting-group title="Content Options">
+            <setting-toggle
+              setting-id="articleExporterIncludeImages"
+              label="Include Images"
+              description="Add image markdown with alt text"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="articleExporterOnlyLongest"
+              label="Only Longest Article"
+              description="Skip sidebars and extract main content only"
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="articleExporterShowInfo"
+              label="Show Info Notification"
+              description="Display article details when found"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="articleExporterIncludeUrl"
+              label="Include Page URL"
+              description="Add source link to the article"
+              checked
+            ></setting-toggle>
+          </setting-group>
+        </section>
+
+        <!-- Universal Section -->
+        <section id="section-universal" class="settings-section">
+          <div class="section-header">
+            <h2>Universal Settings</h2>
+            <p>Configure fallback extraction for any webpage</p>
+          </div>
+
+          <setting-group title="Content Detection">
+            <setting-select
+              setting-id="universalContentMode"
+              label="Content Mode"
+              description="How to detect the main content area"
+              value="auto"
+            >
+              <option value="auto">Auto (Smart Detection)</option>
+              <option value="main">Main Element Only</option>
+              <option value="full">Full Page</option>
+              <option value="selector">Custom Selector</option>
+            </setting-select>
+
+            <div class="setting-row" id="customSelectorRow" style="display: none">
+              <div class="setting-info">
+                <span class="setting-label">Custom Selector</span>
+                <span class="setting-desc">CSS selector for content (e.g., #main, .content)</span>
+              </div>
+              <input
+                type="text"
+                id="universalCustomSelector"
+                class="input-text"
+                placeholder=".article-content"
+              />
+            </div>
+
+            <setting-toggle
+              setting-id="universalStripNav"
+              label="Strip Navigation"
+              description="Remove nav, header, footer, and sidebar elements"
+              checked
+            ></setting-toggle>
+          </setting-group>
+
+          <setting-group title="Content Options">
+            <setting-toggle
+              setting-id="universalIncludeImages"
+              label="Include Images"
+              description="Convert images to markdown format"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="universalIncludeLinks"
+              label="Include Links"
+              description="Preserve hyperlinks in markdown"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="universalPreserveCodeBlocks"
+              label="Preserve Code Blocks"
+              description="Format code with syntax highlighting hints"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="universalIncludeUrl"
+              label="Include Page URL"
+              description="Add source link header to output"
+              checked
+            ></setting-toggle>
+          </setting-group>
+        </section>
+
+        <!-- Workflow Section -->
+        <section id="section-workflow" class="settings-section">
+          <div class="section-header">
+            <h2>Workflow Settings</h2>
+            <p>Automate your extraction workflow</p>
+          </div>
+
+          <setting-group title="After Extraction">
+            <setting-toggle
+              setting-id="jumpToDomain"
+              label="Jump to Target Domain"
+              description="Automatically open a URL after copying"
+            ></setting-toggle>
+
+            <div class="setting-block">
+              <label class="setting-label-sm">Target URL</label>
+              <input
+                type="text"
+                id="jumpToDomainUrl"
+                class="input-text"
+                placeholder="https://chat.openai.com/"
+              />
+            </div>
+
+            <setting-toggle
+              setting-id="closeTabAfterExtraction"
+              label="Close Tab After Extraction"
+              description="Automatically close the source tab"
+            ></setting-toggle>
+          </setting-group>
+
+          <setting-group title="Output Mode">
+            <setting-toggle
+              setting-id="downloadInsteadOfCopy"
+              label="Download as .md File"
+              description="Save to file instead of clipboard"
+            ></setting-toggle>
+
+            <setting-input
+              setting-id="downloadIfTokensExceed"
+              label="Download if Tokens Exceed"
+              description="Auto-download large extractions (thousands)"
+              type="number"
+              min="0"
+              step="1"
+              placeholder="0"
+            >
+            </setting-input>
+
+            <setting-toggle
+              setting-id="showTokenCountInNotification"
+              label="Show Token Count"
+              description="Display token count in notification"
+            ></setting-toggle>
+          </setting-group>
+
+          <setting-group title="Display">
+            <setting-toggle
+              setting-id="showUsageKpi"
+              label="Show Usage KPIs"
+              description="Track extraction statistics"
+              checked
+            ></setting-toggle>
+          </setting-group>
+        </section>
+
+        <!-- Data Section -->
+        <section id="section-data" class="settings-section">
+          <div class="section-header">
+            <h2>Data & Statistics</h2>
+            <p>View usage stats and manage settings</p>
+          </div>
+
+          <div class="settings-group">
+            <h3 class="group-title">Usage Statistics</h3>
+
+            <div class="kpi-grid" id="kpi-counters">
+              <!-- Populated by JS -->
+            </div>
+
+            <div id="kpi-time-saved" class="kpi-time-saved"></div>
+
+            <button id="clearKpiBtn" class="btn btn-secondary">Clear Statistics</button>
+          </div>
+
+          <div class="settings-group">
+            <h3 class="group-title">Import / Export</h3>
+
+            <div class="button-row">
+              <button id="exportSettingsBtn" class="btn btn-secondary">Export Settings</button>
+              <button id="importSettingsBtn" class="btn btn-secondary">Import Settings</button>
+              <input
+                type="file"
+                id="importSettingsFile"
+                accept="application/json"
+                style="display: none"
+              />
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3 class="group-title">Reset Data</h3>
+            <p class="group-desc">
+              Clear stored data that accumulates over time. This does not affect your settings.
+            </p>
+
+            <div class="setting-block">
+              <div class="setting-block-header">
+                <div class="setting-info">
+                  <span class="setting-label">Floating Button Positions</span>
+                  <span class="setting-desc">Clear all saved button positions across domains</span>
+                </div>
+                <button id="resetPositionsBtn" class="btn btn-secondary btn-sm">
+                  Reset Positions
                 </button>
-                <button class="nav-item" data-section="youtube">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
-                        <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
-                    </svg>
-                    <span>YouTube</span>
-                </button>
-                <button class="nav-item" data-section="hackernews">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="2" width="20" height="20" rx="3"/>
-                        <path d="M7 6l5 7v5M17 6l-5 7"/>
-                    </svg>
-                    <span>Hacker News</span>
-                </button>
-                <button class="nav-item" data-section="articles">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                    </svg>
-                    <span>Articles</span>
-                </button>
-                <button class="nav-item" data-section="universal">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="2" y1="12" x2="22" y2="12"/>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                    </svg>
-                    <span>Universal</span>
-                </button>
-                
-                <div class="nav-divider"></div>
-                
-                <button class="nav-item" data-section="workflow">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="16 3 21 3 21 8"/>
-                        <line x1="4" y1="20" x2="21" y2="3"/>
-                        <polyline points="21 16 21 21 16 21"/>
-                        <line x1="15" y1="15" x2="21" y2="21"/>
-                        <line x1="4" y1="4" x2="9" y2="9"/>
-                    </svg>
-                    <span>Workflow</span>
-                </button>
-                <button class="nav-item" data-section="data">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7"/>
-                        <line x1="16" y1="19" x2="22" y2="19"/>
-                        <line x1="19" y1="16" x2="19" y2="22"/>
-                    </svg>
-                    <span>Data</span>
-                </button>
-                <button class="nav-item" data-section="about">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 16v-4"/><path d="M12 8h.01"/>
-                    </svg>
-                    <span>About</span>
-                </button>
-            </nav>
-        </aside>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        <!-- Main Content -->
-        <main class="content">
-            <!-- General Section -->
-            <section id="section-general" class="settings-section active">
-                <div class="section-header">
-                    <h2>General Settings</h2>
-                    <p>Enable or disable integrations and manage ignored domains</p>
-                </div>
-                
-                <setting-group title="Integrations">
-                    <setting-toggle setting-id="enableYouTubeIntegration" label="YouTube Integration" description="Extract transcripts from YouTube videos" checked></setting-toggle>
-                    <setting-toggle setting-id="enableHackerNewsIntegration" label="Hacker News Integration" description="Extract comments and news from HN" checked></setting-toggle>
-                    <setting-toggle setting-id="enableArticleIntegration" label="Article Integration" description="Extract articles from any webpage" checked></setting-toggle>
-                    <setting-toggle setting-id="enableUniversalIntegration" label="Universal Integration" description="Fallback extraction for any webpage" checked></setting-toggle>
-                </setting-group>
-                
-                <setting-group title="Floating Button">
-                    <setting-toggle setting-id="floatingButtonEnableDrag" label="Enable Drag" description="Allow repositioning the button by dragging" checked></setting-toggle>
-                    <setting-toggle setting-id="floatingButtonEnableDismiss" label="Enable Dismiss" description="Show X button on hover to hide on this domain" checked></setting-toggle>
-                    <setting-select 
-                        setting-id="floatingButtonSize" 
-                        label="Button Size" 
-                        description="Size of the floating extraction button"
-                        value="medium">
-                        <option value="extraSmall">Extra Small (32px)</option>
-                        <option value="small">Small (40px)</option>
-                        <option value="medium">Medium (48px)</option>
-                        <option value="large">Large (56px)</option>
-                        <option value="extraLarge">Extra Large (64px)</option>
-                    </setting-select>
-                    <setting-select 
-                        setting-id="floatingButtonTransparency" 
-                        label="Button Transparency" 
-                        description="Transparency level when button is idle"
-                        value="medium">
-                        <option value="low">Low (30%)</option>
-                        <option value="medium">Medium (50%)</option>
-                        <option value="high">High (70%)</option>
-                        <option value="full">Full (100%)</option>
-                    </setting-select>
-                </setting-group>
-                
-                <div class="settings-group">
-                    <h3 class="group-title">Ignored Domains</h3>
-                    <div class="setting-block">
-                        <div class="setting-block-header">
-                            <span class="setting-desc">ExtractMD will not activate on these domains</span>
-                            <button id="ignoreCurrentDomainBtn" class="btn btn-secondary btn-sm">
-                                Add Current Domain
-                            </button>
-                        </div>
-                        <textarea 
-                            id="ignoredDomains" 
-                            class="input-textarea" 
-                            placeholder="example.com&#10;another-site.org"
-                        ></textarea>
-                        <span id="domainValidationError" class="validation-error">Invalid domain format detected</span>
-                    </div>
-                </div>
-            </section>
+        <!-- About Section -->
+        <section id="section-about" class="settings-section">
+          <div class="section-header">
+            <h2>About ExtractMD</h2>
+            <p>Information and credits</p>
+          </div>
 
-            <!-- YouTube Section -->
-            <section id="section-youtube" class="settings-section">
-                <div class="section-header">
-                    <h2>YouTube Settings</h2>
-                    <p>Configure how video transcripts are extracted</p>
-                </div>
-                
-                <setting-group title="Transcript Content">
-                    <setting-toggle setting-id="includeTimestamps" label="Include Timestamps" description="Add time markers to transcript lines" checked></setting-toggle>
-                    <setting-toggle setting-id="addTitleToTranscript" label="Include Video Title" description="Add the video title as a header" checked></setting-toggle>
-                    <setting-toggle setting-id="addChannelToTranscript" label="Include Channel Name" description="Add the channel name to the output" checked></setting-toggle>
-                    <setting-toggle setting-id="addUrlToTranscript" label="Include Video URL" description="Add a link back to the video" checked></setting-toggle>
-                </setting-group>
-            </section>
+          <div class="settings-group">
+            <div class="about-card">
+              <img src="images/logo.svg" alt="ExtractMD Logo" class="about-logo" />
+              <h3 class="mono">ExtractMD</h3>
+              <p class="about-version">Version 1.0</p>
+              <p class="about-desc">
+                Extract content from web pages as clean Markdown. Perfect for feeding content to
+                LLMs, note-taking, or archiving.
+              </p>
+              <div class="about-links">
+                <a
+                  href="https://extractmd.miguelcorderocollar.com/"
+                  target="_blank"
+                  class="about-link"
+                >
+                  <svg
+                    class="link-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                    />
+                  </svg>
+                  Website
+                </a>
+                <a
+                  href="https://github.com/miguelcorderocollar/ExtractMD"
+                  target="_blank"
+                  class="about-link"
+                >
+                  <svg
+                    class="link-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                    />
+                  </svg>
+                  GitHub Repository
+                </a>
+                <a href="https://miguelcorderocollar.com" target="_blank" class="about-link">
+                  <svg
+                    class="link-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                    />
+                  </svg>
+                  Developer Website
+                </a>
+              </div>
+            </div>
+          </div>
 
-            <!-- Hacker News Section -->
-            <section id="section-hackernews" class="settings-section">
-                <div class="section-header">
-                    <h2>Hacker News Settings</h2>
-                    <p>Configure comment threads and news feed extraction</p>
-                </div>
-                
-                <setting-group title="Comments Page">
-                    <setting-toggle setting-id="hnIncludeAuthor" label="Include Author" description="Show username for each comment" checked></setting-toggle>
-                    <setting-toggle setting-id="hnIncludeTime" label="Include Time" description="Show when comments were posted" checked></setting-toggle>
-                    <setting-toggle setting-id="hnIncludeReplies" label="Include Replies" description="Extract threaded reply structure" checked></setting-toggle>
-                    <setting-toggle setting-id="hnIncludeUrl" label="Include Page URL" description="Add link to the HN discussion" checked></setting-toggle>
-                    <setting-toggle setting-id="hnIncludeItemText" label="Include Post Body" description="Extract the original post text" checked></setting-toggle>
-                </setting-group>
-                
-                <setting-group title="News Feed">
-                    <setting-toggle setting-id="hnNewsIncludeTitle" label="Include Title" description="Show the story title" checked></setting-toggle>
-                    <setting-toggle setting-id="hnNewsIncludeUrl" label="Include URL" description="Link to the external article" checked></setting-toggle>
-                    <setting-toggle setting-id="hnNewsIncludeSite" label="Include Site" description="Show the domain name" checked></setting-toggle>
-                    <setting-toggle setting-id="hnNewsIncludePoints" label="Include Points" description="Show the upvote count" checked></setting-toggle>
-                    <setting-toggle setting-id="hnNewsIncludeAuthor" label="Include Author" description="Show who submitted the story" checked></setting-toggle>
-                    <setting-toggle setting-id="hnNewsIncludeTime" label="Include Time" description="Show submission time" checked></setting-toggle>
-                    <setting-toggle setting-id="hnNewsIncludeComments" label="Include Comment Count" description="Show number of comments" checked></setting-toggle>
-                </setting-group>
-            </section>
+          <div class="settings-group">
+            <h3 class="group-title">Feedback & Support</h3>
+            <div class="feedback-card">
+              <p class="feedback-text">
+                Found a bug? Have a feature request? I'd love to hear from you!
+              </p>
+              <div class="button-row">
+                <a
+                  href="https://github.com/miguelcorderocollar/ExtractMD/issues/new"
+                  target="_blank"
+                  class="btn btn-primary"
+                >
+                  <svg
+                    class="btn-icon-sm"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                    />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                  Open an Issue
+                </a>
+                <a href="mailto:contact@miguelcorderocollar.com" class="btn btn-secondary">
+                  <svg
+                    class="btn-icon-sm"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                    />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                  Contact Developer
+                </a>
+              </div>
+            </div>
+          </div>
 
-            <!-- Articles Section -->
-            <section id="section-articles" class="settings-section">
-                <div class="section-header">
-                    <h2>Article Settings</h2>
-                    <p>Configure how web articles are extracted</p>
-                </div>
-                
-                <setting-group title="Content Options">
-                    <setting-toggle setting-id="articleExporterIncludeImages" label="Include Images" description="Add image markdown with alt text" checked></setting-toggle>
-                    <setting-toggle setting-id="articleExporterOnlyLongest" label="Only Longest Article" description="Skip sidebars and extract main content only"></setting-toggle>
-                    <setting-toggle setting-id="articleExporterShowInfo" label="Show Info Notification" description="Display article details when found" checked></setting-toggle>
-                    <setting-toggle setting-id="articleExporterIncludeUrl" label="Include Page URL" description="Add source link to the article" checked></setting-toggle>
-                </setting-group>
-            </section>
+          <div class="about-credit">
+            Made with <span class="credit-icon">🤖</span> by
+            <a href="https://github.com/miguelcorderocollar" target="_blank">miguelcorderocollar</a>
+          </div>
+        </section>
 
-            <!-- Universal Section -->
-            <section id="section-universal" class="settings-section">
-                <div class="section-header">
-                    <h2>Universal Settings</h2>
-                    <p>Configure fallback extraction for any webpage</p>
-                </div>
-                
-                <setting-group title="Content Detection">
-                    <setting-select 
-                        setting-id="universalContentMode" 
-                        label="Content Mode" 
-                        description="How to detect the main content area"
-                        value="auto">
-                        <option value="auto">Auto (Smart Detection)</option>
-                        <option value="main">Main Element Only</option>
-                        <option value="full">Full Page</option>
-                        <option value="selector">Custom Selector</option>
-                    </setting-select>
-                    
-                    <div class="setting-row" id="customSelectorRow" style="display: none;">
-                        <div class="setting-info">
-                            <span class="setting-label">Custom Selector</span>
-                            <span class="setting-desc">CSS selector for content (e.g., #main, .content)</span>
-                        </div>
-                        <input type="text" id="universalCustomSelector" class="input-text" placeholder=".article-content">
-                    </div>
-                    
-                    <setting-toggle setting-id="universalStripNav" label="Strip Navigation" description="Remove nav, header, footer, and sidebar elements" checked></setting-toggle>
-                </setting-group>
-                
-                <setting-group title="Content Options">
-                    <setting-toggle setting-id="universalIncludeImages" label="Include Images" description="Convert images to markdown format" checked></setting-toggle>
-                    <setting-toggle setting-id="universalIncludeLinks" label="Include Links" description="Preserve hyperlinks in markdown" checked></setting-toggle>
-                    <setting-toggle setting-id="universalPreserveCodeBlocks" label="Preserve Code Blocks" description="Format code with syntax highlighting hints" checked></setting-toggle>
-                    <setting-toggle setting-id="universalIncludeUrl" label="Include Page URL" description="Add source link header to output" checked></setting-toggle>
-                </setting-group>
-            </section>
-
-            <!-- Workflow Section -->
-            <section id="section-workflow" class="settings-section">
-                <div class="section-header">
-                    <h2>Workflow Settings</h2>
-                    <p>Automate your extraction workflow</p>
-                </div>
-                
-                <setting-group title="After Extraction">
-                    <setting-toggle setting-id="jumpToDomain" label="Jump to Target Domain" description="Automatically open a URL after copying"></setting-toggle>
-                    
-                    <div class="setting-block">
-                        <label class="setting-label-sm">Target URL</label>
-                        <input 
-                            type="text" 
-                            id="jumpToDomainUrl" 
-                            class="input-text" 
-                            placeholder="https://chat.openai.com/"
-                        >
-                    </div>
-                    
-                    <setting-toggle setting-id="closeTabAfterExtraction" label="Close Tab After Extraction" description="Automatically close the source tab"></setting-toggle>
-                </setting-group>
-                
-                <setting-group title="Output Mode">
-                    <setting-toggle setting-id="downloadInsteadOfCopy" label="Download as .md File" description="Save to file instead of clipboard"></setting-toggle>
-                    
-                    <setting-input 
-                        setting-id="downloadIfTokensExceed" 
-                        label="Download if Tokens Exceed" 
-                        description="Auto-download large extractions (thousands)"
-                        type="number"
-                        min="0"
-                        step="1"
-                        placeholder="0">
-                    </setting-input>
-                    
-                    <setting-toggle setting-id="showTokenCountInNotification" label="Show Token Count" description="Display token count in notification"></setting-toggle>
-                </setting-group>
-                
-                <setting-group title="Display">
-                    <setting-toggle setting-id="showUsageKpi" label="Show Usage KPIs" description="Track extraction statistics" checked></setting-toggle>
-                </setting-group>
-            </section>
-
-            <!-- Data Section -->
-            <section id="section-data" class="settings-section">
-                <div class="section-header">
-                    <h2>Data & Statistics</h2>
-                    <p>View usage stats and manage settings</p>
-                </div>
-                
-                <div class="settings-group">
-                    <h3 class="group-title">Usage Statistics</h3>
-                    
-                    <div class="kpi-grid" id="kpi-counters">
-                        <!-- Populated by JS -->
-                    </div>
-                    
-                    <div id="kpi-time-saved" class="kpi-time-saved"></div>
-                    
-                    <button id="clearKpiBtn" class="btn btn-secondary">
-                        Clear Statistics
-                    </button>
-                </div>
-                
-                <div class="settings-group">
-                    <h3 class="group-title">Import / Export</h3>
-                    
-                    <div class="button-row">
-                        <button id="exportSettingsBtn" class="btn btn-secondary">
-                            Export Settings
-                        </button>
-                        <button id="importSettingsBtn" class="btn btn-secondary">
-                            Import Settings
-                        </button>
-                        <input type="file" id="importSettingsFile" accept="application/json" style="display:none;">
-                    </div>
-                </div>
-                
-                <div class="settings-group">
-                    <h3 class="group-title">Reset Data</h3>
-                    <p class="group-desc">Clear stored data that accumulates over time. This does not affect your settings.</p>
-                    
-                    <div class="setting-block">
-                        <div class="setting-block-header">
-                            <div class="setting-info">
-                                <span class="setting-label">Floating Button Positions</span>
-                                <span class="setting-desc">Clear all saved button positions across domains</span>
-                            </div>
-                            <button id="resetPositionsBtn" class="btn btn-secondary btn-sm">
-                                Reset Positions
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- About Section -->
-            <section id="section-about" class="settings-section">
-                <div class="section-header">
-                    <h2>About ExtractMD</h2>
-                    <p>Information and credits</p>
-                </div>
-                
-                <div class="settings-group">
-                    <div class="about-card">
-                        <img src="images/logo.svg" alt="ExtractMD Logo" class="about-logo">
-                        <h3 class="mono">ExtractMD</h3>
-                        <p class="about-version">Version 1.0</p>
-                        <p class="about-desc">
-                            Extract content from web pages as clean Markdown. 
-                            Perfect for feeding content to LLMs, note-taking, or archiving.
-                        </p>
-                        <div class="about-links">
-                            <a href="https://extractmd.miguelcorderocollar.com/" target="_blank" class="about-link">
-                                <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="2" y1="12" x2="22" y2="12"/>
-                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                                </svg>
-                                Website
-                            </a>
-                            <a href="https://github.com/miguelcorderocollar/ExtractMD" target="_blank" class="about-link">
-                                <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                                </svg>
-                                GitHub Repository
-                            </a>
-                            <a href="https://miguelcorderocollar.com" target="_blank" class="about-link">
-                                <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="2" y1="12" x2="22" y2="12"/>
-                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                                </svg>
-                                Developer Website
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="settings-group">
-                    <h3 class="group-title">Feedback & Support</h3>
-                    <div class="feedback-card">
-                        <p class="feedback-text">
-                            Found a bug? Have a feature request? I'd love to hear from you!
-                        </p>
-                        <div class="button-row">
-                            <a href="https://github.com/miguelcorderocollar/ExtractMD/issues/new" target="_blank" class="btn btn-primary">
-                                <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-                                </svg>
-                                Open an Issue
-                            </a>
-                            <a href="mailto:contact@miguelcorderocollar.com" class="btn btn-secondary">
-                                <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                    <polyline points="22,6 12,13 2,6"/>
-                                </svg>
-                                Contact Developer
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="about-credit">
-                    Made with <span class="credit-icon">🤖</span> by 
-                    <a href="https://github.com/miguelcorderocollar" target="_blank">miguelcorderocollar</a>
-                </div>
-            </section>
-
-            <!-- Status Message -->
-            <div class="status-message" id="status"></div>
-        </main>
+        <!-- Status Message -->
+        <div class="status-message" id="status"></div>
+      </main>
     </div>
     <script src="dist/options.js"></script>
-</body>
+  </body>
 </html>

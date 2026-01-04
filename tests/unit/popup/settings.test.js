@@ -17,4 +17,3 @@ describe('popup.js - DEFAULTS', () => {
     expect(DEFAULTS.enableUsageKpi).toBe(true);
   });
 });
-
