@@ -12,6 +12,7 @@ Your goal is to transform ExtractMD from a collection of monolithic scripts into
 2. **Modular Architecture:** Split files larger than 300 lines. Use shared modules in `extension/shared/`.
 3. **Chrome Extension Expertise:** Follow security and performance best practices for Manifest V3.
 4. **Context-Awareness:** Always refer to `docs/refactoring-plan.md` to ensure you are aligned with the project's phase-based roadmap.
+5. **Git Safety:** NEVER commit changes unless the user explicitly asks you to. This prevents unwanted proactive behavior.
 
 ## Project Vision (ExtractMD 2.0)
 

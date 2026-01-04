@@ -83,5 +83,6 @@
         }
       ]
     }
-  ]
+  ],
+  "ignoreCommand": "git diff --name-only HEAD~1 | grep -q '^web/' && exit 1 || exit 0"
 }
