@@ -11,7 +11,7 @@
 ## Links
 
 - **Website**: [https://extractmd.miguelcorderocollar.com/](https://extractmd.miguelcorderocollar.com/)
-- **Chrome Web Store**: Pending approval
+- **Chrome Web Store**: [https://chromewebstore.google.com/detail/extractmd/dbopkomdhgkkicbndimnooalbfcbhodp](https://chromewebstore.google.com/detail/extractmd/dbopkomdhgkkicbndimnooalbfcbhodp)
 
 ## Features
 
