@@ -100,6 +100,7 @@ const SETTING_ELEMENTS = {
   aiChatOutputMode: { id: 'aiChatOutputMode', type: 'select' },
   aiChatAutoOpen: { id: 'aiChatAutoOpen', type: 'checkbox' },
   aiChatSendDirectly: { id: 'aiChatSendDirectly', type: 'checkbox' },
+  aiChatShowTimestamps: { id: 'aiChatShowTimestamps', type: 'checkbox' },
 };
 
 /**

@@ -70,6 +70,7 @@ export const DEFAULTS = {
   aiChatAutoOpen: false,
   aiChatSendDirectly: true,
   aiChatOutputMode: 'copy', // 'copy' | 'sidebar' | 'both'
+  aiChatShowTimestamps: false, // Show timestamps on messages
 
   // Theme
   accentColor: '#14b8a6', // Default teal
@@ -131,6 +132,7 @@ export const SETTING_SCHEMA = {
   aiChatAutoOpen: 'boolean',
   aiChatSendDirectly: 'boolean',
   aiChatOutputMode: 'string',
+  aiChatShowTimestamps: 'boolean',
   accentColor: 'string',
   welcomeCompleted: 'boolean',
 };

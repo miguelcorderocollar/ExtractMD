@@ -2,12 +2,14 @@
 // Main logic for the chat interface
 
 import { getApiKey, getAiChatSettings } from '../shared/aiStorage.js';
+import { DEFAULTS } from '../shared/defaults.js';
 
 // State management
 let chatHistory = [];
 let extractedContent = null;
 let extractedMetadata = null;
 let settings = null;
+let showTimestamps = false;
 
 // DOM elements
 let chatMessagesEl;
@@ -33,14 +35,39 @@ async function initialize() {
 
   // Load settings
   settings = await getAiChatSettings();
+  const allSettings = await chrome.storage.sync.get({
+    accentColor: DEFAULTS.accentColor,
+    aiChatShowTimestamps: DEFAULTS.aiChatShowTimestamps,
+  });
 
-  // Check if API key is configured (not required for dummy mode)
-  const hasKey = await getApiKey();
-  if (!hasKey) {
-    showStatus(
-      'No API key configured. Using dummy responses. Add your OpenRouter API key in settings for real AI.',
-      'info'
-    );
+  // Apply accent color
+  applyAccentColor(allSettings.accentColor);
+
+  // Apply timestamp setting
+  showTimestamps = allSettings.aiChatShowTimestamps;
+
+  // Listen for settings changes
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'sync') {
+      if (changes.accentColor) {
+        applyAccentColor(changes.accentColor.newValue);
+      }
+      if (changes.aiChatShowTimestamps) {
+        showTimestamps = changes.aiChatShowTimestamps.newValue;
+        // Update all existing timestamps visibility
+        document.querySelectorAll('.message-time').forEach((el) => {
+          el.classList.toggle('visible', showTimestamps);
+        });
+      }
+    }
+  });
+
+  // Configure marked.js for markdown rendering
+  if (typeof marked !== 'undefined') {
+    marked.setOptions({
+      breaks: true, // Convert \n to <br>
+      gfm: true, // GitHub Flavored Markdown
+    });
   }
 
   // Set up event listeners
@@ -50,6 +77,47 @@ async function initialize() {
   chrome.runtime.onMessage.addListener(handleRuntimeMessage);
 
   console.debug('[ExtractMD Sidebar] Initialized');
+}
+
+/**
+ * Apply accent color to CSS variables
+ */
+function applyAccentColor(color) {
+  if (!color) return;
+
+  // Set the accent color CSS variable
+  document.documentElement.style.setProperty('--accent', color);
+
+  // Calculate hover color (slightly darker)
+  const hoverColor = adjustBrightness(color, -15);
+  document.documentElement.style.setProperty('--accent-hover', hoverColor);
+
+  console.debug('[ExtractMD Sidebar] Accent color applied:', color);
+}
+
+/**
+ * Adjust color brightness
+ */
+function adjustBrightness(hex, percent) {
+  // Remove # if present
+  hex = hex.replace('#', '');
+
+  // Convert to RGB
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
+
+  // Adjust brightness
+  r = Math.max(0, Math.min(255, r + (r * percent) / 100));
+  g = Math.max(0, Math.min(255, g + (g * percent) / 100));
+  b = Math.max(0, Math.min(255, b + (b * percent) / 100));
+
+  // Convert back to hex
+  const rr = Math.round(r).toString(16).padStart(2, '0');
+  const gg = Math.round(g).toString(16).padStart(2, '0');
+  const bb = Math.round(b).toString(16).padStart(2, '0');
+
+  return `#${rr}${gg}${bb}`;
 }
 
 /**
@@ -122,6 +190,12 @@ async function handleSendMessage() {
 
   console.debug('[ExtractMD Sidebar] Sending message:', message);
 
+  // Clear welcome message if still visible
+  const welcomeMsg = chatMessagesEl.querySelector('.welcome-message');
+  if (welcomeMsg) {
+    welcomeMsg.remove();
+  }
+
   // Add user message to chat
   addMessage('user', message);
 
@@ -146,7 +220,7 @@ async function sendMessageToAI(userMessage) {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 1000));
 
-    // Generate dummy response
+    // Generate dummy response with markdown
     const dummyResponse = generateDummyResponse(userMessage);
     console.debug('[ExtractMD Sidebar] Generated dummy response:', dummyResponse);
 
@@ -166,17 +240,87 @@ async function sendMessageToAI(userMessage) {
 }
 
 /**
- * Generate a dummy AI response
+ * Generate a dummy AI response with markdown examples
  */
 function generateDummyResponse(userMessage) {
   const responses = [
-    'This is a dummy response. AI integration will be added in the next phase.',
-    'I can see you sent: "' +
-      userMessage.substring(0, 50) +
-      '..."\n\nThis is a placeholder response.',
-    'Great question! Once the OpenRouter API is integrated, I will provide real AI-powered responses.',
-    'I analyzed your message. (This is a simulated response until AI is connected)',
-    'Interesting! In the future, this will be an actual AI response analyzing your extracted content.',
+    `This is a **dummy response** with _markdown_ support!
+
+Here's what I can do:
+- Render **bold** and *italic* text
+- Create \`code snippets\` inline
+- Make lists and links
+
+\`\`\`javascript
+// Even code blocks work!
+function analyze(content) {
+  return "AI response here";
+}
+\`\`\`
+
+Once the OpenRouter API is integrated, I'll provide real AI-powered responses.`,
+
+    `I analyzed your message: "${userMessage.substring(0, 50)}..."
+
+**Key features:**
+1. Markdown rendering ✓
+2. Code highlighting ✓
+3. Smart formatting ✓
+
+> This is a blockquote example
+
+Visit [ExtractMD](https://github.com) for more info.
+
+*This is a placeholder response until AI is connected.*`,
+
+    `Great question! Here's a **formatted response** with:
+
+- **Bold text** for emphasis
+- \`inline code\` for technical terms
+- [Links](https://example.com) that work
+
+\`\`\`python
+# Code blocks with syntax
+def process_content(text):
+    return ai_analyze(text)
+\`\`\`
+
+> **Note:** Real AI responses coming soon!`,
+
+    `**Analysis Complete**
+
+Your content has been received. In production, this would be analyzed by **${settings.aiChatModel || 'AI'}**.
+
+**Features demonstrated:**
+- Markdown rendering
+- List formatting
+- Code blocks
+- Blockquotes
+
+\`\`\`json
+{
+  "status": "dummy",
+  "model": "${settings.aiChatModel}",
+  "ready": true
+}
+\`\`\``,
+
+    `**Summary**
+
+I can see you asked about: _${userMessage.substring(0, 40)}_...
+
+Here's what you'll get with real AI:
+1. **Deep analysis** of extracted content
+2. **Smart summaries** and insights
+3. **Code examples** when relevant
+4. **Follow-up** suggestions
+
+\`\`\`
+# This is a dummy response
+# Real AI integration coming next!
+\`\`\`
+
+> **Tip:** Add your OpenRouter API key in settings for real responses.`,
   ];
 
   return responses[Math.floor(Math.random() * responses.length)];
@@ -189,19 +333,32 @@ function addMessage(role, content) {
   const messageEl = document.createElement('div');
   messageEl.className = `message ${role}`;
 
-  const avatarEl = document.createElement('div');
-  avatarEl.className = 'message-avatar';
-  avatarEl.textContent = role === 'user' ? 'U' : role === 'assistant' ? 'AI' : 'S';
-
   const contentEl = document.createElement('div');
   contentEl.className = 'message-content';
 
   const bubbleEl = document.createElement('div');
   bubbleEl.className = 'message-bubble';
-  bubbleEl.textContent = content;
+
+  // Render markdown if available and role is assistant or user
+  if (typeof marked !== 'undefined' && (role === 'assistant' || role === 'user')) {
+    try {
+      bubbleEl.innerHTML = marked.parse(content);
+    } catch (e) {
+      console.error('[ExtractMD] Markdown parse error:', e);
+      bubbleEl.textContent = content;
+    }
+  } else {
+    bubbleEl.textContent = content;
+  }
+
+  // Check if message is long (needs read more) - need to check after adding to DOM
+  let isLong = false;
 
   const timeEl = document.createElement('div');
   timeEl.className = 'message-time';
+  if (showTimestamps) {
+    timeEl.classList.add('visible');
+  }
   timeEl.textContent = new Date().toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
@@ -209,10 +366,29 @@ function addMessage(role, content) {
 
   contentEl.appendChild(bubbleEl);
   contentEl.appendChild(timeEl);
-  messageEl.appendChild(avatarEl);
   messageEl.appendChild(contentEl);
-
   chatMessagesEl.appendChild(messageEl);
+
+  // Check if long AFTER adding to DOM (so we can measure scrollHeight)
+  // Wait a tick for the DOM to render
+  setTimeout(() => {
+    isLong = bubbleEl.scrollHeight > 250 || content.length > 500;
+
+    if (isLong) {
+      contentEl.classList.add('collapsed');
+      const readMoreBtn = document.createElement('button');
+      readMoreBtn.className = 'read-more-btn';
+      readMoreBtn.textContent = 'Read more';
+      readMoreBtn.addEventListener('click', () => {
+        const isCollapsed = contentEl.classList.contains('collapsed');
+        contentEl.classList.toggle('collapsed');
+        readMoreBtn.textContent = isCollapsed ? 'Show less' : 'Read more';
+      });
+      // Insert before timestamp
+      contentEl.insertBefore(readMoreBtn, timeEl);
+    }
+  }, 10);
+
   chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
 
   // Add to history
@@ -235,10 +411,6 @@ function showTypingIndicator() {
   messageEl.className = 'message assistant';
   messageEl.id = id;
 
-  const avatarEl = document.createElement('div');
-  avatarEl.className = 'message-avatar';
-  avatarEl.textContent = 'AI';
-
   const contentEl = document.createElement('div');
   contentEl.className = 'message-content';
 
@@ -252,7 +424,6 @@ function showTypingIndicator() {
 
   bubbleEl.appendChild(typingEl);
   contentEl.appendChild(bubbleEl);
-  messageEl.appendChild(avatarEl);
   messageEl.appendChild(contentEl);
 
   chatMessagesEl.appendChild(messageEl);
@@ -306,9 +477,9 @@ function handleClearChat() {
       <div class="welcome-message">
         <svg class="welcome-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          <circle cx="9" cy="10" r="1" />
-          <circle cx="15" cy="10" r="1" />
-          <path d="M9 14c.5.5 1.5 1 3 1s2.5-.5 3-1" />
+          <circle cx="9" cy="8" r="1" fill="currentColor" />
+          <circle cx="15" cy="8" r="1" fill="currentColor" />
+          <path d="M9 12c.5.5 1.5 1 3 1s2.5-.5 3-1" />
         </svg>
         <h2>Welcome to AI Chat</h2>
         <p>Extract content from a webpage to start chatting with AI about it.</p>
@@ -319,7 +490,7 @@ function handleClearChat() {
 }
 
 /**
- * Handle export chat as markdown
+ * Handle export chat as JSON
  */
 function handleExportChat() {
   if (chatHistory.length === 0) {
@@ -327,30 +498,34 @@ function handleExportChat() {
     return;
   }
 
-  let markdown = '# ExtractMD AI Chat Export\n\n';
-  markdown += `Exported: ${new Date().toLocaleString()}\n\n`;
-  markdown += '---\n\n';
-
-  for (const msg of chatHistory) {
-    if (msg.role === 'user') {
-      markdown += `**You:** ${msg.content}\n\n`;
-    } else if (msg.role === 'assistant') {
-      markdown += `**AI:** ${msg.content}\n\n`;
-    } else if (msg.role === 'system') {
-      markdown += `*${msg.content}*\n\n`;
-    }
-  }
+  // Create export data with metadata
+  const exportData = {
+    metadata: {
+      exportedAt: new Date().toISOString(),
+      version: '1.0',
+      model: settings.aiChatModel || 'dummy',
+      messageCount: chatHistory.length,
+    },
+    extractedContent: extractedContent
+      ? {
+          content: extractedContent.substring(0, 500) + '...', // Truncate for file size
+          metadata: extractedMetadata,
+        }
+      : null,
+    messages: chatHistory,
+  };
 
   // Create download
-  const blob = new Blob([markdown], { type: 'text/markdown' });
+  const json = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `extractmd-chat-${Date.now()}.md`;
+  a.download = `extractmd-chat-${Date.now()}.json`;
   a.click();
   URL.revokeObjectURL(url);
 
-  showStatus('Chat exported successfully', 'success');
+  showStatus('Chat exported as JSON', 'success');
 }
 
 // Initialize when DOM is ready
