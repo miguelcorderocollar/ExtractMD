@@ -8,6 +8,7 @@ import {
   updateIntegrationVisibility,
 } from './integrationVisibility.js';
 import { showStatus } from './ui.js';
+import { getApiKey, saveApiKey } from '../shared/aiStorage.js';
 
 /**
  * Mapping of setting keys to their DOM element IDs and types
@@ -91,6 +92,14 @@ const SETTING_ELEMENTS = {
   floatingButtonEnableDismiss: { id: 'floatingButtonEnableDismiss', type: 'checkbox' },
   floatingButtonSize: { id: 'floatingButtonSize', type: 'select' },
   floatingButtonTransparency: { id: 'floatingButtonTransparency', type: 'select' },
+
+  // AI Chat settings (API key handled separately via aiStorage.js)
+  aiChatEnabled: { id: 'aiChatEnabled', type: 'checkbox' },
+  aiChatModel: { id: 'aiChatModel', type: 'select' },
+  aiChatSystemPrompt: { id: 'aiChatSystemPrompt', type: 'textarea' },
+  aiChatOutputMode: { id: 'aiChatOutputMode', type: 'select' },
+  aiChatAutoOpen: { id: 'aiChatAutoOpen', type: 'checkbox' },
+  aiChatSendDirectly: { id: 'aiChatSendDirectly', type: 'checkbox' },
 };
 
 /**
@@ -235,7 +244,11 @@ export function attachSettingHandlers() {
       });
     } else if (config.type === 'text' || config.type === 'textarea' || config.type === 'color') {
       // Text inputs are handled separately (domain validation, etc.)
-      if (key === 'jumpToDomainUrl' || key === 'universalCustomSelector') {
+      if (
+        key === 'jumpToDomainUrl' ||
+        key === 'universalCustomSelector' ||
+        key === 'aiChatSystemPrompt'
+      ) {
         const inputEl = getInputElement(element);
         inputEl.addEventListener('input', function () {
           saveSetting(key, inputEl.value);
@@ -377,6 +390,38 @@ function initializeResetPositionsButton() {
 }
 
 /**
+ * Initialize API key field handling
+ * API key is stored in chrome.storage.local (not synced)
+ */
+async function initializeApiKeyField() {
+  const apiKeyElement = findSettingElement('aiChatApiKey');
+  if (!apiKeyElement) return;
+
+  // Load API key from local storage
+  const apiKey = await getApiKey();
+  const inputEl = getInputElement(apiKeyElement);
+  if (inputEl) {
+    inputEl.value = apiKey || '';
+  }
+
+  // Save API key on input with debouncing
+  let debounceTimeout = null;
+  if (inputEl) {
+    inputEl.addEventListener('input', function () {
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(async () => {
+        try {
+          await saveApiKey(inputEl.value);
+          console.debug('[ExtractMD] API key saved');
+        } catch (error) {
+          console.error('[ExtractMD] Error saving API key:', error);
+        }
+      }, 500);
+    });
+  }
+}
+
+/**
  * Initialize settings module
  */
 export function initializeSettings() {
@@ -384,4 +429,5 @@ export function initializeSettings() {
   loadSettings();
   attachSettingHandlers();
   initializeResetPositionsButton();
+  initializeApiKeyField();
 }

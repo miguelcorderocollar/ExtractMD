@@ -65,6 +65,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.action === 'closeCurrentTab' && sender.tab) {
     chrome.tabs.remove(sender.tab.id);
     sendResponse({ success: true });
+  } else if (message.action === 'openSidebarWithContent') {
+    console.debug('[ExtractMD Background] Received openSidebarWithContent request', {
+      tabId: sender.tab?.id,
+      contentLength: message.content?.length,
+    });
+
+    // Open the sidebar for the current tab
+    chrome.sidePanel
+      .open({ tabId: sender.tab.id })
+      .then(() => {
+        console.debug('[ExtractMD Background] ✅ Sidebar opened, sending content...');
+        // Wait a bit for sidebar to initialize, then send the content
+        setTimeout(() => {
+          chrome.runtime.sendMessage({
+            action: 'setExtractedContent',
+            content: message.content,
+            metadata: message.metadata,
+          });
+          console.debug('[ExtractMD Background] Content sent to sidebar');
+        }, 100);
+        sendResponse({ success: true });
+      })
+      .catch((error) => {
+        console.error('[ExtractMD Background] ❌ Error opening sidebar:', error);
+        sendResponse({ success: false, error: error.message });
+      });
+    return true; // Will respond asynchronously
   }
 });
 

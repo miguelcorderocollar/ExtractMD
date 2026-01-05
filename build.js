@@ -68,6 +68,12 @@ try {
       entryPoints: ['extension/options/index.js'],
       outfile: 'extension/dist/options.js',
     }),
+    // Sidebar bundle
+    esbuild.build({
+      ...commonOptions,
+      entryPoints: ['extension/sidebar/sidebar.js'],
+      outfile: 'extension/dist/sidebar.js',
+    }),
   ]);
   console.log('\n✅ Build completed successfully!\n');
 } catch (error) {

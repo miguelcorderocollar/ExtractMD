@@ -24,7 +24,7 @@ export async function handleCopyOrDownload(
   markdown,
   { title, kpiType, successMessage, onSuccess }
 ) {
-  // Get user settings for copy/download behavior
+  // Get user settings for copy/download behavior and AI chat
   const settings = await new Promise((resolve) => {
     chrome.storage.sync.get(
       {
@@ -33,39 +33,88 @@ export async function handleCopyOrDownload(
         jumpToDomain: false,
         jumpToDomainUrl: 'https://chat.openai.com/',
         closeTabAfterExtraction: false,
+        aiChatEnabled: false,
+        aiChatAutoOpen: false,
+        aiChatOutputMode: 'copy',
       },
       resolve
     );
+  });
+
+  // Debug: Log all AI chat settings
+  console.debug('[ExtractMD] AI Chat Settings:', {
+    aiChatEnabled: settings.aiChatEnabled,
+    aiChatAutoOpen: settings.aiChatAutoOpen,
+    aiChatOutputMode: settings.aiChatOutputMode,
   });
 
   const tokens = encode(markdown).length;
   let action = 'copy';
   let message = successMessage || 'Copied to clipboard!';
 
-  // Determine action:
+  // Determine if sidebar should be opened
+  // Opens sidebar when AI chat is enabled and output mode includes sidebar
+  const shouldOpenSidebar =
+    settings.aiChatEnabled &&
+    (settings.aiChatOutputMode === 'sidebar' || settings.aiChatOutputMode === 'both');
+
+  console.debug('[ExtractMD] Sidebar decision:', {
+    shouldOpenSidebar,
+    aiChatEnabled: settings.aiChatEnabled,
+    outputMode: settings.aiChatOutputMode,
+  });
+
+  // Determine if content should be copied/downloaded
+  const shouldCopyOrDownload = settings.aiChatOutputMode !== 'sidebar' || !settings.aiChatEnabled;
+
+  // Determine action (only if we should copy/download):
   // 1. User setting: downloadInsteadOfCopy
   // 2. Token threshold exceeded
   // 3. Default: copy to clipboard
-  if (settings.downloadInsteadOfCopy) {
-    action = 'download';
-    message = successMessage || 'Downloaded as .md!';
-  } else {
-    const threshold = parseInt(settings.downloadIfTokensExceed, 10);
-    if (!isNaN(threshold) && threshold > 0 && tokens >= threshold * 1000) {
-      action = 'download-threshold';
-      message = successMessage || 'Downloaded as .md (token threshold)!';
+  if (shouldCopyOrDownload) {
+    if (settings.downloadInsteadOfCopy) {
+      action = 'download';
+      message = successMessage || 'Downloaded as .md!';
+    } else {
+      const threshold = parseInt(settings.downloadIfTokensExceed, 10);
+      if (!isNaN(threshold) && threshold > 0 && tokens >= threshold * 1000) {
+        action = 'download-threshold';
+        message = successMessage || 'Downloaded as .md (token threshold)!';
+      }
     }
+
+    // Perform the action
+    if (action === 'download' || action === 'download-threshold') {
+      downloadMarkdownFile(markdown, title, 'ExtractMD');
+    } else {
+      await copyToClipboard(markdown, true);
+    }
+
+    // Show notification with token count
+    showSuccessNotificationWithTokens(message, markdown);
   }
 
-  // Perform the action
-  if (action === 'download' || action === 'download-threshold') {
-    downloadMarkdownFile(markdown, title, 'ExtractMD');
+  // Open sidebar if configured
+  if (shouldOpenSidebar) {
+    console.debug('[ExtractMD] Attempting to open sidebar with content...');
+    try {
+      const response = await chrome.runtime.sendMessage({
+        action: 'openSidebarWithContent',
+        content: markdown,
+        metadata: { title, kpiType, tokens },
+      });
+      console.debug('[ExtractMD] Sidebar response:', response);
+      if (response?.success) {
+        console.debug('[ExtractMD] ✅ Sidebar opened successfully');
+      } else {
+        console.warn('[ExtractMD] ⚠️ Sidebar open failed:', response);
+      }
+    } catch (error) {
+      console.error('[ExtractMD] ❌ Error opening sidebar:', error);
+    }
   } else {
-    await copyToClipboard(markdown, true);
+    console.debug('[ExtractMD] Sidebar NOT opening (shouldOpenSidebar = false)');
   }
-
-  // Show notification with token count
-  showSuccessNotificationWithTokens(message, markdown);
 
   // Increment KPI counter
   await incrementKpi(kpiType);

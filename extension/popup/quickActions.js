@@ -105,6 +105,26 @@ function handleOpenSettings() {
 }
 
 /**
+ * Handle Open Sidebar button click
+ * Opens the AI Chat sidebar panel
+ */
+async function handleOpenSidebar() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab || !tab.id) {
+      showStatus('No active tab found', 'error');
+      return;
+    }
+
+    await chrome.sidePanel.open({ tabId: tab.id });
+    showStatus('Sidebar opened', 'success');
+  } catch (error) {
+    console.error('[ExtractMD] Error opening sidebar:', error);
+    showStatus('Failed to open sidebar', 'error');
+  }
+}
+
+/**
  * Initialize Extract Now button visibility
  * Hides the button if domain is blacklisted or no content to extract
  */
@@ -138,11 +158,16 @@ async function initializeExtractButton() {
  */
 export function initializeQuickActions() {
   const openSettingsBtn = document.getElementById('openSettingsBtn');
+  const openSidebarBtn = document.getElementById('openSidebarBtn');
 
   // Initialize extract button (async - handles visibility)
   initializeExtractButton();
 
   if (openSettingsBtn) {
     openSettingsBtn.addEventListener('click', handleOpenSettings);
+  }
+
+  if (openSidebarBtn) {
+    openSidebarBtn.addEventListener('click', handleOpenSidebar);
   }
 }

@@ -92,6 +92,21 @@
             </svg>
             <span>Universal</span>
           </button>
+          <button class="nav-item" data-section="ai-chat">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <circle cx="9" cy="10" r="1" />
+              <circle cx="15" cy="10" r="1" />
+              <path d="M9 14c.5.5 1.5 1 3 1s2.5-.5 3-1" />
+            </svg>
+            <span>AI Chat</span>
+          </button>
 
           <div class="nav-divider"></div>
 
@@ -482,6 +497,72 @@
               setting-id="universalIncludeUrl"
               label="Include Page URL"
               description="Add source link header to output"
+              checked
+            ></setting-toggle>
+          </setting-group>
+        </section>
+
+        <!-- AI Chat Section -->
+        <section id="section-ai-chat" class="settings-section">
+          <div class="section-header">
+            <h2>AI Chat Settings</h2>
+            <p>Enable AI-powered chat sidebar for extracted content analysis</p>
+          </div>
+
+          <setting-group title="AI Chat">
+            <setting-toggle
+              setting-id="aiChatEnabled"
+              label="Enable AI Chat"
+              description="Enable AI-powered chat sidebar. Requires an OpenRouter API key."
+            ></setting-toggle>
+
+            <setting-input
+              setting-id="aiChatApiKey"
+              label="OpenRouter API Key"
+              description="Your API key from OpenRouter. Stored locally and never synced."
+              type="password"
+              placeholder="sk-or-v1-..."
+            ></setting-input>
+
+            <setting-select
+              setting-id="aiChatModel"
+              label="AI Model"
+              description="Choose which AI model to use for chat responses"
+            >
+              <option value="openai/gpt-4o-mini">GPT-4o Mini (Fast & Affordable)</option>
+              <option value="openai/gpt-4o">GPT-4o (Most Capable)</option>
+              <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+              <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+              <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
+            </setting-select>
+
+            <setting-textarea
+              setting-id="aiChatSystemPrompt"
+              label="System Prompt"
+              description="Instructions for the AI on how to analyze and respond to content"
+              placeholder="You are a helpful assistant analyzing extracted content from web pages."
+            ></setting-textarea>
+
+            <setting-select
+              setting-id="aiChatOutputMode"
+              label="Output Mode"
+              description="How content should be handled after extraction"
+            >
+              <option value="copy">Copy Only (Default)</option>
+              <option value="sidebar">Open Sidebar Only</option>
+              <option value="both">Copy & Open Sidebar</option>
+            </setting-select>
+
+            <setting-toggle
+              setting-id="aiChatAutoOpen"
+              label="Auto-open Sidebar"
+              description="Automatically open the sidebar after content extraction"
+            ></setting-toggle>
+
+            <setting-toggle
+              setting-id="aiChatSendDirectly"
+              label="Send Directly"
+              description="Send content to AI immediately without allowing edits"
               checked
             ></setting-toggle>
           </setting-group>

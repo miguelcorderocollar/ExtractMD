@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ExtractMD AI Chat</title>
+    <link rel="stylesheet" href="sidebar.css" />
+  </head>
+  <body>
+    <div class="sidebar-container">
+      <!-- Header -->
+      <header class="sidebar-header">
+        <div class="header-content">
+          <h1 class="header-title">ExtractMD AI Chat</h1>
+          <div class="header-actions">
+            <button id="clearChatBtn" class="icon-btn" title="Clear chat" aria-label="Clear chat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6" />
+                <path
+                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                />
+              </svg>
+            </button>
+            <button
+              id="exportChatBtn"
+              class="icon-btn"
+              title="Export chat as markdown"
+              aria-label="Export chat"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Chat Messages Area -->
+      <main class="chat-messages" id="chatMessages">
+        <div class="welcome-message">
+          <svg
+            class="welcome-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            <circle cx="9" cy="10" r="1" />
+            <circle cx="15" cy="10" r="1" />
+            <path d="M9 14c.5.5 1.5 1 3 1s2.5-.5 3-1" />
+          </svg>
+          <h2>Welcome to AI Chat</h2>
+          <p>Extract content from a webpage to start chatting with AI about it.</p>
+        </div>
+      </main>
+
+      <!-- Status Bar -->
+      <div class="status-bar" id="statusBar" style="display: none">
+        <span class="status-message" id="statusMessage"></span>
+      </div>
+
+      <!-- Input Area -->
+      <footer class="input-area">
+        <div class="input-container">
+          <textarea
+            id="messageInput"
+            class="message-input"
+            placeholder="Type your message..."
+            rows="1"
+          ></textarea>
+          <button id="sendBtn" class="send-btn" aria-label="Send message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    <script src="dist/sidebar.js"></script>
+  </body>
+</html>

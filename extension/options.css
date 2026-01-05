@@ -910,3 +910,45 @@ input:checked + .toggle-slider:before {
   stroke-linejoin: round;
   flex-shrink: 0;
 }
+
+/* ============================================
+   Password Input Toggle
+   ============================================ */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-input-wrapper input {
+  flex: 1;
+  padding-right: 40px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 4px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.password-toggle-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.password-toggle-btn svg {
+  width: 18px;
+  height: 18px;
+}

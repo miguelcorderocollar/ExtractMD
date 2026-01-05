@@ -63,6 +63,14 @@ export const DEFAULTS = {
   floatingButtonSize: 'medium', // 'small' | 'medium' | 'large'
   floatingButtonTransparency: 'medium', // 'low' | 'medium' | 'high' | 'full'
 
+  // AI Chat
+  aiChatEnabled: false,
+  aiChatModel: 'openai/gpt-4o-mini',
+  aiChatSystemPrompt: 'You are a helpful assistant analyzing extracted content from web pages.',
+  aiChatAutoOpen: false,
+  aiChatSendDirectly: true,
+  aiChatOutputMode: 'copy', // 'copy' | 'sidebar' | 'both'
+
   // Theme
   accentColor: '#14b8a6', // Default teal
 
@@ -117,6 +125,12 @@ export const SETTING_SCHEMA = {
   floatingButtonEnableDismiss: 'boolean',
   floatingButtonSize: 'string',
   floatingButtonTransparency: 'string',
+  aiChatEnabled: 'boolean',
+  aiChatModel: 'string',
+  aiChatSystemPrompt: 'string',
+  aiChatAutoOpen: 'boolean',
+  aiChatSendDirectly: 'boolean',
+  aiChatOutputMode: 'string',
   accentColor: 'string',
   welcomeCompleted: 'boolean',
 };
