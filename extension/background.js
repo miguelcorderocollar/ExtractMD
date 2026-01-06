@@ -27,24 +27,57 @@ async function updateIcon(enabled) {
   console.debug(`[ExtractMD] Icon updated: ${enabled ? 'enabled' : 'disabled'}`);
 }
 
-// Listen for storage changes to update icon when globalEnabled changes
+// =============================================================================
+// Action Behavior Management - Configure popup vs sidebar based on aiChatEnabled
+// =============================================================================
+/**
+ * Configure extension action behavior based on aiChatEnabled setting
+ * @param {boolean} aiChatEnabled - Whether AI chat is enabled
+ */
+async function configureActionBehavior(aiChatEnabled) {
+  if (aiChatEnabled) {
+    // AI Chat enabled: Clear popup to enable onClicked listener
+    await chrome.action.setPopup({ popup: '' });
+    console.debug('[ExtractMD] Action configured to open sidebar');
+  } else {
+    // AI Chat disabled: Set popup to show popup.html
+    await chrome.action.setPopup({ popup: 'popup.html' });
+    console.debug('[ExtractMD] Action configured to open popup');
+  }
+}
+
+// Listen for storage changes to update icon and action behavior
 chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'sync' && changes.globalEnabled) {
-    // If the key was removed from storage, it means it's back to the default (true)
-    // If the key was set, use the new value
-    const enabled =
-      changes.globalEnabled.newValue !== undefined ? changes.globalEnabled.newValue : true;
-    updateIcon(enabled);
+  if (areaName === 'sync') {
+    // Handle globalEnabled changes
+    if (changes.globalEnabled) {
+      // If the key was removed from storage, it means it's back to the default (true)
+      // If the key was set, use the new value
+      const enabled =
+        changes.globalEnabled.newValue !== undefined ? changes.globalEnabled.newValue : true;
+      updateIcon(enabled);
+    }
+
+    // Handle aiChatEnabled changes
+    if (changes.aiChatEnabled) {
+      const aiEnabled =
+        changes.aiChatEnabled.newValue !== undefined ? changes.aiChatEnabled.newValue : false;
+      configureActionBehavior(aiEnabled);
+    }
   }
 });
 
-// Set correct icon on startup
+// Set correct icon and action behavior on startup
 chrome.runtime.onStartup.addListener(async () => {
-  const { globalEnabled = true } = await chrome.storage.sync.get({ globalEnabled: true });
+  const { globalEnabled = true, aiChatEnabled = false } = await chrome.storage.sync.get({
+    globalEnabled: true,
+    aiChatEnabled: false,
+  });
   updateIcon(globalEnabled);
+  configureActionBehavior(aiChatEnabled);
 });
 
-// Handle extension installation - auto-open options page and set initial icon
+// Handle extension installation - auto-open options page and set initial state
 chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
     // Mark welcome as not completed so modal shows
@@ -53,9 +86,24 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     chrome.runtime.openOptionsPage();
   }
 
-  // Set correct icon based on current state (for both install and update)
-  const { globalEnabled = true } = await chrome.storage.sync.get({ globalEnabled: true });
+  // Set correct icon and action behavior based on current state (for both install and update)
+  const { globalEnabled = true, aiChatEnabled = false } = await chrome.storage.sync.get({
+    globalEnabled: true,
+    aiChatEnabled: false,
+  });
   updateIcon(globalEnabled);
+  configureActionBehavior(aiChatEnabled);
+});
+
+// Handle extension icon click when AI chat is enabled (popup is cleared)
+chrome.action.onClicked.addListener(async (tab) => {
+  // This listener only fires when popup is not set (i.e., when AI chat is enabled)
+  try {
+    await chrome.sidePanel.open({ tabId: tab.id });
+    console.debug('[ExtractMD] Sidebar opened via action click');
+  } catch (error) {
+    console.error('[ExtractMD] Error opening sidebar:', error);
+  }
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
