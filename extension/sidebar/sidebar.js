@@ -90,7 +90,7 @@ function setupTabListeners() {
   });
 
   // Listen for tab updates (navigation, page load)
-  chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, _tab) => {
     // Only react to complete page loads and URL changes
     if (changeInfo.status === 'complete' || changeInfo.url) {
       const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });

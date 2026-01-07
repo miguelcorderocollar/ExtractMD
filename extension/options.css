@@ -196,6 +196,17 @@
   padding-top: 0;
 }
 
+/* Textarea rows need to stack vertically */
+.setting-row-textarea {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.setting-row-textarea .setting-info {
+  padding-bottom: 0;
+}
+
 .setting-info {
   display: flex;
   flex-direction: column;

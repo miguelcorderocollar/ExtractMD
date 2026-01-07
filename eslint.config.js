@@ -56,6 +56,7 @@ export default [
       'packages/**',
       'playwright-report/**',
       'test-results/**',
+      'extension/libs/**', // Third-party minified libraries
     ],
   },
 ];

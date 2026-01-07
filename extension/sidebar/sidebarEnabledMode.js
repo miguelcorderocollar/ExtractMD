@@ -1,7 +1,10 @@
 // Sidebar Enabled Mode Container
 // Manages AI chat interface and interactions
 
+/* global marked */
+
 import { getApiKey, getAiChatSettings } from '../shared/aiStorage.js';
+import { sendChatCompletion, formatMessagesForAPI, OpenRouterError } from '../shared/openrouter.js';
 
 // State management
 let chatHistory = [];
@@ -19,9 +22,9 @@ let statusMessageEl;
 
 /**
  * Initialize enabled mode (AI chat)
- * @param {Object} stateManager - State manager instance
+ * @param {Object} _stateManager - State manager instance (unused but kept for API consistency)
  */
-export async function initializeEnabledMode(stateManager) {
+export async function initializeEnabledMode(_stateManager) {
   console.debug('[ExtractMD Sidebar] Initializing enabled mode...');
 
   // Get DOM elements
@@ -170,7 +173,7 @@ async function handleSendMessage() {
 }
 
 /**
- * Send message to AI (dummy implementation for now)
+ * Send message to AI using OpenRouter API
  */
 async function sendMessageToAI(userMessage) {
   console.debug('[ExtractMD Sidebar] Sending to AI:', userMessage);
@@ -179,39 +182,90 @@ async function sendMessageToAI(userMessage) {
   const typingId = showTypingIndicator();
 
   try {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 1000));
+    // Get API key
+    const apiKey = await getApiKey();
 
-    // Generate dummy response
-    const dummyResponse = generateDummyResponse(userMessage);
-    console.debug('[ExtractMD Sidebar] Generated dummy response:', dummyResponse);
+    // If no API key, show friendly message
+    if (!apiKey || apiKey.trim() === '') {
+      removeTypingIndicator(typingId);
+      addSystemMessage(
+        `**No API Key Configured** 🔑\n\nTo start chatting with AI, you need an OpenRouter API key:\n\n1. [Sign up at OpenRouter](https://openrouter.ai/keys) (free, no credit card required)\n2. Copy your API key\n3. Go to the Settings page and paste it in the "OpenRouter API Key" field\n\n**Free Tier Benefits:**\n- 50 requests per day\n- Access to 4 free AI models\n- No payment required`
+      );
+      return;
+    }
+
+    // Load settings
+    const currentSettings = await getAiChatSettings();
+    const allSettings = await chrome.storage.sync.get({
+      aiChatTemperature: 1.0,
+    });
+
+    const model = currentSettings.aiChatModel;
+    const systemPrompt = currentSettings.aiChatSystemPrompt;
+    const temperature = allSettings.aiChatTemperature;
+
+    console.debug('[ExtractMD Sidebar] API settings:', { model, temperature });
+
+    // Format messages for API
+    const messages = formatMessagesForAPI(chatHistory, systemPrompt);
+
+    // Send to OpenRouter API
+    const response = await sendChatCompletion({
+      apiKey,
+      model,
+      messages,
+      temperature,
+    });
 
     // Remove typing indicator
     removeTypingIndicator(typingId);
 
     // Add assistant message
-    addMessage('assistant', dummyResponse);
+    addMessage('assistant', response);
 
     // Clear any error status
     hideStatus();
   } catch (error) {
     console.error('[ExtractMD Sidebar] Error sending message:', error);
     removeTypingIndicator(typingId);
-    showStatus('Failed to send message. Please try again.', 'error');
+
+    // Handle OpenRouter-specific errors
+    if (error instanceof OpenRouterError) {
+      switch (error.type) {
+        case 'rate_limit':
+          showStatus('Rate limit exceeded (50/day)', 'error');
+          addSystemMessage(
+            `**Rate Limit Exceeded** ⏱️\n\nYou've reached the free tier limit of 50 requests per day.\n\n- Try again tomorrow\n- Or [upgrade your OpenRouter account](https://openrouter.ai/credits) for higher limits`
+          );
+          break;
+
+        case 'network':
+          showStatus('Network error. Check your connection.', 'error');
+          break;
+
+        case 'api_error':
+          if (error.statusCode === 401 || error.statusCode === 403) {
+            showStatus('Invalid API key. Check settings.', 'error');
+          } else if (error.statusCode === 400) {
+            showStatus('Invalid request. Try different model.', 'error');
+          } else if (error.statusCode >= 500) {
+            showStatus('Server error. Try again later.', 'error');
+          } else {
+            showStatus(`API error: ${error.message}`, 'error');
+          }
+          break;
+
+        case 'invalid_response':
+          showStatus('Invalid API response. Try again.', 'error');
+          break;
+
+        default:
+          showStatus('Failed to send message. Please try again.', 'error');
+      }
+    } else {
+      showStatus('Failed to send message. Please try again.', 'error');
+    }
   }
-}
-
-/**
- * Generate a dummy AI response
- */
-function generateDummyResponse(userMessage) {
-  const responses = [
-    `This is a **dummy response** with _markdown_ support!\n\nHere's what I can do:\n- Render **bold** and *italic* text\n- Create \`code snippets\` inline\n- Make lists and links\n\n\`\`\`javascript\n// Even code blocks work!\nfunction analyze(content) {\n  return "AI response here";\n}\n\`\`\`\n\nOnce the OpenRouter API is integrated, I'll provide real AI-powered responses.`,
-    `I analyzed your message: "${userMessage.substring(0, 50)}..."\n\n**Key features:**\n1. Markdown rendering ✓\n2. Code highlighting ✓\n3. Smart formatting ✓\n\n> This is a blockquote example\n\nVisit [ExtractMD](https://github.com) for more info.\n\n*This is a placeholder response until AI is connected.*`,
-    `Great question! Here's a **formatted response** with:\n\n- **Bold text** for emphasis\n- \`inline code\` for technical terms\n- [Links](https://example.com) that work\n\n\`\`\`python\n# Code blocks with syntax\ndef process_content(text):\n    return ai_analyze(text)\n\`\`\`\n\n> **Note:** Real AI responses coming soon!`,
-  ];
-
-  return responses[Math.floor(Math.random() * responses.length)];
 }
 
 /**

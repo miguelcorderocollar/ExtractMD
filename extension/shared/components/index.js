@@ -11,12 +11,14 @@
  * // <setting-toggle>
  * // <setting-select>
  * // <setting-input>
+ * // <setting-textarea>
  * // <setting-group>
  */
 
 export { SettingToggle } from './setting-toggle.js';
 export { SettingSelect } from './setting-select.js';
 export { SettingInput } from './setting-input.js';
+export { SettingTextarea } from './setting-textarea.js';
 export { SettingGroup } from './setting-group.js';
 export { WelcomeModal } from './welcome-modal.js';
 

@@ -529,18 +529,51 @@
               label="AI Model"
               description="Choose which AI model to use for chat responses"
             >
-              <option value="openai/gpt-4o-mini">GPT-4o Mini (Fast & Affordable)</option>
-              <option value="openai/gpt-4o">GPT-4o (Most Capable)</option>
-              <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
-              <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
-              <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
+              <option value="nvidia/nemotron-3-nano-30b-a3b:free">
+                NVIDIA Nemotron 3 Nano (Fast, lightweight)
+              </option>
+              <option value="openai/gpt-oss-120b:free">GPT OSS 120B (Balanced performance)</option>
+              <option value="z-ai/glm-4.5-air:free">GLM 4.5 Air (Bilingual model)</option>
+              <option value="moonshotai/kimi-k2:free">Kimi K2 (Advanced reasoning)</option>
             </setting-select>
+
+            <div
+              class="info-box"
+              style="
+                margin-top: 8px;
+                padding: 12px;
+                background: #f0f9ff;
+                border-left: 3px solid #3b82f6;
+                border-radius: 4px;
+              "
+            >
+              <span style="color: #3b82f6; font-weight: 500">ℹ️ Free Tier:</span>
+              <span style="color: #1e40af">50 requests per day. </span>
+              <a
+                href="https://openrouter.ai/docs/limits"
+                target="_blank"
+                style="color: #2563eb; text-decoration: underline"
+                >Learn more</a
+              >
+            </div>
+
+            <setting-input
+              setting-id="aiChatTemperature"
+              label="Temperature"
+              description="Controls randomness in responses. Lower = more focused, Higher = more creative (0.0 - 2.0)"
+              type="number"
+              min="0"
+              max="2"
+              step="0.1"
+              placeholder="1.0"
+            ></setting-input>
 
             <setting-textarea
               setting-id="aiChatSystemPrompt"
               label="System Prompt"
-              description="Instructions for the AI on how to analyze and respond to content"
-              placeholder="You are a helpful assistant analyzing extracted content from web pages."
+              description="Instructions for the AI on how to analyze and respond to content. Default provides structured article summaries."
+              placeholder="When I provide you with an article..."
+              rows="12"
             ></setting-textarea>
 
             <setting-select
