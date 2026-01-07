@@ -4,11 +4,6 @@
 import { DEFAULTS } from '../shared/defaults.js';
 import { SidebarState } from './sidebarState.js';
 import { initializeSidebarDomainToggle } from './sidebarDomainToggle.js';
-import {
-  toggleHistoryDropdown,
-  closeHistoryDropdown,
-  initializeHistoryBadge,
-} from './sidebarExtractionHistory.js';
 import { initializeHeaderExtractButton } from './sidebarQuickActions.js';
 import { initializeDisabledMode } from './sidebarDisabledMode.js';
 import { initializeEnabledMode } from './sidebarEnabledMode.js';
@@ -62,10 +57,10 @@ async function initialize() {
  * Initialize shared components (present in both modes)
  */
 function initializeSharedComponents() {
-  // Domain toggle button (header)
+  // Domain toggle button (header - for enabled mode)
   initializeSidebarDomainToggle();
 
-  // Settings button
+  // Settings button (header - for enabled mode)
   const settingsBtn = document.getElementById('settingsBtn');
   if (settingsBtn) {
     settingsBtn.addEventListener('click', () => {
@@ -73,32 +68,60 @@ function initializeSharedComponents() {
     });
   }
 
-  // History button and dropdown
-  const historyBtn = document.getElementById('historyBtn');
-  if (historyBtn) {
-    historyBtn.addEventListener('click', toggleHistoryDropdown);
-  }
-
-  // Initialize history badge
-  initializeHistoryBadge();
-
-  // Extract button in header
+  // Extract button in header (for enabled mode)
   initializeHeaderExtractButton(showHeaderStatus);
 
-  // Close dropdown when clicking outside
-  document.addEventListener('click', (e) => {
-    const dropdown = document.getElementById('historyDropdown');
-    const historyBtn = document.getElementById('historyBtn');
+  // Global enable toggle in header
+  initializeHeaderGlobalToggle();
 
-    if (dropdown && dropdown.style.display !== 'none') {
-      if (
-        !dropdown.contains(e.target) &&
-        e.target !== historyBtn &&
-        !historyBtn.contains(e.target)
-      ) {
-        closeHistoryDropdown();
+  // Listen for tab changes and page navigation to refresh sidebar
+  setupTabListeners();
+}
+
+/**
+ * Setup listeners for tab changes and navigation
+ */
+function setupTabListeners() {
+  // Listen for tab activation (switching tabs)
+  chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    console.debug('[ExtractMD Sidebar] Tab activated:', activeInfo.tabId);
+    // Reload the sidebar to update for new tab
+    location.reload();
+  });
+
+  // Listen for tab updates (navigation, page load)
+  chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    // Only react to complete page loads and URL changes
+    if (changeInfo.status === 'complete' || changeInfo.url) {
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (activeTab && activeTab.id === tabId) {
+        console.debug('[ExtractMD Sidebar] Page updated, reloading sidebar');
+        // Reload the sidebar to update for new page
+        location.reload();
       }
     }
+  });
+}
+
+/**
+ * Initialize header global enable toggle
+ */
+async function initializeHeaderGlobalToggle() {
+  const toggleInput = document.getElementById('globalEnabledHeader');
+  if (!toggleInput) return;
+
+  // Load current state
+  const { globalEnabled = true } = await chrome.storage.sync.get({ globalEnabled: true });
+  toggleInput.checked = globalEnabled;
+
+  // Add change listener
+  toggleInput.addEventListener('change', async () => {
+    const newValue = toggleInput.checked;
+    await chrome.storage.sync.set({ globalEnabled: newValue });
+    showHeaderStatus(
+      newValue ? 'ExtractMD enabled' : 'ExtractMD disabled',
+      newValue ? 'success' : 'info'
+    );
   });
 }
 

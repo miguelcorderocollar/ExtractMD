@@ -108,25 +108,15 @@ async function initializeDomainToggle() {
 }
 
 /**
- * Initialize global enable toggle
+ * Initialize settings button
  */
-async function initializeGlobalEnableToggle() {
-  const toggleInput = document.getElementById('globalEnabledDisabled');
-  if (!toggleInput) return;
-
-  // Load current state
-  const { globalEnabled = true } = await chrome.storage.sync.get({ globalEnabled: true });
-  toggleInput.checked = globalEnabled;
-
-  // Add change listener
-  toggleInput.addEventListener('change', async () => {
-    const newValue = toggleInput.checked;
-    await chrome.storage.sync.set({ globalEnabled: newValue });
-    showDisabledModeStatus(
-      newValue ? 'ExtractMD enabled' : 'ExtractMD disabled',
-      newValue ? 'success' : 'info'
-    );
-  });
+function initializeSettingsButton() {
+  const settingsBtn = document.getElementById('openSettingsBtnDisabled');
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
+      chrome.runtime.openOptionsPage();
+    });
+  }
 }
 
 /**
@@ -141,9 +131,6 @@ export function initializeDisabledMode() {
   // Initialize domain toggle
   initializeDomainToggle();
 
-  // Initialize global enable toggle
-  initializeGlobalEnableToggle();
-
   // Initialize extract button
   initializeDisabledModeExtractButton(showDisabledModeStatus);
 
@@ -155,6 +142,9 @@ export function initializeDisabledMode() {
 
   // Initialize import/export
   initializeImportExport(showDisabledModeStatus);
+
+  // Initialize settings button
+  initializeSettingsButton();
 
   console.debug('[ExtractMD Sidebar] Disabled mode initialized');
 }

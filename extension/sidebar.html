@@ -12,8 +12,8 @@
     <div class="sidebar-container">
       <!-- Header -->
       <header class="sidebar-header">
-        <!-- LEFT: General functionality (always visible) -->
-        <div class="header-left">
+        <!-- LEFT: Chat-only functionality -->
+        <div class="header-left" id="chatActions">
           <button
             id="extractBtn"
             class="icon-btn"
@@ -23,17 +23,6 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
               <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-            </svg>
-          </button>
-          <button
-            id="historyBtn"
-            class="icon-btn"
-            title="Recent extractions"
-            aria-label="Recent extractions"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
             </svg>
           </button>
           <button
@@ -60,10 +49,6 @@
               />
             </svg>
           </button>
-        </div>
-
-        <!-- RIGHT: Chat-specific (hidden when aiChatEnabled=false) -->
-        <div class="header-right" id="chatActions">
           <button
             id="timestampsToggleBtn"
             class="icon-btn"
@@ -96,21 +81,21 @@
             </svg>
           </button>
         </div>
-      </header>
 
-      <!-- History Dropdown (positioned absolute) -->
-      <div id="historyDropdown" class="history-dropdown" style="display: none">
-        <div class="history-header">Recent Extractions</div>
-        <div id="historyList" class="history-list">
-          <!-- Populated dynamically -->
+        <!-- RIGHT: Global toggle switch -->
+        <div class="header-right">
+          <label class="header-toggle-switch" title="Enable/Disable ExtractMD">
+            <input type="checkbox" id="globalEnabledHeader" checked />
+            <span class="header-toggle-slider"></span>
+          </label>
         </div>
-      </div>
+      </header>
 
       <!-- Main Content - Dual Mode Containers -->
       <main class="sidebar-main">
         <!-- DISABLED MODE: Full Popup Replica -->
         <div id="disabledModeContent" class="disabled-mode" style="display: none">
-          <!-- Extract Button -->
+          <!-- 1. Extract Button (Primary Action) -->
           <div class="action-section">
             <button id="extractNowBtnDisabled" class="btn btn-primary btn-extract">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -123,7 +108,12 @@
             </button>
           </div>
 
-          <!-- Domain Info Bar -->
+          <!-- 2. Last Extraction Status -->
+          <div id="lastExtractionSectionDisabled" class="last-extraction" style="display: none">
+            <span id="lastExtractionStatusDisabled"></span>
+          </div>
+
+          <!-- 3. Domain Bar with Toggle Button -->
           <div class="domain-bar">
             <div class="domain-info">
               <span class="domain-label">Domain</span>
@@ -132,50 +122,24 @@
             <button id="toggleDomainBtnDisabled" class="btn-domain-toggle">Ignore</button>
           </div>
 
-          <!-- Last Extraction Status -->
-          <div id="lastExtractionSectionDisabled" class="last-extraction" style="display: none">
-            <span id="lastExtractionStatusDisabled"></span>
-          </div>
-
-          <!-- KPI Summary -->
+          <!-- 4. KPI Summary -->
           <div id="kpiSectionDisabled" class="kpi-bar">
+            <div class="kpi-header">Statistics</div>
             <div id="kpiCountersDisabled" class="kpi-inline"></div>
           </div>
 
-          <!-- Global Enable Toggle -->
-          <div class="settings-section">
-            <div class="setting-block">
-              <div class="setting-info">
-                <span class="setting-label">Enable ExtractMD</span>
-                <span class="setting-desc">Global on/off switch</span>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="globalEnabledDisabled" checked />
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Import/Export -->
-          <div class="import-export-section">
-            <button id="importSettingsBtnDisabled" class="btn btn-secondary">
+          <!-- 5. Settings Button (Secondary) -->
+          <div class="action-section">
+            <button id="openSettingsBtnDisabled" class="btn btn-secondary btn-settings">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                />
               </svg>
-              <span>Import Settings</span>
-            </button>
-            <button id="exportSettingsBtnDisabled" class="btn btn-secondary">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              <span>Export Settings</span>
+              <span>Settings</span>
             </button>
           </div>
-          <input type="file" id="importSettingsFileDisabled" accept=".json" style="display: none" />
 
           <!-- Status Toast -->
           <div class="status-toast-disabled" id="statusDisabled"></div>

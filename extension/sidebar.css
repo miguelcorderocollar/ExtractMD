@@ -682,6 +682,33 @@ body {
   height: 18px;
 }
 
+.btn-secondary {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-strong);
+}
+
+.btn-secondary svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* Domain Bar */
 .domain-bar {
   display: flex;
@@ -767,6 +794,15 @@ body {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
+}
+
+.kpi-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .kpi-inline {
@@ -906,19 +942,22 @@ input:checked + .toggle-slider:before {
 
 /* Status Toast for Disabled Mode */
 .status-toast-disabled {
-  position: fixed;
-  bottom: 16px;
+  position: absolute;
+  bottom: 80px;
   left: 16px;
   right: 16px;
-  padding: 10px 14px;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  padding: 12px 16px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
   border-radius: var(--radius-md);
   opacity: 0;
   transform: translateY(8px);
   transition: var(--transition-fast);
   pointer-events: none;
-  z-index: 200;
+  z-index: 1000;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
 }
 
 .status-toast-disabled.visible {
@@ -929,19 +968,19 @@ input:checked + .toggle-slider:before {
 .status-toast-disabled.success {
   background: var(--success-bg);
   color: var(--success);
-  border: 1px solid var(--success-border);
+  border: 2px solid var(--success-border);
 }
 
 .status-toast-disabled.error {
   background: var(--error-bg);
   color: var(--error);
-  border: 1px solid var(--error-border);
+  border: 2px solid var(--error-border);
 }
 
 .status-toast-disabled.info {
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
   color: var(--text-primary);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border-strong);
 }
 
 /* Enabled Mode Styles */
@@ -954,6 +993,49 @@ input:checked + .toggle-slider:before {
 .enabled-mode .chat-messages {
   flex: 1;
   overflow-y: auto;
+}
+
+/* Header Toggle Switch */
+.header-toggle-switch {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.header-toggle-switch input[type='checkbox'] {
+  display: none;
+}
+
+.header-toggle-slider {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  transition: var(--transition-fast);
+}
+
+.header-toggle-slider::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: var(--transition-fast);
+}
+
+.header-toggle-switch input:checked + .header-toggle-slider {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.header-toggle-switch input:checked + .header-toggle-slider::before {
+  transform: translateX(18px);
+  background: white;
 }
 
 /* Mode Visibility Classes */
@@ -976,4 +1058,9 @@ input:checked + .toggle-slider:before {
 
 .sidebar-container.mode-enabled .input-area {
   display: block;
+}
+
+/* Hide chat buttons in disabled mode */
+.sidebar-container.mode-disabled .header-left {
+  display: none !important;
 }
