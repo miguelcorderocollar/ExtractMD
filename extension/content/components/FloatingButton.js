@@ -459,14 +459,8 @@ export async function createFloatingButton({
       // Clear the copy function
       window.copyExtractMD = null;
 
-      // Remove the button
-      if (button.parentNode) {
-        button.parentNode.removeChild(button);
-      }
-
-      // Clean up event listeners
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      // Full cleanup via controller
+      controller.remove();
     }
   });
 
@@ -496,23 +490,25 @@ export async function createFloatingButton({
   };
 
   // Set up listeners for fullscreen changes
-  document.addEventListener('fullscreenchange', updateVisibility);
-  document.addEventListener('webkitfullscreenchange', updateVisibility);
-  document.addEventListener('mozfullscreenchange', updateVisibility);
-  document.addEventListener('MSFullscreenChange', updateVisibility);
+  const fullscreenEvents = [
+    'fullscreenchange',
+    'webkitfullscreenchange',
+    'mozfullscreenchange',
+    'MSFullscreenChange',
+  ];
+  fullscreenEvents.forEach((evt) => document.addEventListener(evt, updateVisibility));
 
   // For YouTube fullscreen changes (theater mode no longer hides the button)
+  let ytObserver = null;
   if (window.location.hostname.includes('youtube.com')) {
-    const ytObserver = new MutationObserver(updateVisibility);
-    // Only observe fullscreen attribute changes (not theater)
+    ytObserver = new MutationObserver(updateVisibility);
     const watchElement = document.querySelector('ytd-watch-flexy');
     if (watchElement) {
       ytObserver.observe(watchElement, {
         attributes: true,
-        attributeFilter: ['fullscreen'], // Removed 'theater'
+        attributeFilter: ['fullscreen'],
       });
     }
-    // Also observe the movie player for aria-pressed changes on fullscreen button
     const player = document.querySelector('#movie_player');
     if (player) {
       ytObserver.observe(player, {
@@ -522,7 +518,6 @@ export async function createFloatingButton({
       });
     }
 
-    // Initial check for fullscreen only
     updateVisibility();
   }
 
@@ -592,11 +587,16 @@ export async function createFloatingButton({
     },
 
     /**
-     * Remove button from DOM and clean up event listeners
+     * Remove button from DOM and clean up all event listeners
      */
     remove() {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      fullscreenEvents.forEach((evt) => document.removeEventListener(evt, updateVisibility));
+      if (ytObserver) {
+        ytObserver.disconnect();
+        ytObserver = null;
+      }
       if (hoverTimeout) {
         clearTimeout(hoverTimeout);
       }
