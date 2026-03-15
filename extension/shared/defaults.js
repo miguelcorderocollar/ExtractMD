@@ -4,6 +4,7 @@
 export const DEFAULTS = {
   // YouTube
   includeTimestamps: true,
+  includeChapters: true,
   addTitleToTranscript: true,
   addChannelToTranscript: true,
   addUrlToTranscript: true,
@@ -84,6 +85,7 @@ export const DEFAULTS = {
 // Schema for validation during import
 export const SETTING_SCHEMA = {
   includeTimestamps: 'boolean',
+  includeChapters: 'boolean',
   addTitleToTranscript: 'boolean',
   addChannelToTranscript: 'boolean',
   addUrlToTranscript: 'boolean',

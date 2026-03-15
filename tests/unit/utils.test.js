@@ -23,6 +23,7 @@ describe('utils.js', () => {
     it('returns default settings when storage is empty', async () => {
       const settings = await getSettings();
       expect(settings.includeTimestamps).toBe(true);
+      expect(settings.includeChapters).toBe(true);
       expect(settings.jumpToDomain).toBe(false);
     });
 

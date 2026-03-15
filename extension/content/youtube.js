@@ -64,7 +64,8 @@ async function waitForTranscriptAndCopy(settings = {}) {
     );
     throw new Error('Transcript failed to load within timeout period.');
   }
-  let transcriptText = extractTranscriptText(settings.includeTimestamps !== false);
+  const includeChapters = settings.includeChapters !== false;
+  let transcriptText = extractTranscriptText(settings.includeTimestamps !== false, includeChapters);
   let metaMd = '';
   if (
     settings.addTitleToTranscript ||
@@ -90,6 +91,15 @@ async function waitForTranscriptAndCopy(settings = {}) {
     if (settings.addUrlToTranscript && videoUrl) metaMd += `**Video URL:** ${videoUrl}\n`;
     if (metaMd) metaMd += '\n';
   }
+
+  if (includeChapters) {
+    const chapters = extractChapters();
+    const chaptersMd = formatChaptersSection(chapters);
+    if (chaptersMd) {
+      metaMd += chaptersMd + '\n\n';
+    }
+  }
+
   transcriptText = metaMd + transcriptText;
   const userSettings = await getSettings();
   chrome.storage.sync.get(
@@ -136,24 +146,61 @@ async function waitForTranscriptAndCopy(settings = {}) {
   }
 }
 
-export function extractTranscriptText(includeTimestamps = true) {
+export function extractChapters() {
+  const chapters = [];
+
+  // Old UI: chapter headers inside transcript section headers
+  document.querySelectorAll('ytd-transcript-section-header-renderer').forEach((el) => {
+    const title = el.querySelector('.shelf-header-layout-wiz__title')?.textContent?.trim();
+    if (title) chapters.push({ title });
+  });
+
+  // New UI: chapter view models
+  document.querySelectorAll('timeline-chapter-view-model').forEach((el) => {
+    const title = el.querySelector('.ytwTimelineChapterViewModelTitle')?.textContent?.trim();
+    const timestamp = el
+      .querySelector('.ytwTimelineChapterViewModelTimestamp')
+      ?.textContent?.trim();
+    if (title) chapters.push({ title, timestamp });
+  });
+
+  return chapters;
+}
+
+export function formatChaptersSection(chapters) {
+  if (!chapters.length) return '';
+  const lines = chapters.map((ch) => {
+    return ch.timestamp ? `- ${ch.title} (${ch.timestamp})` : `- ${ch.title}`;
+  });
+  return `## Chapters\n${lines.join('\n')}`;
+}
+
+export function extractTranscriptText(includeTimestamps = true, includeChapters = true) {
   let transcript = '';
   const allElements = Array.from(
     document.querySelectorAll(
-      'ytd-transcript-segment-renderer, ytd-transcript-section-header-renderer, transcript-segment-view-model'
+      'ytd-transcript-segment-renderer, ytd-transcript-section-header-renderer, transcript-segment-view-model, timeline-chapter-view-model'
     )
   );
   allElements.forEach((element) => {
-    if (element.tagName === 'YTD-TRANSCRIPT-SECTION-HEADER-RENDERER') {
+    const tag = element.tagName;
+    if (includeChapters && tag === 'YTD-TRANSCRIPT-SECTION-HEADER-RENDERER') {
       const headerText = element
         .querySelector('.shelf-header-layout-wiz__title')
         ?.textContent?.trim();
       if (headerText) {
         transcript += `\n\n## ${headerText}\n`;
       }
+    } else if (includeChapters && tag === 'TIMELINE-CHAPTER-VIEW-MODEL') {
+      const headerText = element
+        .querySelector('.ytwTimelineChapterViewModelTitle')
+        ?.textContent?.trim();
+      if (headerText) {
+        transcript += `\n\n## ${headerText}\n`;
+      }
     } else if (
-      element.tagName === 'YTD-TRANSCRIPT-SEGMENT-RENDERER' ||
-      element.tagName === 'TRANSCRIPT-SEGMENT-VIEW-MODEL'
+      tag === 'YTD-TRANSCRIPT-SEGMENT-RENDERER' ||
+      tag === 'TRANSCRIPT-SEGMENT-VIEW-MODEL'
     ) {
       const timestamp = element
         .querySelector('.segment-timestamp, .ytwTranscriptSegmentViewModelTimestamp')
@@ -182,6 +229,7 @@ export async function copyYouTubeTranscript(settings = null) {
         chrome.storage.sync.get(
           {
             includeTimestamps: true,
+            includeChapters: true,
             addTitleToTranscript: true,
             addChannelToTranscript: true,
             addUrlToTranscript: true,
