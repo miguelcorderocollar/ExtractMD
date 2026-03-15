@@ -7,6 +7,7 @@ describe('popup.js - DEFAULTS', () => {
   it('has all required settings', () => {
     expect(DEFAULTS).toHaveProperty('globalEnabled');
     expect(DEFAULTS).toHaveProperty('includeTimestamps');
+    expect(DEFAULTS).toHaveProperty('includeChapters');
     expect(DEFAULTS).toHaveProperty('jumpToDomain');
     expect(DEFAULTS).toHaveProperty('enableYouTubeIntegration');
     expect(DEFAULTS).toHaveProperty('enableHackerNewsIntegration');
@@ -17,6 +18,7 @@ describe('popup.js - DEFAULTS', () => {
   it('has proper default values', () => {
     expect(DEFAULTS.globalEnabled).toBe(true);
     expect(DEFAULTS.includeTimestamps).toBe(true);
+    expect(DEFAULTS.includeChapters).toBe(true);
     expect(DEFAULTS.jumpToDomain).toBe(false);
     expect(DEFAULTS.downloadInsteadOfCopy).toBe(false);
     expect(DEFAULTS.enableUsageKpi).toBe(true);

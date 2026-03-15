@@ -15,6 +15,7 @@ import {
 const SETTING_ELEMENTS = {
   // YouTube settings
   includeTimestamps: { id: 'includeTimestamps', type: 'checkbox' },
+  includeChapters: { id: 'includeChapters', type: 'checkbox' },
   addTitleToTranscript: { id: 'addTitleToTranscript', type: 'checkbox' },
   addChannelToTranscript: { id: 'addChannelToTranscript', type: 'checkbox' },
   addUrlToTranscript: { id: 'addUrlToTranscript', type: 'checkbox' },
