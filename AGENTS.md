@@ -16,6 +16,7 @@ Your goal is to transform ExtractMD from a collection of monolithic scripts into
 6. **Feature Branch by Default (With Small-Change Exception):** Unless the user explicitly says otherwise, start feature work on a new branch with a clear conventional name (for example: `feat/<short-kebab-description>`, `fix/<short-kebab-description>`, `refactor/<short-kebab-description>`, `chore/<short-kebab-description>`). For small maintenance updates (for example version bumps, copy/docs-only edits, or minor metadata/config tweaks), a dedicated branch is not required.
 7. **Changelog Discipline (Extension-Only):** Document relevant extension updates in `CHANGELOG.md` (usually under `## [Unreleased]`) as part of feature work. Do not include contribution-process/docs changes (for example templates or `CONTRIBUTING.md`) and do not include website-only updates.
 8. **Unreleased Changelog Consolidation:** Keep `## [Unreleased]` concise by merging iterative updates for the same topic (for example, feature + follow-up fix) into one entry instead of duplicating details across sections.
+9. **Sanitized Test Content:** Always use fictional/synthetic names, handles, quotes, transcripts, and IDs in fixtures, temp samples, and test assertions. Never copy real-world personal or sensitive content into test assets.
 
 ## Project Vision (ExtractMD 2.0)
 

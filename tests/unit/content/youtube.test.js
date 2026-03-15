@@ -92,7 +92,7 @@ describe('YouTube content script logic', () => {
           <timeline-item-view-model>
             <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
               <div class="ytwTranscriptSegmentViewModelTimestamp">0:00</div>
-              <span class="yt-core-attributed-string">Atención a la brutal subida de impuestos</span>
+              <span class="yt-core-attributed-string">Intro segment for a synthetic policy briefing</span>
             </transcript-segment-view-model>
           </timeline-item-view-model>
         </macro-markers-panel-item-view-model>
@@ -100,27 +100,27 @@ describe('YouTube content script logic', () => {
           <timeline-item-view-model>
             <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
               <div class="ytwTranscriptSegmentViewModelTimestamp">0:16</div>
-              <span class="yt-core-attributed-string">El socialista Zorán Mamdani llegó a la alcaldía</span>
+              <span class="yt-core-attributed-string">Next we compare two fictional city planning options</span>
             </transcript-segment-view-model>
           </timeline-item-view-model>
         </macro-markers-panel-item-view-model>
       `;
 
       const result = extractTranscriptText(true);
-      expect(result).toContain('[0:00] Atención a la brutal subida de impuestos');
-      expect(result).toContain('[0:16] El socialista Zorán Mamdani llegó a la alcaldía');
+      expect(result).toContain('[0:00] Intro segment for a synthetic policy briefing');
+      expect(result).toContain('[0:16] Next we compare two fictional city planning options');
     });
 
     it('extracts transcript from the new DOM without timestamps', () => {
       document.body.innerHTML = `
         <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
           <div class="ytwTranscriptSegmentViewModelTimestamp">0:00</div>
-          <span class="yt-core-attributed-string">Atención a la brutal subida de impuestos</span>
+          <span class="yt-core-attributed-string">Intro segment for a synthetic policy briefing</span>
         </transcript-segment-view-model>
       `;
 
       const result = extractTranscriptText(false);
-      expect(result).toBe('Atención a la brutal subida de impuestos');
+      expect(result).toBe('Intro segment for a synthetic policy briefing');
       expect(result).not.toContain('[0:00]');
     });
 
