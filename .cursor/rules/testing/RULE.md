@@ -1,36 +1,34 @@
 ---
-description: 'Mandatory testing requirements for ExtractMD (Vitest and Playwright)'
+description: 'Mandatory testing requirements for ExtractMD (Vitest-first)'
 alwaysApply: true
 ---
 
 # Testing Requirements
 
-## CRITICAL: Always Write Tests
+## Core Rule
 
-- **Before refactoring:** Write tests for existing behavior.
-- **New features:** Write tests alongside implementation.
-- **Bug fixes:** Add a regression test.
-- Run `npm test` before committing changes.
+- **Before refactoring:** lock in behavior with tests first.
+- **New features:** add tests in the same change.
+- **Bug fixes:** add a regression test that fails before the fix.
+- Run relevant tests before requesting review.
 
 ## Unit Tests (Vitest)
 
-- Test pure functions and business logic.
-- Mock Chrome APIs using `extension/__tests__/setup.js`.
-- Aim for >80% coverage on refactored modules.
-- Keep tests fast (<1s per suite).
-- Use descriptive names: "should do X when Y".
+- Unit tests live in `tests/unit/`.
+- Shared test setup lives in `tests/unit/setup.js`.
+- Prefer focused tests near the touched behavior (content, popup, options, shared modules).
+- Mock Chrome APIs through the existing test setup/mocks rather than ad-hoc globals.
+- Use descriptive names that explain scenario + expectation.
 
-## E2E Tests (Playwright)
+## E2E Coverage
 
-- Test full user workflows.
-- Use test fixtures in `tests/e2e/fixtures/`.
-- Skip real site tests by default (use `.skip`).
+- There is no active `tests/e2e/` suite in this repo right now.
+- If E2E tests are introduced later, add them under `tests/e2e/` and document the command in `package.json` and project docs.
 
 ## Test Commands
 
 ```bash
-npm test              # Watch mode
-npm run test:run      # Run once
-npm run test:coverage # With coverage
-npm run test:e2e      # E2E tests
+pnpm test                 # Watch mode
+pnpm run test:run         # Run once
+pnpm run test:coverage    # With coverage
 ```
