@@ -64,6 +64,12 @@ describe('copyHandler', () => {
       );
     });
 
+    it('does not write lastExtraction to local storage', async () => {
+      await handleCopyOrDownload(testMarkdown, testOptions);
+
+      expect(chrome.storage.local.set).not.toHaveBeenCalled();
+    });
+
     it('calls onSuccess callback if provided', async () => {
       const onSuccess = vi.fn();
 
