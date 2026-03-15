@@ -251,6 +251,21 @@ export async function createFloatingButton({
     ? '0 6px 28px -1px rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.35)'
     : null;
   const glassIconColor = isGlass ? '#ffffff' : null;
+  const glassLoadingBg = isGlass
+    ? dark
+      ? 'rgba(251, 191, 36, 0.24)'
+      : 'rgba(245, 158, 11, 0.2)'
+    : null;
+  const glassSuccessBg = isGlass
+    ? dark
+      ? 'rgba(74, 222, 128, 0.24)'
+      : 'rgba(34, 197, 94, 0.2)'
+    : null;
+  const glassErrorBg = isGlass
+    ? dark
+      ? 'rgba(248, 113, 113, 0.24)'
+      : 'rgba(239, 68, 68, 0.2)'
+    : null;
 
   const button = document.createElement('div');
   button.id = id;
@@ -622,7 +637,7 @@ export async function createFloatingButton({
       button.dataset.processing = 'true';
       const iconClr = isGlass ? glassIconColor : colors.iconColor;
       updateIcon(ICONS.loading, iconClr);
-      button.style.background = colors.loading;
+      button.style.background = isGlass ? glassLoadingBg : colors.loading;
       button.style.cursor = 'not-allowed';
       button.style.opacity = '1';
       button.style.transform = 'scale(1)';
@@ -635,7 +650,7 @@ export async function createFloatingButton({
     setSuccess() {
       const iconClr = isGlass ? glassIconColor : colors.iconColor;
       updateIcon(ICONS.success, iconClr);
-      button.style.background = colors.success;
+      button.style.background = isGlass ? glassSuccessBg : colors.success;
       button.style.opacity = '1';
       button.style.transform = 'scale(1)';
     },
@@ -646,7 +661,7 @@ export async function createFloatingButton({
     setError() {
       const iconClr = isGlass ? glassIconColor : colors.iconColor;
       updateIcon(ICONS.error, iconClr);
-      button.style.background = colors.error;
+      button.style.background = isGlass ? glassErrorBg : colors.error;
       button.style.opacity = '1';
       button.style.transform = 'scale(1)';
     },
