@@ -132,6 +132,70 @@ describe('X content extractor', () => {
     expect(result.markdown).toContain('> Quoted context that should render as blockquote text.');
   });
 
+  it('scopes quote-card text and appends original post reference when available', () => {
+    loadFixture('post-quote-reference.html');
+    window.history.pushState({}, '', '/levelsio/status/2032923328181350415');
+
+    const result = extractXMarkdown({
+      xIncludeImages: true,
+      xIncludeVideos: true,
+      xIncludeCards: true,
+      xIncludeQuotes: true,
+      xIncludeUrl: true,
+      xIncludeMetricsContext: false,
+    });
+
+    expect(result.date).toBe('2026-03-14T20:54:25.000Z');
+    expect(result.markdown).toContain('I asked AI:');
+    expect(result.markdown).toContain(
+      '\n\nWho benefits financially if Europe brings in low/no income low educated non-culturally aligned welfare seekers from the third world?'
+    );
+    expect(result.markdown).toContain('\n\n1. Employers in low-wage sectors');
+    expect(result.markdown).toContain(
+      '\n- Construction, agriculture, food processing, cleaning, logistics'
+    );
+    expect(result.markdown).toContain('\n\nWho Bears the Costs');
+    expect(result.markdown).not.toContain('&ZeroWidthSpace;');
+    expect(result.markdown).toContain('### Quotes');
+    expect(result.markdown).toContain('> Quoted post by @hispanicnomad');
+    expect(result.markdown).toContain(
+      "It's crazy because every time it looks like a European country is reclaiming its sanity."
+    );
+    expect(result.markdown).toContain('> They pull something like this off.');
+    expect(result.markdown).toContain("> What's the reasoning behind this?");
+    expect(result.markdown).not.toContain('[Original post](');
+
+    const [beforeQuotesSection] = result.markdown.split('### Quotes');
+    expect(beforeQuotesSection).not.toContain(
+      "It's crazy because every time it looks like a European country is reclaiming its sanity."
+    );
+  });
+
+  it('treats role-link quote cards without aria quote labels as quotes', () => {
+    loadFixture('post-quote-role-link.html');
+    window.history.pushState({}, '', '/levelsio/status/2032923328181350415');
+
+    const result = extractXMarkdown({
+      xIncludeImages: true,
+      xIncludeVideos: true,
+      xIncludeCards: true,
+      xIncludeQuotes: true,
+      xIncludeUrl: true,
+      xIncludeMetricsContext: false,
+    });
+
+    expect(result.markdown).toContain('Main post body should stay separate from quote text.');
+    expect(result.markdown).toContain('### Quotes');
+    expect(result.markdown).toContain('> Quoted post by @hispanicnomad');
+    expect(result.markdown).toContain('> Quote text should render in quote section, not body.');
+    expect(result.markdown).not.toContain('[Original post](');
+
+    const [beforeQuotesSection] = result.markdown.split('### Quotes');
+    expect(beforeQuotesSection).not.toContain(
+      'Quote text should render in quote section, not body.'
+    );
+  });
+
   it('falls back to permalink and poster thumbnail for blob-backed videos', () => {
     loadFixture('post-video-blob.html');
     window.history.pushState({}, '', '/video_author/status/2032872133513408838');

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>X post quote role-link fallback fixture</title>
+  </head>
+  <body>
+    <main>
+      <article data-testid="tweet" id="main-post">
+        <div data-testid="User-Name">
+          <a href="/levelsio">@levelsio</a>
+          <span>@levelsio</span>
+        </div>
+
+        <div data-testid="tweetText">
+          <span>Main post body should stay separate from quote text.</span>
+        </div>
+
+        <div class="quote-wrapper">
+          <div role="link" tabindex="0" id="quote-card-no-aria">
+            <div data-testid="User-Name">
+              <span>Hispanic Nomad</span>
+              <span>@hispanicnomad</span>
+            </div>
+            <div data-testid="tweetText">
+              <span>Quote text should render in quote section, not body.</span>
+            </div>
+            <a href="/levelsio/status/2032923328181350415">
+              <time datetime="2026-03-14T20:54:25.000Z">9:54 PM · Mar 14, 2026</time>
+            </a>
+          </div>
+        </div>
+
+        <a href="/levelsio/status/2032923328181350415">
+          <time datetime="2026-03-14T20:54:25.000Z">9:54 PM · Mar 14, 2026</time>
+        </a>
+      </article>
+    </main>
+  </body>
+</html>
