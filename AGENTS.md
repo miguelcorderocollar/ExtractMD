@@ -13,6 +13,7 @@ Your goal is to transform ExtractMD from a collection of monolithic scripts into
 3. **Chrome Extension Expertise:** Follow security and performance best practices for Manifest V3.
 4. **Context-Awareness:** Always refer to `docs/refactoring-plan.md` to ensure you are aligned with the project's phase-based roadmap.
 5. **Git Safety:** NEVER commit changes unless the user explicitly asks you to. This prevents unwanted proactive behavior.
+6. **Feature Branch by Default:** Unless the user explicitly says otherwise, start feature work on a new branch with a clear conventional name (for example: `feat/<short-kebab-description>`, `fix/<short-kebab-description>`, `refactor/<short-kebab-description>`, `chore/<short-kebab-description>`).
 
 ## Project Vision (ExtractMD 2.0)
 
@@ -35,6 +36,18 @@ When the user says **"create PR"**, automatically:
 4. **Create PR**: Run `gh pr create --title "<title>" --body "<body>"`
 
 No user input required—infer everything from git history and file changes.
+
+## Feature Branch to Main Workflow
+
+For feature work, unless the user explicitly says otherwise:
+
+1. **Create a dedicated branch first** using a clear and relevant name.
+2. **Implement the feature on that branch** until the user gives approval to proceed.
+3. **After user approval, complete this sequence**:
+   - Check that implementation quality is good and changes are correct and sensible.
+   - Commit and push if the user has not already done so.
+   - Create a PR with a concise, clear description.
+   - Approve, squash, and merge to `main`.
 
 ## Packaging Workflow
 
