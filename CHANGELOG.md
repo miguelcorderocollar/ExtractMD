@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **X Integration (Posts + Articles)**: Added dedicated extraction for X/Twitter status pages and long-form X articles with metadata (`title`, author handle, date, link), rich media handling (images, video/card placeholders), quoted-post markdown blocks, metrics-context extraction toggle (comments/reposts/likes/bookmarks/views + extraction timestamp), and new X settings/KPI tracking.
+
 ### Fixed
 
 - **YouTube Transcript (New UI)**: Restored transcript extraction for YouTube's updated transcript panel DOM while preserving compatibility with the legacy transcript layout.
+- **X Video Media Extraction**: Improved X video output by extracting direct video links when available and falling back to a permalink + poster-thumbnail capture for blob-backed video players.
 
 ## [1.1.0] - 2026-01-04
 

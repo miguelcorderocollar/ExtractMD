@@ -12,8 +12,9 @@ function renderKpiSummary(stats) {
   const articles = stats.articles || 0;
   const hnComments = stats.hn_comments || 0;
   const hnNews = stats.hn_news || 0;
+  const xPosts = stats.x_posts || 0;
   const universal = stats.universal || 0;
-  const total = youtube + articles + hnComments + hnNews + universal;
+  const total = youtube + articles + hnComments + hnNews + xPosts + universal;
 
   if (total === 0) {
     kpiCounters.innerHTML = '<span class="kpi-empty">No extractions yet</span>';
@@ -36,6 +37,10 @@ function renderKpiSummary(stats) {
         <span class="kpi-item" title="HN news exports">
             <span class="kpi-label">News</span>
             <span class="kpi-value">${hnNews}</span>
+        </span>
+        <span class="kpi-item" title="X post/article exports">
+            <span class="kpi-label">X</span>
+            <span class="kpi-value">${xPosts}</span>
         </span>
         <span class="kpi-item" title="Universal page exports">
             <span class="kpi-label">Web</span>

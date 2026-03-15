@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>X post media quote fixture</title>
+  </head>
+  <body>
+    <main>
+      <article data-testid="tweet" id="main-post">
+        <div data-testid="User-Name">
+          <a href="/creator_dev">Creator Dev</a>
+          <span>@creator_dev</span>
+        </div>
+        <a href="/creator_dev/status/2010751592346030461">
+          <time datetime="2026-01-18T08:12:00.000Z">Jan 18, 2026</time>
+        </a>
+        <div data-testid="tweetText">
+          <span>We shipped image parsing and quote support today.</span>
+        </div>
+        <div data-testid="tweetPhoto">
+          <img src="https://pbs.twimg.com/media/example-one.jpg" alt="Architecture sketch" />
+        </div>
+        <div data-testid="tweetPhoto">
+          <img src="https://pbs.twimg.com/media/example-two.jpg" alt="State transitions" />
+        </div>
+        <div data-testid="videoPlayer">
+          <video controls></video>
+        </div>
+        <div data-testid="card.wrapper">
+          <a href="https://example.com/launch-note">Launch note</a>
+        </div>
+        <article data-testid="tweet" id="quoted-post">
+          <div data-testid="User-Name">
+            <a href="/quoted_author">Quoted Author</a>
+            <span>@quoted_author</span>
+          </div>
+          <a href="/quoted_author/status/2000000000000000000">
+            <time datetime="2026-01-10T10:00:00.000Z">Jan 10, 2026</time>
+          </a>
+          <div data-testid="tweetText">
+            <span>Quoted context that should render as blockquote text.</span>
+          </div>
+        </article>
+      </article>
+      <article data-testid="tweet" id="reply-post">
+        <div data-testid="tweetText">
+          <span>Reply content should be ignored in main-post-only mode.</span>
+        </div>
+      </article>
+    </main>
+  </body>
+</html>

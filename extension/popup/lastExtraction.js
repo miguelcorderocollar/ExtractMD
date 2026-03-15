@@ -31,6 +31,7 @@ function getTypeIcon(type) {
     articles: '📄',
     hn_comments: '💬',
     hn_news: '📰',
+    x_posts: 'X',
   };
   return icons[type] || '📋';
 }
@@ -46,6 +47,7 @@ function getTypeLabel(type) {
     articles: 'Article',
     hn_comments: 'HN Comments',
     hn_news: 'HN News',
+    x_posts: 'X Post/Article',
   };
   return labels[type] || 'Content';
 }

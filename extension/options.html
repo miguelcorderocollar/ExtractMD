@@ -60,6 +60,14 @@
             </svg>
             <span>Hacker News</span>
           </button>
+          <button class="nav-item" data-section="x">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25h6.83l4.713 6.231L18.244 2.25zm-1.161 17.52h1.833L7.086 4.126H5.119L17.083 19.77z"
+              />
+            </svg>
+            <span>X</span>
+          </button>
           <button class="nav-item" data-section="articles">
             <svg
               class="nav-icon"
@@ -173,6 +181,12 @@
               setting-id="enableHackerNewsIntegration"
               label="Hacker News Integration"
               description="Extract comments and news from HN"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="enableXIntegration"
+              label="X Integration"
+              description="Extract X posts and long-form articles"
               checked
             ></setting-toggle>
             <setting-toggle
@@ -375,6 +389,52 @@
               label="Include Comment Count"
               description="Show number of comments"
               checked
+            ></setting-toggle>
+          </setting-group>
+        </section>
+
+        <!-- X Section -->
+        <section id="section-x" class="settings-section">
+          <div class="section-header">
+            <h2>X Settings</h2>
+            <p>Configure extraction for X posts and long-form articles</p>
+          </div>
+
+          <setting-group title="Content Options">
+            <setting-toggle
+              setting-id="xIncludeImages"
+              label="Include Images"
+              description="Convert post/article images to markdown"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="xIncludeVideos"
+              label="Include Video Placeholders"
+              description="Include a placeholder when a post has attached video"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="xIncludeCards"
+              label="Include Link Cards"
+              description="Include external card links in markdown output"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="xIncludeQuotes"
+              label="Include Quoted Posts"
+              description="Include quoted post content as markdown blockquotes"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="xIncludeUrl"
+              label="Include Post URL"
+              description="Add the canonical X link in the metadata header"
+              checked
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="xIncludeMetricsContext"
+              label="Include Metrics Context"
+              description="Prepend comments, reposts, likes, views, and extraction time at the top"
             ></setting-toggle>
           </setting-group>
         </section>

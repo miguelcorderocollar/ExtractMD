@@ -8,6 +8,7 @@ const TIME_ESTIMATES = {
   articles: 30,
   hn_comments: 40,
   hn_news: 20,
+  x_posts: 35,
   universal: 25,
 };
 
@@ -44,6 +45,7 @@ export function calculateTimeSaved(stats) {
     (stats.articles || 0) * TIME_ESTIMATES.articles +
     (stats.hn_comments || 0) * TIME_ESTIMATES.hn_comments +
     (stats.hn_news || 0) * TIME_ESTIMATES.hn_news +
+    (stats.x_posts || 0) * TIME_ESTIMATES.x_posts +
     (stats.universal || 0) * TIME_ESTIMATES.universal
   );
 }
@@ -60,6 +62,7 @@ export function renderKpiCounters(stats) {
   const articles = stats.articles || 0;
   const hnComments = stats.hn_comments || 0;
   const hnNews = stats.hn_news || 0;
+  const xPosts = stats.x_posts || 0;
   const universal = stats.universal || 0;
 
   kpiCounters.innerHTML = `
@@ -78,6 +81,10 @@ export function renderKpiCounters(stats) {
         <div class="kpi-card" title="HN news exports">
             <div class="kpi-card-label">HN News</div>
             <div class="kpi-card-value">${hnNews}</div>
+        </div>
+        <div class="kpi-card" title="X post/article exports">
+            <div class="kpi-card-label">X</div>
+            <div class="kpi-card-value">${xPosts}</div>
         </div>
         <div class="kpi-card" title="Universal page exports">
             <div class="kpi-card-label">Universal</div>
@@ -120,7 +127,14 @@ export function initializeKpi() {
     clearKpiBtn.addEventListener('click', function () {
       chrome.storage.sync.set(
         {
-          usageStats: { youtube: 0, articles: 0, hn_comments: 0, hn_news: 0, universal: 0 },
+          usageStats: {
+            youtube: 0,
+            articles: 0,
+            hn_comments: 0,
+            hn_news: 0,
+            x_posts: 0,
+            universal: 0,
+          },
         },
         function () {
           loadKpiCounters();

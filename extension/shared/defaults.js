@@ -30,6 +30,14 @@ export const DEFAULTS = {
   articleExporterShowInfo: true,
   articleExporterIncludeUrl: true,
 
+  // X (Posts + Articles)
+  xIncludeImages: true,
+  xIncludeVideos: true,
+  xIncludeCards: true,
+  xIncludeQuotes: true,
+  xIncludeUrl: true,
+  xIncludeMetricsContext: false,
+
   // General
   globalEnabled: true,
   jumpToDomain: false,
@@ -44,6 +52,7 @@ export const DEFAULTS = {
   // Integration toggles
   enableYouTubeIntegration: true,
   enableHackerNewsIntegration: true,
+  enableXIntegration: true,
   enableArticleIntegration: true,
   enableUniversalIntegration: true,
 
@@ -92,6 +101,12 @@ export const SETTING_SCHEMA = {
   articleExporterOnlyLongest: 'boolean',
   articleExporterShowInfo: 'boolean',
   articleExporterIncludeUrl: 'boolean',
+  xIncludeImages: 'boolean',
+  xIncludeVideos: 'boolean',
+  xIncludeCards: 'boolean',
+  xIncludeQuotes: 'boolean',
+  xIncludeUrl: 'boolean',
+  xIncludeMetricsContext: 'boolean',
   globalEnabled: 'boolean',
   jumpToDomain: 'boolean',
   jumpToDomainUrl: 'string',
@@ -103,6 +118,7 @@ export const SETTING_SCHEMA = {
   ignoredDomains: 'string',
   enableYouTubeIntegration: 'boolean',
   enableHackerNewsIntegration: 'boolean',
+  enableXIntegration: 'boolean',
   enableArticleIntegration: 'boolean',
   enableUniversalIntegration: 'boolean',
   universalShowInfoNotification: 'boolean',

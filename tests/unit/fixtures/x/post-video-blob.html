@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>X post blob video fixture</title>
+  </head>
+  <body>
+    <main>
+      <article data-testid="tweet" id="main-post">
+        <div data-testid="User-Name">
+          <a href="/video_author">Video Author</a>
+          <span>@video_author</span>
+        </div>
+        <a href="/video_author/status/2032872133513408838">
+          <time datetime="2026-03-14T17:31:00.000Z">Mar 14, 2026</time>
+        </a>
+        <div data-testid="tweetText">
+          <span>Post with an X-hosted video that is blob-backed in DOM.</span>
+        </div>
+        <div data-testid="videoPlayer">
+          <video
+            aria-label="Embedded video"
+            poster="https://pbs.twimg.com/ext_tw_video_thumb/2015389729387139072/pu/img/-qDumgPswjyOOHzS.jpg"
+          >
+            <source
+              type="video/mp4"
+              src="blob:https://x.com/ac46159e-411b-4334-b63a-5ef83f856d8e"
+            />
+          </video>
+        </div>
+      </article>
+    </main>
+  </body>
+</html>

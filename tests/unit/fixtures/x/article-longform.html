@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>X article fixture</title>
+  </head>
+  <body>
+    <main>
+      <article data-testid="article">
+        <header>
+          <h1>Designing resilient parsers for social content</h1>
+          <div data-testid="User-Name">
+            <a href="/longform_author">Longform Author</a>
+            <span>@longform_author</span>
+          </div>
+          <a href="/longform_author/status/2020202020202020202">
+            <time datetime="2026-01-20T16:45:00.000Z">Jan 20, 2026</time>
+          </a>
+        </header>
+        <div data-testid="twitterArticleReadView">
+          <div data-testid="tweetPhoto">
+            <img src="https://pbs.twimg.com/media/article-hero.jpg" alt="Image" />
+          </div>
+        </div>
+        <section data-testid="articleBody">
+          <p>Long-form articles on X can include paragraphs, links, and rich media.</p>
+          <p>
+            This fixture keeps markup deterministic for unit tests and references
+            <a href="https://example.com/guide">this guide</a>.
+          </p>
+          <figure>
+            <img src="https://pbs.twimg.com/media/article-image.jpg" alt="Longform diagram" />
+          </figure>
+        </section>
+      </article>
+    </main>
+  </body>
+</html>

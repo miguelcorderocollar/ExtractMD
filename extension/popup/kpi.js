@@ -8,6 +8,7 @@ const TIME_ESTIMATES = {
   articles: 30,
   hn_comments: 40,
   hn_news: 20,
+  x_posts: 35,
 };
 
 /**
@@ -42,7 +43,8 @@ export function calculateTimeSaved(stats) {
     (stats.youtube || 0) * TIME_ESTIMATES.youtube +
     (stats.articles || 0) * TIME_ESTIMATES.articles +
     (stats.hn_comments || 0) * TIME_ESTIMATES.hn_comments +
-    (stats.hn_news || 0) * TIME_ESTIMATES.hn_news
+    (stats.hn_news || 0) * TIME_ESTIMATES.hn_news +
+    (stats.x_posts || 0) * TIME_ESTIMATES.x_posts
   );
 }
 
@@ -59,6 +61,7 @@ export function renderKpiCounters(stats) {
         <span title="Article exports">Articles: <b>${stats.articles || 0}</b></span>
         <span title="HN comments exports">HN Comments: <b>${stats.hn_comments || 0}</b></span>
         <span title="HN news exports">HN News: <b>${stats.hn_news || 0}</b></span>
+        <span title="X post/article exports">X: <b>${stats.x_posts || 0}</b></span>
     `;
 
   const totalSeconds = calculateTimeSaved(stats);
@@ -97,7 +100,7 @@ export function initializeKpi() {
     clearKpiBtn.addEventListener('click', function () {
       chrome.storage.sync.set(
         {
-          usageStats: { youtube: 0, articles: 0, hn_comments: 0, hn_news: 0 },
+          usageStats: { youtube: 0, articles: 0, hn_comments: 0, hn_news: 0, x_posts: 0 },
         },
         function () {
           loadKpiCounters();

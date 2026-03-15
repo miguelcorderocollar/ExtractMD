@@ -43,9 +43,10 @@ describe('popup/kpi module', () => {
         articles: 1, // 30s
         hn_comments: 1, // 40s
         hn_news: 1, // 20s
+        x_posts: 1, // 35s
       };
 
-      expect(calculateTimeSaved(stats)).toBe(150);
+      expect(calculateTimeSaved(stats)).toBe(185);
     });
 
     it('handles empty stats', () => {
@@ -76,7 +77,7 @@ describe('popup/kpi module', () => {
     });
 
     it('renders stats into DOM', () => {
-      const stats = { youtube: 5, articles: 3, hn_comments: 2, hn_news: 1 };
+      const stats = { youtube: 5, articles: 3, hn_comments: 2, hn_news: 1, x_posts: 4 };
 
       renderKpiCounters(stats);
 
@@ -84,6 +85,7 @@ describe('popup/kpi module', () => {
       expect(container.innerHTML).toContain('Articles: <b>3</b>');
       expect(container.innerHTML).toContain('HN Comments: <b>2</b>');
       expect(container.innerHTML).toContain('HN News: <b>1</b>');
+      expect(container.innerHTML).toContain('X: <b>4</b>');
     });
 
     it('handles zero stats', () => {

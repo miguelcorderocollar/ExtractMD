@@ -63,6 +63,11 @@ const SETTING_ELEMENTS = {
     type: 'checkbox',
     invertDefault: true,
   },
+  enableXIntegration: {
+    id: 'enableXIntegration',
+    type: 'checkbox',
+    invertDefault: true,
+  },
   enableArticleIntegration: {
     id: 'enableArticleIntegration',
     type: 'checkbox',
@@ -142,6 +147,7 @@ export function attachSettingHandlers() {
         if (
           key === 'enableYouTubeIntegration' ||
           key === 'enableHackerNewsIntegration' ||
+          key === 'enableXIntegration' ||
           key === 'enableArticleIntegration'
         ) {
           updateIntegrationVisibility();

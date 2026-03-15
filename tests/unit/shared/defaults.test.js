@@ -34,6 +34,14 @@ describe('shared/defaults', () => {
     expect(DEFAULTS.articleExporterShowInfo).toBe(true);
     expect(DEFAULTS.articleExporterIncludeUrl).toBe(true);
 
+    // X settings
+    expect(DEFAULTS.xIncludeImages).toBe(true);
+    expect(DEFAULTS.xIncludeVideos).toBe(true);
+    expect(DEFAULTS.xIncludeCards).toBe(true);
+    expect(DEFAULTS.xIncludeQuotes).toBe(true);
+    expect(DEFAULTS.xIncludeUrl).toBe(true);
+    expect(DEFAULTS.xIncludeMetricsContext).toBe(false);
+
     // General settings
     expect(DEFAULTS.globalEnabled).toBe(true);
     expect(DEFAULTS.jumpToDomain).toBe(false);
@@ -48,6 +56,7 @@ describe('shared/defaults', () => {
     // Integration toggles
     expect(DEFAULTS.enableYouTubeIntegration).toBe(true);
     expect(DEFAULTS.enableHackerNewsIntegration).toBe(true);
+    expect(DEFAULTS.enableXIntegration).toBe(true);
     expect(DEFAULTS.enableArticleIntegration).toBe(true);
     expect(DEFAULTS.enableUniversalIntegration).toBe(true);
 
