@@ -1,7 +1,7 @@
 name: Question / Support
 description: Ask a question or get help using ExtractMD
-title: "[Question]: "
-labels: ["question"]
+title: '[Question]: '
+labels: ['question']
 body:
   - type: markdown
     attributes:
@@ -38,4 +38,4 @@ body:
     id: context
     attributes:
       label: Additional Context
-      description: "Any screenshots, URLs, or details that help clarify your question."
+      description: 'Any screenshots, URLs, or details that help clarify your question.'

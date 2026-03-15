@@ -14,11 +14,13 @@ describe('Floating Button Settings', () => {
     expect(DEFAULTS).toHaveProperty('floatingButtonEnableDismiss');
     expect(DEFAULTS).toHaveProperty('floatingButtonSize');
     expect(DEFAULTS).toHaveProperty('floatingButtonTransparency');
+    expect(DEFAULTS).toHaveProperty('floatingButtonStyle');
 
     expect(DEFAULTS.floatingButtonEnableDrag).toBe(true);
     expect(DEFAULTS.floatingButtonEnableDismiss).toBe(true);
     expect(DEFAULTS.floatingButtonSize).toBe('medium');
     expect(DEFAULTS.floatingButtonTransparency).toBe('medium');
+    expect(DEFAULTS.floatingButtonStyle).toBe('glass');
   });
 
   it('should save floating button settings correctly', async () => {
@@ -64,6 +66,14 @@ describe('Floating Button Settings', () => {
     // Save default transparency (should call remove)
     saveSetting('floatingButtonTransparency', 'medium');
     expect(removeSpy).toHaveBeenCalledWith('floatingButtonTransparency', expect.any(Function));
+
+    // Save non-default style (should call set)
+    saveSetting('floatingButtonStyle', 'solid');
+    expect(setSpy).toHaveBeenCalledWith({ floatingButtonStyle: 'solid' }, expect.any(Function));
+
+    // Save default style (should call remove)
+    saveSetting('floatingButtonStyle', 'glass');
+    expect(removeSpy).toHaveBeenCalledWith('floatingButtonStyle', expect.any(Function));
   });
 
   it('should load floating button settings with defaults', async () => {
@@ -79,6 +89,7 @@ describe('Floating Button Settings', () => {
               floatingButtonEnableDismiss: true,
               floatingButtonSize: 'medium',
               floatingButtonTransparency: 'medium',
+              floatingButtonStyle: 'glass',
             });
           }),
         },
@@ -90,12 +101,14 @@ describe('Floating Button Settings', () => {
       'floatingButtonEnableDismiss',
       'floatingButtonSize',
       'floatingButtonTransparency',
+      'floatingButtonStyle',
     ]);
 
     expect(settings.floatingButtonEnableDrag).toBe(true);
     expect(settings.floatingButtonEnableDismiss).toBe(true);
     expect(settings.floatingButtonSize).toBe('medium');
     expect(settings.floatingButtonTransparency).toBe('medium');
+    expect(settings.floatingButtonStyle).toBe('glass');
   });
 
   it('should have floating button settings in SETTING_SCHEMA', async () => {
@@ -105,6 +118,7 @@ describe('Floating Button Settings', () => {
     expect(SETTING_SCHEMA).toHaveProperty('floatingButtonEnableDismiss', 'boolean');
     expect(SETTING_SCHEMA).toHaveProperty('floatingButtonSize', 'string');
     expect(SETTING_SCHEMA).toHaveProperty('floatingButtonTransparency', 'string');
+    expect(SETTING_SCHEMA).toHaveProperty('floatingButtonStyle', 'string');
   });
 
   it('should reset all floating button positions', async () => {

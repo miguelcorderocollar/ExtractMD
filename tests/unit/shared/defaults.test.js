@@ -75,6 +75,7 @@ describe('shared/defaults', () => {
     expect(DEFAULTS.floatingButtonEnableDismiss).toBe(true);
     expect(DEFAULTS.floatingButtonSize).toBe('medium');
     expect(DEFAULTS.floatingButtonTransparency).toBe('medium');
+    expect(DEFAULTS.floatingButtonStyle).toBe('glass');
 
     // Theme
     expect(DEFAULTS.accentColor).toBe('#14b8a6');
