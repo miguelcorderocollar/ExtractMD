@@ -1,0 +1,66 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for ExtractMD
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please describe your idea so we can evaluate and prioritize it.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      options:
+        - New Integration (website/platform support)
+        - Extraction Quality (better output formatting)
+        - User Interface (popup, options page, button)
+        - Settings / Configuration
+        - Keyboard Shortcuts
+        - Performance
+        - Developer Experience (testing, build, docs)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Use Case
+      description: "What problem does this feature solve? What's the use case?"
+      placeholder: "I often need to extract content from Reddit threads, but there's no dedicated integration..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you've considered.
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      description: How many users would benefit from this feature?
+      options:
+        - Low (nice to have, niche use case)
+        - Medium (useful for many users)
+        - High (significant improvement for most users)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: "Screenshots, mockups, links to similar tools, or anything else that helps explain the request."

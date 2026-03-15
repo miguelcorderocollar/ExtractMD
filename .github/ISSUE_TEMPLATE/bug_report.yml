@@ -1,0 +1,132 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in ExtractMD
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the sections below so we can reproduce and fix the issue quickly.
+
+  - type: input
+    id: version
+    attributes:
+      label: ExtractMD Version
+      description: "Find this in the extension popup or `chrome://extensions`."
+      placeholder: "e.g. 1.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Chromium
+        - Brave
+        - Edge
+        - Arc
+        - Vivaldi
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: input
+    id: browser-version
+    attributes:
+      label: Browser Version
+      description: "Find this in your browser's About page."
+      placeholder: "e.g. 134.0.6998.89"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - ChromeOS
+    validations:
+      required: true
+
+  - type: dropdown
+    id: integration
+    attributes:
+      label: Which integration is affected?
+      options:
+        - YouTube
+        - Hacker News
+        - X / Twitter
+        - Article Extraction
+        - Universal Extractor
+        - Popup / Settings
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of the bug.
+      placeholder: "When I try to extract a YouTube transcript, the button stays in the loading state and nothing is copied."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps to reproduce the behavior.
+      value: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Observe '...'
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened instead.
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+      description: "The URL where the issue occurs (if applicable)."
+      placeholder: "https://www.youtube.com/watch?v=..."
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: Console Errors
+      description: "Open DevTools (F12) → Console tab and paste any relevant errors."
+      render: text
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: "Drag and drop screenshots here if they help illustrate the problem."
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that might help (custom settings, other extensions, etc.).
