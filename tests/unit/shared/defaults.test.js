@@ -31,7 +31,7 @@ describe('shared/defaults', () => {
     // Article settings
     expect(DEFAULTS.articleExporterIncludeImages).toBe(true);
     expect(DEFAULTS.articleExporterOnlyLongest).toBe(false);
-    expect(DEFAULTS.articleExporterShowInfo).toBe(true);
+    expect(DEFAULTS.articleExporterShowInfo).toBe(false);
     expect(DEFAULTS.articleExporterIncludeUrl).toBe(true);
 
     // X settings
@@ -76,6 +76,7 @@ describe('shared/defaults', () => {
     expect(DEFAULTS.floatingButtonSize).toBe('medium');
     expect(DEFAULTS.floatingButtonTransparency).toBe('medium');
     expect(DEFAULTS.floatingButtonStyle).toBe('glass');
+    expect(DEFAULTS.floatingButtonShowDetectionHint).toBe(true);
 
     // Theme
     expect(DEFAULTS.accentColor).toBe('#14b8a6');

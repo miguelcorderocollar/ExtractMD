@@ -265,6 +265,7 @@ async function manageFloatingButtonForUniversal() {
           {
             floatingButtonEnableDrag: true,
             floatingButtonEnableDismiss: true,
+            floatingButtonShowDetectionHint: true,
           },
           resolve
         );
@@ -274,6 +275,8 @@ async function manageFloatingButtonForUniversal() {
         domain: window.location.hostname,
         enableDrag: buttonSettings.floatingButtonEnableDrag,
         enableDismiss: buttonSettings.floatingButtonEnableDismiss,
+        showDetectionHint: buttonSettings.floatingButtonShowDetectionHint !== false,
+        detectionHintText: 'Page',
         onClick: async () => {
           await performUniversalCopy(true);
         },

@@ -191,6 +191,8 @@ function injectAnimationStyles() {
  * @param {string} [options.domain] - Current domain for position persistence and ignore functionality
  * @param {boolean} [options.enableDrag=true] - Whether dragging to reposition is enabled
  * @param {boolean} [options.enableDismiss=true] - Whether the dismiss (X) button is enabled
+ * @param {boolean} [options.showDetectionHint=false] - Whether to render a mode hint badge
+ * @param {string} [options.detectionHintText=''] - Mode hint text (e.g. "Article" or "Page")
  * @returns {Promise<Object|null>} Button controller with element and state methods
  */
 export async function createFloatingButton({
@@ -199,6 +201,8 @@ export async function createFloatingButton({
   domain = '',
   enableDrag = true,
   enableDismiss = true,
+  showDetectionHint = false,
+  detectionHintText = '',
 }) {
   // Check if button already exists
   const existing = document.getElementById(id);
@@ -250,6 +254,15 @@ export async function createFloatingButton({
 
   const button = document.createElement('div');
   button.id = id;
+  button.setAttribute('role', 'button');
+
+  const normalizedHintText = String(detectionHintText || '').trim();
+  const hasDetectionHint = showDetectionHint && normalizedHintText.length > 0;
+  const a11yLabel = hasDetectionHint
+    ? `ExtractMD copy (${normalizedHintText} mode detected)`
+    : 'ExtractMD copy';
+  button.title = a11yLabel;
+  button.setAttribute('aria-label', a11yLabel);
 
   // Create inner content container for icon
   const contentContainer = document.createElement('div');
@@ -271,6 +284,34 @@ export async function createFloatingButton({
     svg.style.height = '100%';
   }
   button.appendChild(contentContainer);
+
+  if (hasDetectionHint) {
+    const hintBadge = document.createElement('span');
+    hintBadge.className = 'extractmd-detection-hint';
+    hintBadge.textContent = normalizedHintText;
+    const hs = hintBadge.style;
+    hs.position = 'absolute';
+    hs.bottom = '-8px';
+    hs.left = '50%';
+    hs.transform = 'translateX(-50%)';
+    hs.padding = '2px 6px';
+    hs.borderRadius = '999px';
+    hs.fontSize = '10px';
+    hs.fontWeight = '700';
+    hs.lineHeight = '1';
+    hs.letterSpacing = '0.2px';
+    hs.whiteSpace = 'nowrap';
+    hs.pointerEvents = 'none';
+    hs.color = '#ffffff';
+    hs.zIndex = '10001';
+    hs.background = isGlass
+      ? dark
+        ? 'rgba(0, 0, 0, 0.72)'
+        : 'rgba(17, 24, 39, 0.82)'
+      : 'rgba(17, 24, 39, 0.82)';
+    hs.boxShadow = '0 1px 3px rgba(0,0,0,0.25)';
+    button.appendChild(hintBadge);
+  }
 
   // Create dismiss button (hidden by default)
   const dismissBtn = document.createElement('div');

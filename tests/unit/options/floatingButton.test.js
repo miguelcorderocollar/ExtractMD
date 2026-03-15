@@ -15,12 +15,14 @@ describe('Floating Button Settings', () => {
     expect(DEFAULTS).toHaveProperty('floatingButtonSize');
     expect(DEFAULTS).toHaveProperty('floatingButtonTransparency');
     expect(DEFAULTS).toHaveProperty('floatingButtonStyle');
+    expect(DEFAULTS).toHaveProperty('floatingButtonShowDetectionHint');
 
     expect(DEFAULTS.floatingButtonEnableDrag).toBe(true);
     expect(DEFAULTS.floatingButtonEnableDismiss).toBe(true);
     expect(DEFAULTS.floatingButtonSize).toBe('medium');
     expect(DEFAULTS.floatingButtonTransparency).toBe('medium');
     expect(DEFAULTS.floatingButtonStyle).toBe('glass');
+    expect(DEFAULTS.floatingButtonShowDetectionHint).toBe(true);
   });
 
   it('should save floating button settings correctly', async () => {
@@ -74,6 +76,17 @@ describe('Floating Button Settings', () => {
     // Save default style (should call remove)
     saveSetting('floatingButtonStyle', 'glass');
     expect(removeSpy).toHaveBeenCalledWith('floatingButtonStyle', expect.any(Function));
+
+    // Save non-default hint visibility (should call set)
+    saveSetting('floatingButtonShowDetectionHint', false);
+    expect(setSpy).toHaveBeenCalledWith(
+      { floatingButtonShowDetectionHint: false },
+      expect.any(Function)
+    );
+
+    // Save default hint visibility (should call remove)
+    saveSetting('floatingButtonShowDetectionHint', true);
+    expect(removeSpy).toHaveBeenCalledWith('floatingButtonShowDetectionHint', expect.any(Function));
   });
 
   it('should load floating button settings with defaults', async () => {
@@ -90,6 +103,7 @@ describe('Floating Button Settings', () => {
               floatingButtonSize: 'medium',
               floatingButtonTransparency: 'medium',
               floatingButtonStyle: 'glass',
+              floatingButtonShowDetectionHint: true,
             });
           }),
         },
@@ -102,6 +116,7 @@ describe('Floating Button Settings', () => {
       'floatingButtonSize',
       'floatingButtonTransparency',
       'floatingButtonStyle',
+      'floatingButtonShowDetectionHint',
     ]);
 
     expect(settings.floatingButtonEnableDrag).toBe(true);
@@ -109,6 +124,7 @@ describe('Floating Button Settings', () => {
     expect(settings.floatingButtonSize).toBe('medium');
     expect(settings.floatingButtonTransparency).toBe('medium');
     expect(settings.floatingButtonStyle).toBe('glass');
+    expect(settings.floatingButtonShowDetectionHint).toBe(true);
   });
 
   it('should have floating button settings in SETTING_SCHEMA', async () => {
@@ -119,6 +135,7 @@ describe('Floating Button Settings', () => {
     expect(SETTING_SCHEMA).toHaveProperty('floatingButtonSize', 'string');
     expect(SETTING_SCHEMA).toHaveProperty('floatingButtonTransparency', 'string');
     expect(SETTING_SCHEMA).toHaveProperty('floatingButtonStyle', 'string');
+    expect(SETTING_SCHEMA).toHaveProperty('floatingButtonShowDetectionHint', 'boolean');
   });
 
   it('should reset all floating button positions', async () => {

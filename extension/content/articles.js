@@ -28,7 +28,7 @@ export async function performArticleCopy(updateButton = false) {
         {
           articleExporterIncludeImages: true,
           articleExporterOnlyLongest: false,
-          articleExporterShowInfo: true,
+          articleExporterShowInfo: false,
           articleExporterIncludeUrl: true,
           downloadInsteadOfCopy: false,
           downloadIfTokensExceed: 0,
@@ -348,6 +348,7 @@ async function manageFloatingButtonForArticles() {
           {
             floatingButtonEnableDrag: true,
             floatingButtonEnableDismiss: true,
+            floatingButtonShowDetectionHint: true,
           },
           resolve
         );
@@ -357,6 +358,8 @@ async function manageFloatingButtonForArticles() {
         domain: window.location.hostname,
         enableDrag: buttonSettings.floatingButtonEnableDrag,
         enableDismiss: buttonSettings.floatingButtonEnableDismiss,
+        showDetectionHint: buttonSettings.floatingButtonShowDetectionHint !== false,
+        detectionHintText: 'Article',
         onClick: async () => {
           await performArticleCopy(true);
         },
@@ -368,7 +371,7 @@ async function manageFloatingButtonForArticles() {
 
         // Show article info notification if setting is enabled
         chrome.storage.sync.get(
-          { articleExporterShowInfo: true, articleExporterOnlyLongest: false },
+          { articleExporterShowInfo: false, articleExporterOnlyLongest: false },
           function (settings) {
             if (settings.articleExporterShowInfo) {
               showArticleInfoNotification(articles, settings.articleExporterOnlyLongest);

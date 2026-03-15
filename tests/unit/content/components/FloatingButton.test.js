@@ -119,6 +119,43 @@ describe('FloatingButton component', () => {
       expect(styleEl).not.toBeNull();
       expect(styleEl.textContent).toContain('extractmd-bounce');
     });
+
+    it('renders detection hint badge when enabled', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({
+        onClick,
+        showDetectionHint: true,
+        detectionHintText: 'Article',
+      });
+
+      const hint = controller.element.querySelector('.extractmd-detection-hint');
+      expect(hint).not.toBeNull();
+      expect(hint.textContent).toBe('Article');
+    });
+
+    it('does not render detection hint badge when disabled', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({
+        onClick,
+        showDetectionHint: false,
+        detectionHintText: 'Article',
+      });
+
+      const hint = controller.element.querySelector('.extractmd-detection-hint');
+      expect(hint).toBeNull();
+    });
+
+    it('sets accessible label including detection hint text', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({
+        onClick,
+        showDetectionHint: true,
+        detectionHintText: 'Page',
+      });
+
+      expect(controller.element.getAttribute('aria-label')).toContain('Page');
+      expect(controller.element.title).toContain('Page');
+    });
   });
 
   describe('button appearance', () => {

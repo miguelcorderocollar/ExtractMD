@@ -105,6 +105,7 @@ const SETTING_ELEMENTS = {
   floatingButtonSize: { id: 'floatingButtonSize', type: 'select' },
   floatingButtonTransparency: { id: 'floatingButtonTransparency', type: 'select' },
   floatingButtonStyle: { id: 'floatingButtonStyle', type: 'select' },
+  floatingButtonShowDetectionHint: { id: 'floatingButtonShowDetectionHint', type: 'checkbox' },
 };
 
 /**

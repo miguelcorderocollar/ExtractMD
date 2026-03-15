@@ -27,7 +27,7 @@ export const DEFAULTS = {
   // Articles
   articleExporterIncludeImages: true,
   articleExporterOnlyLongest: false,
-  articleExporterShowInfo: true,
+  articleExporterShowInfo: false,
   articleExporterIncludeUrl: true,
 
   // X (Posts + Articles)
@@ -72,6 +72,7 @@ export const DEFAULTS = {
   floatingButtonSize: 'medium', // 'small' | 'medium' | 'large'
   floatingButtonTransparency: 'medium', // 'low' | 'medium' | 'high' | 'full'
   floatingButtonStyle: 'glass', // 'solid' | 'glass'
+  floatingButtonShowDetectionHint: true,
 
   // Theme
   accentColor: '#14b8a6', // Default teal
@@ -135,6 +136,7 @@ export const SETTING_SCHEMA = {
   floatingButtonSize: 'string',
   floatingButtonTransparency: 'string',
   floatingButtonStyle: 'string',
+  floatingButtonShowDetectionHint: 'boolean',
   accentColor: 'string',
   welcomeCompleted: 'boolean',
 };
