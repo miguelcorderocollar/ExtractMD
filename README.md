@@ -30,7 +30,6 @@
 - **Usage Tracking** - KPI counters for each integration type
 - **Domain Ignore** - Per-domain toggle to disable extraction
 - **Settings Import/Export** - Backup and restore your configuration
-- **Last Extraction Status** - Shows recent extraction activity in popup
 - **Jump to Domain** - Automatically open a custom URL (e.g., ChatGPT) after copying
 - **Close Tab After Extraction** - Optional automatic tab closure
 - **Token Counting** - Optional GPT token count display in notifications
@@ -61,7 +60,7 @@
 
 ### Quick Actions
 
-- **Popup** - Click extension icon for quick actions: Extract Now, domain toggle, KPI summary, last extraction status
+- **Popup** - Click extension icon for quick actions: Extract Now, domain toggle, KPI summary
 - **Options Page** - Right-click extension icon → Options for comprehensive settings management
 - **Keyboard Shortcut** - Press `Ctrl+Shift+E` to trigger extraction on current page
 

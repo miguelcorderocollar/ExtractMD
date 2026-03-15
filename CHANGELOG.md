@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **X Video Media Extraction**: Improved X video output by extracting direct video links when available and falling back to a permalink + poster-thumbnail capture for blob-backed video players.
 - **Article Detection Notification Defaults**: Switched article-detected info notification to default off in favor of the new floating-button mode hint (still configurable in settings).
 
+### Removed
+
+- **Last Extraction Status (Popup)**: Removed the popup banner and related `lastExtraction` local-storage writes/reads to reduce UI noise and simplify popup state.
+
 ## [1.1.0] - 2026-01-04
 
 ### Added

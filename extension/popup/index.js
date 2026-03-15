@@ -3,7 +3,6 @@
 
 import { initializeQuickActions } from './quickActions.js';
 import { initializeDomainToggle } from './domainToggle.js';
-import { initializeLastExtraction } from './lastExtraction.js';
 import { initializeKpiSummary } from './kpiSummary.js';
 import { initializeSettings } from './settings.js';
 import { initializeTheme } from '../shared/theme-manager.js';
@@ -23,6 +22,5 @@ document.addEventListener('DOMContentLoaded', async function () {
   initializeSettings();
   initializeQuickActions();
   initializeDomainToggle();
-  initializeLastExtraction();
   initializeKpiSummary();
 });

@@ -44,6 +44,14 @@ async function updateIcon(enabled) {
   console.debug(`[ExtractMD] Icon updated: ${enabled ? 'enabled' : 'disabled'}`);
 }
 
+async function cleanupLegacyLastExtraction() {
+  try {
+    await chrome.storage.local.remove('lastExtraction');
+  } catch (error) {
+    console.debug('[ExtractMD] Could not remove legacy lastExtraction key:', error);
+  }
+}
+
 // Listen for storage changes to update icon when globalEnabled changes
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'sync' && changes.globalEnabled) {
@@ -57,12 +65,15 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 
 // Set correct icon on startup
 chrome.runtime.onStartup.addListener(async () => {
+  await cleanupLegacyLastExtraction();
   const { globalEnabled = true } = await chrome.storage.sync.get({ globalEnabled: true });
   updateIcon(globalEnabled);
 });
 
 // Handle extension installation - auto-open options page and set initial icon
 chrome.runtime.onInstalled.addListener(async (details) => {
+  await cleanupLegacyLastExtraction();
+
   if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
     // Mark welcome as not completed so modal shows
     chrome.storage.sync.set({ welcomeCompleted: false });

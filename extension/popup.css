@@ -188,18 +188,6 @@
 }
 
 /* ============================================
-   Last Extraction
-   ============================================ */
-.last-extraction {
-  padding: 8px 16px;
-  background: var(--accent-light);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--accent);
-  border-bottom: 1px solid var(--border);
-}
-
-/* ============================================
    KPI Bar
    ============================================ */
 .kpi-bar {

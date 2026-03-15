@@ -79,21 +79,6 @@ export async function handleCopyOrDownload(
     setTimeout(() => closeCurrentTab(), 500);
   }
 
-  // Store last extraction info for popup display
-  try {
-    chrome.storage.local.set({
-      lastExtraction: {
-        type: kpiType,
-        timestamp: Date.now(),
-        title: title || 'Untitled',
-        success: true,
-        downloaded: action === 'download' || action === 'download-threshold',
-      },
-    });
-  } catch (e) {
-    console.debug('[ExtractMD] Could not store lastExtraction:', e);
-  }
-
   // Call success callback if provided
   if (onSuccess) {
     onSuccess();

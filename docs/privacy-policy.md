@@ -33,7 +33,6 @@ ExtractMD stores the following data **locally in your browser only**:
 2. **Usage Statistics (KPIs)**
    - Number of extractions performed (by type)
    - Token counts for extracted content
-   - Last extraction timestamp
    - These statistics are stored locally and are never transmitted
 
 All data is stored using Chrome's built-in `chrome.storage.sync` API, which means:
