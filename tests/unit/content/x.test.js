@@ -55,7 +55,7 @@ describe('X content extractor', () => {
 
   it('finds the primary post container for the current status URL', () => {
     loadFixture('post-basic.html');
-    window.history.pushState({}, '', '/writer_one/status/2010751592346030461');
+    window.history.pushState({}, '', '/writer_one/status/9000000000000000001');
 
     const container = findPrimaryXContainer(document);
     expect(container).toBeTruthy();
@@ -63,7 +63,7 @@ describe('X content extractor', () => {
   });
 
   it('waits for the primary container to appear', async () => {
-    window.history.pushState({}, '', '/writer_one/status/2010751592346030461');
+    window.history.pushState({}, '', '/writer_one/status/9000000000000000001');
 
     const pendingContainer = waitForPrimaryXContainer({ timeoutMs: 200 });
     setTimeout(() => {
@@ -76,7 +76,7 @@ describe('X content extractor', () => {
   });
 
   it('times out when waiting for a primary container', async () => {
-    window.history.pushState({}, '', '/writer_one/status/2010751592346030461');
+    window.history.pushState({}, '', '/writer_one/status/9000000000000000001');
 
     const container = await waitForPrimaryXContainer({ timeoutMs: 30 });
     expect(container).toBeNull();
@@ -84,7 +84,7 @@ describe('X content extractor', () => {
 
   it('extracts metadata and markdown body from a standard post', () => {
     loadFixture('post-basic.html');
-    window.history.pushState({}, '', '/writer_one/status/2010751592346030461');
+    window.history.pushState({}, '', '/writer_one/status/9000000000000000001');
 
     const result = extractXMarkdown({
       xIncludeImages: true,
@@ -97,7 +97,7 @@ describe('X content extractor', () => {
 
     expect(result.title).toBe('Building in public with markdown extraction.');
     expect(result.handle).toBe('@writer_one');
-    expect(result.link).toBe(`${window.location.origin}/writer_one/status/2010751592346030461`);
+    expect(result.link).toBe(`${window.location.origin}/writer_one/status/9000000000000000001`);
     expect(result.markdown).not.toContain('# Building in public with markdown extraction.');
     expect(result.markdown).toContain('**Author:** Writer One (@writer_one)');
     expect(result.markdown).toContain('**Date:** 2026-01-17T12:34:56.000Z');
@@ -107,7 +107,7 @@ describe('X content extractor', () => {
 
   it('extracts rich media placeholders and quoted post markdown', () => {
     loadFixture('post-media-quote.html');
-    window.history.pushState({}, '', '/creator_dev/status/2010751592346030461');
+    window.history.pushState({}, '', '/creator_dev/status/9000000000000000002');
 
     const result = extractXMarkdown({
       xIncludeImages: true,
@@ -125,7 +125,7 @@ describe('X content extractor', () => {
       '![State transitions](https://pbs.twimg.com/media/example-two.jpg)'
     );
     expect(result.markdown).toContain(
-      `- [Video attached on X](${window.location.origin}/creator_dev/status/2010751592346030461)`
+      `- [Video attached on X](${window.location.origin}/creator_dev/status/9000000000000000002)`
     );
     expect(result.markdown).toContain('- [Launch note](https://example.com/launch-note)');
     expect(result.markdown).toContain('> Quoted post by @quoted_author');
@@ -134,7 +134,7 @@ describe('X content extractor', () => {
 
   it('falls back to permalink and poster thumbnail for blob-backed videos', () => {
     loadFixture('post-video-blob.html');
-    window.history.pushState({}, '', '/video_author/status/2032872133513408838');
+    window.history.pushState({}, '', '/video_author/status/9000000000000000004');
 
     const result = extractXMarkdown({
       xIncludeImages: true,
@@ -146,19 +146,19 @@ describe('X content extractor', () => {
     });
 
     expect(result.markdown).toContain(
-      `- [Video attached on X](${window.location.origin}/video_author/status/2032872133513408838)`
+      `- [Video attached on X](${window.location.origin}/video_author/status/9000000000000000004)`
     );
     expect(result.markdown).toContain(
-      'https://pbs.twimg.com/ext_tw_video_thumb/2015389729387139072/pu/img/-qDumgPswjyOOHzS.jpg'
+      'https://pbs.twimg.com/ext_tw_video_thumb/9000000000000000099/pu/img/sample-video-thumb.jpg'
     );
     expect(result.markdown).not.toContain(
-      'blob:https://x.com/ac46159e-411b-4334-b63a-5ef83f856d8e'
+      'blob:https://x.com/00000000-0000-4000-8000-000000000000'
     );
   });
 
   it('extracts long-form article body and title from article routes', () => {
     loadFixture('article-longform.html');
-    window.history.pushState({}, '', '/i/articles/2020202020202020202');
+    window.history.pushState({}, '', '/i/articles/9000000000000000010');
 
     const result = extractXMarkdown({
       xIncludeImages: true,
@@ -183,7 +183,7 @@ describe('X content extractor', () => {
 
   it('honors X content toggles for media, quotes, and URL', () => {
     loadFixture('post-media-quote.html');
-    window.history.pushState({}, '', '/creator_dev/status/2010751592346030461');
+    window.history.pushState({}, '', '/creator_dev/status/9000000000000000002');
 
     const result = extractXMarkdown({
       xIncludeImages: false,
@@ -203,7 +203,7 @@ describe('X content extractor', () => {
 
   it('appends metrics context after metadata when enabled', () => {
     loadFixture('post-basic.html');
-    window.history.pushState({}, '', '/writer_one/status/2010751592346030461');
+    window.history.pushState({}, '', '/writer_one/status/9000000000000000001');
 
     const result = extractXMarkdown({
       xIncludeMetricsContext: true,
