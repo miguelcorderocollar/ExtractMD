@@ -5,13 +5,7 @@ import { initYouTubeFeatures, copyYouTubeTranscript } from './content/youtube.js
 import { initHackerNewsFeatures, performHNCopy } from './content/hackernews.js';
 import { initArticleFeatures, performArticleCopy } from './content/articles.js';
 import { initUniversalFeatures, performUniversalCopy } from './content/universal.js';
-import {
-  initXFeatures,
-  performXCopy,
-  isXPostPage,
-  isXArticlePage,
-  teardownXFeatures,
-} from './content/x.js';
+import { initXFeatures, performXCopy, isXPostPage, isXArticlePage } from './content/x.js';
 
 function isHNNewsPage() {
   if (!window.location.hostname.includes('ycombinator.com')) return false;
@@ -27,7 +21,6 @@ async function runInitForCurrentPage() {
     console.debug('[ExtractMD] Extension globally disabled, skipping initialization');
     // Clear any existing copy function and floating button
     window.copyExtractMD = null;
-    teardownXFeatures();
     const existingButton = document.getElementById('extractmd-floating-button');
     if (existingButton) {
       existingButton.remove();
@@ -41,12 +34,16 @@ async function runInitForCurrentPage() {
     .filter((d) => d.length > 0);
 
   const hostname = window.location.hostname;
+  const isIntegrationDomainEnabled =
+    ((hostname.includes('x.com') || hostname.includes('twitter.com')) &&
+      settings.enableXIntegration !== false) ||
+    (hostname.includes('youtube.com') && settings.enableYouTubeIntegration !== false) ||
+    (hostname.includes('ycombinator.com') && settings.enableHackerNewsIntegration !== false);
 
-  if (ignoredDomains.includes(hostname)) {
+  if (ignoredDomains.includes(hostname) && !isIntegrationDomainEnabled) {
     console.debug(`[ExtractMD] Domain ${hostname} is ignored, skipping initialization`);
     window.__extractmd_domain_ignored = true;
     window.copyExtractMD = null;
-    teardownXFeatures();
     const existingButton = document.getElementById('extractmd-floating-button');
     if (existingButton) {
       existingButton.remove();
@@ -74,7 +71,6 @@ async function runInitForCurrentPage() {
     if (settings.enableXIntegration === false) {
       console.debug('[ExtractMD] X integration disabled by user setting');
       window.copyExtractMD = null;
-      teardownXFeatures();
       const existingButton = document.getElementById('extractmd-floating-button');
       if (existingButton) {
         existingButton.remove();

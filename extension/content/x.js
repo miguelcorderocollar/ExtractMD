@@ -13,20 +13,16 @@ const X_SETTINGS_DEFAULTS = {
   xIncludeMetricsContext: false,
 };
 
-const X_POST_PATH_REGEX = /^\/(?:[^/]+|i\/web)\/status\/\d+(?:\/.*)?$/;
-const X_ARTICLE_PATH_REGEX = /^\/(?:i\/)?articles\/[^/?#]+(?:\/.*)?$/;
-
 let isProcessing = false;
 let xObserver = null;
-let xObserverDebounceTimer = null;
 let floatingButtonController = null;
 
 export function isXPostPage(pathname = window.location.pathname) {
-  return X_POST_PATH_REGEX.test(pathname);
+  return /\/status\/\d+/.test(pathname);
 }
 
 export function isXArticlePage(pathname = window.location.pathname) {
-  return X_ARTICLE_PATH_REGEX.test(pathname);
+  return /\/i\/articles\/[^/]+/.test(pathname) || /\/articles\/[^/]+/.test(pathname);
 }
 
 function toAbsoluteUrl(url) {
@@ -748,7 +744,13 @@ export async function performXCopy(updateButton = false) {
 
 async function manageFloatingButtonForX() {
   if (window.__extractmd_domain_ignored) {
-    removeXFloatingButton();
+    const existingDomButton = document.getElementById('extractmd-floating-button');
+    if (floatingButtonController) {
+      floatingButtonController.remove();
+      floatingButtonController = null;
+    } else if (existingDomButton) {
+      existingDomButton.remove();
+    }
     return;
   }
 
@@ -756,7 +758,13 @@ async function manageFloatingButtonForX() {
   const hasContainer = Boolean(findPrimaryXContainer(document));
 
   if (!supportedPage || !hasContainer) {
-    removeXFloatingButton();
+    const existingDomButton = document.getElementById('extractmd-floating-button');
+    if (floatingButtonController) {
+      floatingButtonController.remove();
+      floatingButtonController = null;
+    } else if (existingDomButton) {
+      existingDomButton.remove();
+    }
     return;
   }
 
@@ -792,38 +800,14 @@ async function manageFloatingButtonForX() {
   }
 }
 
-function removeXFloatingButton() {
-  const existingDomButton = document.getElementById('extractmd-floating-button');
-  if (floatingButtonController) {
-    floatingButtonController.remove();
-    floatingButtonController = null;
-  } else if (existingDomButton) {
-    existingDomButton.remove();
-  }
-}
-
-export function teardownXFeatures() {
-  if (xObserver) {
-    xObserver.disconnect();
-    xObserver = null;
-  }
-  if (xObserverDebounceTimer) {
-    clearTimeout(xObserverDebounceTimer);
-    xObserverDebounceTimer = null;
-  }
-  removeXFloatingButton();
-  isProcessing = false;
-}
-
 function setupXMutationObserver() {
   if (xObserver) return;
 
+  let debounceTimer = null;
   xObserver = new MutationObserver(() => {
-    if (xObserverDebounceTimer) clearTimeout(xObserverDebounceTimer);
-    xObserverDebounceTimer = setTimeout(() => {
-      manageFloatingButtonForX().catch((error) => {
-        console.error('[ExtractMD] Failed to manage X floating button:', error);
-      });
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      manageFloatingButtonForX();
     }, 400);
   });
 
@@ -834,8 +818,6 @@ export function initXFeatures() {
   chrome.storage.sync.get({ enableXIntegration: true }, function (items) {
     if (items.enableXIntegration === false) return;
     setupXMutationObserver();
-    manageFloatingButtonForX().catch((error) => {
-      console.error('[ExtractMD] Failed to initialize X floating button:', error);
-    });
+    manageFloatingButtonForX();
   });
 }
