@@ -44,7 +44,8 @@ For feature work, unless the user explicitly says otherwise:
 
 1. **Create a dedicated branch first** using a clear and relevant name.
 2. **Implement the feature on that branch** until the user gives approval to proceed.
-3. **After user approval, complete this sequence**:
+3. **After implementation, present changes for user review.** NEVER commit, push, create a PR, or merge without explicit user approval. The user must review the diff and say "okay" (or equivalent) before any git operations proceed.
+4. **After user approval, complete this sequence**:
    - Check that implementation quality is good and changes are correct and sensible.
    - Ensure `CHANGELOG.md` includes the update, usually in `## [Unreleased]`.
    - Commit and push if the user has not already done so.
@@ -104,3 +105,13 @@ When making any UI changes (excluding text-only changes) that require visual rev
 **Note**: Text-only changes (e.g., updating copy, fixing typos) don't require preview. Visual changes (CSS, layout, responsive design, component styling) should always be previewed.
 
 The server runs in the background until stopped. Use DevTools device toolbar (Ctrl+Shift+M) to test mobile breakpoints.
+
+## Website Update Workflow
+
+When a new integration or major feature is added to the extension, the public website (`web/`) must also be updated to reflect it. This includes:
+
+1. **`web/index.html`**: Add a new feature card in the "Built-in Integrations" grid, update meta descriptions (HTML meta, Open Graph, Twitter Card), update JSON-LD `featureList`, and update keywords.
+2. **`web/privacy.html`**: Update the overview paragraph and integration visibility settings list to include the new integration name.
+3. **`web/manifest.json`**: Update the `description` field to mention the new integration.
+
+This ensures the website stays in sync with the extension's actual capabilities.
