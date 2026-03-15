@@ -104,6 +104,7 @@ const SETTING_ELEMENTS = {
   floatingButtonEnableDismiss: { id: 'floatingButtonEnableDismiss', type: 'checkbox' },
   floatingButtonSize: { id: 'floatingButtonSize', type: 'select' },
   floatingButtonTransparency: { id: 'floatingButtonTransparency', type: 'select' },
+  floatingButtonStyle: { id: 'floatingButtonStyle', type: 'select' },
 };
 
 /**

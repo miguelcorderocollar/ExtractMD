@@ -23,6 +23,7 @@ describe('FloatingButton component', () => {
               ignoredDomains: '',
               floatingButtonSize: 'medium',
               floatingButtonTransparency: 'medium',
+              floatingButtonStyle: 'glass',
               accentColor: '#14b8a6',
             });
           }),
@@ -121,13 +122,13 @@ describe('FloatingButton component', () => {
   });
 
   describe('button appearance', () => {
-    it('creates button with default teal accent background color', async () => {
+    it('creates button with default frosted glass background', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
 
       expect(controller).not.toBeNull();
-      // Light mode uses #14b8a6 - jsdom converts to rgb
-      expect(controller.element.style.background).toBe('rgb(20, 184, 166)');
+      // Default is glass style: neutral white rgba background
+      expect(controller.element.style.background).toContain('rgba(255, 255, 255');
     });
 
     it('creates button with rounded square shape (not circular)', async () => {
@@ -281,6 +282,15 @@ describe('FloatingButton component', () => {
         removeEventListener: vi.fn(),
       }));
 
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({
+          floatingButtonSize: 'medium',
+          floatingButtonTransparency: 'medium',
+          floatingButtonStyle: 'solid',
+          accentColor: '#14b8a6',
+        });
+      });
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
 
@@ -296,20 +306,30 @@ describe('FloatingButton component', () => {
         removeEventListener: vi.fn(),
       }));
 
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({
+          floatingButtonSize: 'medium',
+          floatingButtonTransparency: 'medium',
+          floatingButtonStyle: 'solid',
+          accentColor: '#14b8a6',
+        });
+      });
+
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
 
       // Dark mode uses a lightened accent color for better visibility
-      // The exact color depends on ColorUtils.lighten(#14b8a6, 10)
       expect(controller.element.style.background).not.toBe('');
       // Just verify it's different from light mode (rgb(20, 184, 166))
       expect(controller.element.style.background).not.toBe('rgb(20, 184, 166)');
     });
 
     it('uses custom accent color from storage', async () => {
-      // Mock storage to return custom color
       chrome.storage.sync.get = vi.fn((keys, callback) => {
-        callback({ accentColor: '#ff0000' }); // Red
+        callback({
+          floatingButtonStyle: 'solid',
+          accentColor: '#ff0000',
+        });
       });
 
       const onClick = vi.fn();
@@ -319,9 +339,11 @@ describe('FloatingButton component', () => {
     });
 
     it('computes hover variant correctly', async () => {
-      // Mock storage to return blue color
       chrome.storage.sync.get = vi.fn((keys, callback) => {
-        callback({ accentColor: '#0066cc' }); // Blue
+        callback({
+          floatingButtonStyle: 'solid',
+          accentColor: '#0066cc',
+        });
       });
 
       const onClick = vi.fn();
@@ -762,6 +784,109 @@ describe('FloatingButton component', () => {
       // Hover uses a darkened version of the accent color
       expect(controller.element.style.background).not.toBe('');
       expect(controller.element.style.background).not.toBe(initialBg);
+    });
+  });
+
+  describe('glass style', () => {
+    it('uses solid style when configured (no backdrop-filter)', async () => {
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({
+          floatingButtonSize: 'medium',
+          floatingButtonTransparency: 'medium',
+          floatingButtonStyle: 'solid',
+          accentColor: '#14b8a6',
+        });
+      });
+
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+
+      // Solid style should not set backdrop-filter
+      expect(controller.element.style.backdropFilter || '').toBe('');
+      // Solid style sets border to 'none' (jsdom serializes as 'medium')
+      expect(controller.element.style.borderStyle).toBe('none');
+    });
+
+    it('uses glass style by default (colorless frosted glass)', async () => {
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+
+      // Glass background should be neutral white rgba (no accent color)
+      const bg = controller.element.style.background;
+      expect(bg).toContain('rgba');
+      expect(bg).toContain('255');
+      expect(bg).not.toContain('184'); // No accent tint (teal green component)
+
+      // Glass style should set a visible border
+      expect(controller.element.style.border).not.toBe('none');
+      expect(controller.element.style.border).toContain('rgba');
+    });
+
+    it('glass style hover updates background while keeping glass effect', async () => {
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({
+          floatingButtonSize: 'medium',
+          floatingButtonTransparency: 'medium',
+          floatingButtonStyle: 'glass',
+          accentColor: '#14b8a6',
+        });
+      });
+
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+      controller.appendTo(document.body);
+
+      const initialBg = controller.element.style.background;
+
+      const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
+      controller.element.dispatchEvent(mouseenterEvent);
+
+      // Hover should change background
+      expect(controller.element.style.background).not.toBe(initialBg);
+    });
+
+    it('glass style setNormal restores glass background', async () => {
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({
+          floatingButtonSize: 'medium',
+          floatingButtonTransparency: 'medium',
+          floatingButtonStyle: 'glass',
+          accentColor: '#14b8a6',
+        });
+      });
+
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+
+      const initialBg = controller.element.style.background;
+
+      controller.setLoading();
+      controller.setNormal();
+
+      expect(controller.element.style.background).toBe(initialBg);
+    });
+
+    it('glass style loading/success/error states use opaque colors', async () => {
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({
+          floatingButtonSize: 'medium',
+          floatingButtonTransparency: 'medium',
+          floatingButtonStyle: 'glass',
+          accentColor: '#14b8a6',
+        });
+      });
+
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+
+      controller.setLoading();
+      expect(controller.element.style.background).toBe('rgb(245, 158, 11)');
+
+      controller.setSuccess();
+      expect(controller.element.style.background).toBe('rgb(34, 197, 94)');
+
+      controller.setError();
+      expect(controller.element.style.background).toBe('rgb(239, 68, 68)');
     });
   });
 

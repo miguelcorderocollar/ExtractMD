@@ -108,7 +108,7 @@ async function loadPositionOffset(domain) {
 
 /**
  * Load all button settings from storage in a single call
- * @returns {Promise<{size: string, transparency: string, accentColor: string}>}
+ * @returns {Promise<{size: string, transparency: string, style: string, accentColor: string}>}
  */
 async function loadButtonSettings() {
   return new Promise((resolve) => {
@@ -116,12 +116,14 @@ async function loadButtonSettings() {
       {
         floatingButtonSize: 'medium',
         floatingButtonTransparency: 'medium',
+        floatingButtonStyle: 'glass',
         accentColor: DEFAULTS.accentColor,
       },
       (items) => {
         resolve({
           size: items.floatingButtonSize || 'medium',
           transparency: items.floatingButtonTransparency || 'medium',
+          style: items.floatingButtonStyle || 'glass',
           accentColor: items.accentColor || DEFAULTS.accentColor,
         });
       }
@@ -216,9 +218,35 @@ export async function createFloatingButton({
   let currentOffset = { ...positionOffset };
   const sizeConfig = SIZE_CONFIG[settings.size] || SIZE_CONFIG.medium;
   const idleOpacity = TRANSPARENCY_CONFIG[settings.transparency] || TRANSPARENCY_CONFIG.medium;
+  const isGlass = settings.style === 'glass';
 
   // Get theme colors using loaded accent color
   const colors = getThemeColors(settings.accentColor);
+
+  // Pre-compute glass-specific values (colorless frosted glass, no accent tint)
+  const dark = isDarkMode();
+  const glassBg = isGlass
+    ? dark
+      ? 'rgba(255, 255, 255, 0.12)'
+      : 'rgba(255, 255, 255, 0.15)'
+    : null;
+  const glassHoverBg = isGlass
+    ? dark
+      ? 'rgba(255, 255, 255, 0.22)'
+      : 'rgba(255, 255, 255, 0.3)'
+    : null;
+  const glassBorder = isGlass
+    ? dark
+      ? '1px solid rgba(255, 255, 255, 0.18)'
+      : '1px solid rgba(255, 255, 255, 0.5)'
+    : null;
+  const glassBoxShadow = isGlass
+    ? '0 4px 24px -1px rgba(0, 0, 0, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.25)'
+    : null;
+  const glassHoverBoxShadow = isGlass
+    ? '0 6px 28px -1px rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.35)'
+    : null;
+  const glassIconColor = isGlass ? '#ffffff' : null;
 
   const button = document.createElement('div');
   button.id = id;
@@ -235,7 +263,7 @@ export async function createFloatingButton({
   cs.display = 'flex';
   cs.alignItems = 'center';
   cs.justifyContent = 'center';
-  cs.color = colors.iconColor;
+  cs.color = isGlass ? glassIconColor : colors.iconColor;
 
   const svg = contentContainer.querySelector('svg');
   if (svg) {
@@ -282,9 +310,6 @@ export async function createFloatingButton({
   bs.width = `${sizeConfig.size}px`;
   bs.height = `${sizeConfig.size}px`;
   bs.cursor = 'pointer';
-  bs.background = colors.accent;
-  bs.border = 'none';
-  bs.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
   bs.zIndex = '10000';
   bs.display = 'flex';
   bs.alignItems = 'center';
@@ -293,6 +318,18 @@ export async function createFloatingButton({
     'box-shadow 0.2s ease, opacity 0.2s ease, background 0.2s ease, transform 0.2s ease';
   bs.userSelect = 'none';
   bs.opacity = idleOpacity.toString();
+
+  if (isGlass) {
+    bs.background = glassBg;
+    bs.border = glassBorder;
+    bs.boxShadow = glassBoxShadow;
+    bs.backdropFilter = 'blur(12px) saturate(180%)';
+    bs.webkitBackdropFilter = 'blur(12px) saturate(180%)';
+  } else {
+    bs.background = colors.accent;
+    bs.border = 'none';
+    bs.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+  }
 
   // Drag state
   let isDragging = false;
@@ -410,10 +447,16 @@ export async function createFloatingButton({
   button.addEventListener('mouseenter', () => {
     if (!button.dataset.processing) {
       isHovering = true;
-      button.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
       button.style.opacity = '1';
-      button.style.background = colors.accentHover;
       button.style.transform = 'scale(1.05)';
+
+      if (isGlass) {
+        button.style.background = glassHoverBg;
+        button.style.boxShadow = glassHoverBoxShadow;
+      } else {
+        button.style.background = colors.accentHover;
+        button.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
+      }
 
       // Start timer to show dismiss button (only if dismiss is enabled)
       if (domain && enableDismiss) {
@@ -439,10 +482,16 @@ export async function createFloatingButton({
     dismissBtn.style.display = 'none';
 
     if (!button.dataset.processing) {
-      button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
       button.style.opacity = idleOpacity.toString();
-      button.style.background = colors.accent;
       button.style.transform = 'scale(1)';
+
+      if (isGlass) {
+        button.style.background = glassBg;
+        button.style.boxShadow = glassBoxShadow;
+      } else {
+        button.style.background = colors.accent;
+        button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+      }
     }
   });
 
@@ -530,7 +579,8 @@ export async function createFloatingButton({
      */
     setLoading() {
       button.dataset.processing = 'true';
-      updateIcon(ICONS.loading, colors.iconColor);
+      const iconClr = isGlass ? glassIconColor : colors.iconColor;
+      updateIcon(ICONS.loading, iconClr);
       button.style.background = colors.loading;
       button.style.cursor = 'not-allowed';
       button.style.opacity = '1';
@@ -542,7 +592,8 @@ export async function createFloatingButton({
      * Set button to success state
      */
     setSuccess() {
-      updateIcon(ICONS.success, colors.iconColor);
+      const iconClr = isGlass ? glassIconColor : colors.iconColor;
+      updateIcon(ICONS.success, iconClr);
       button.style.background = colors.success;
       button.style.opacity = '1';
       button.style.transform = 'scale(1)';
@@ -552,7 +603,8 @@ export async function createFloatingButton({
      * Set button to error state
      */
     setError() {
-      updateIcon(ICONS.error, colors.iconColor);
+      const iconClr = isGlass ? glassIconColor : colors.iconColor;
+      updateIcon(ICONS.error, iconClr);
       button.style.background = colors.error;
       button.style.opacity = '1';
       button.style.transform = 'scale(1)';
@@ -563,8 +615,9 @@ export async function createFloatingButton({
      */
     setNormal() {
       delete button.dataset.processing;
-      updateIcon(ICONS.clipboard, colors.iconColor);
-      button.style.background = colors.accent;
+      const iconClr = isGlass ? glassIconColor : colors.iconColor;
+      updateIcon(ICONS.clipboard, iconClr);
+      button.style.background = isGlass ? glassBg : colors.accent;
       button.style.cursor = 'pointer';
       button.style.opacity = idleOpacity.toString();
       button.style.transform = 'scale(1)';

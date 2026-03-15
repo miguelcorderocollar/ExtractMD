@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **X Integration (Posts + Articles)**: Added dedicated extraction for X/Twitter status pages and long-form X articles with metadata (`title`, author handle, date, link), rich media handling (images, video/card placeholders), quoted-post markdown blocks, metrics-context extraction toggle (comments/reposts/likes/bookmarks/views + extraction timestamp), and new X settings/KPI tracking.
 - **Contribution Templates**: Added GitHub issue forms (bug report, feature request, question/support), issue template configuration, pull request template, and a new `CONTRIBUTING.md` guide to standardize community contributions.
+- **Frosted Glass Floating Button**: New "Glass" button style option that renders the floating button as a colorless frosted glass element using `backdrop-filter` blur and saturation, with subtle white borders and inset highlights. Glass is now the default style; users can switch back to solid (accent-colored) in settings.
 
 ### Fixed
 

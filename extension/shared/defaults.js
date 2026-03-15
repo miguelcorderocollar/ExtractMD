@@ -71,6 +71,7 @@ export const DEFAULTS = {
   floatingButtonEnableDismiss: true,
   floatingButtonSize: 'medium', // 'small' | 'medium' | 'large'
   floatingButtonTransparency: 'medium', // 'low' | 'medium' | 'high' | 'full'
+  floatingButtonStyle: 'glass', // 'solid' | 'glass'
 
   // Theme
   accentColor: '#14b8a6', // Default teal
@@ -133,6 +134,7 @@ export const SETTING_SCHEMA = {
   floatingButtonEnableDismiss: 'boolean',
   floatingButtonSize: 'string',
   floatingButtonTransparency: 'string',
+  floatingButtonStyle: 'string',
   accentColor: 'string',
   welcomeCompleted: 'boolean',
 };
