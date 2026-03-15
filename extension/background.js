@@ -79,10 +79,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'openNewTab' && message.url) {
     chrome.tabs.create({ url: message.url });
     sendResponse({ success: true });
-  } else if (message.action === 'closeCurrentTab' && sender.tab) {
+    return false;
+  }
+
+  if (message.action === 'closeCurrentTab' && sender.tab) {
     chrome.tabs.remove(sender.tab.id);
     sendResponse({ success: true });
+    return false;
   }
+
+  return false;
 });
 
 // Handle keyboard shortcut command

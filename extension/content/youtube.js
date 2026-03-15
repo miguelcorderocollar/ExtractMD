@@ -3,224 +3,107 @@ import {
   copyToClipboard,
   downloadMarkdownFile,
   showSuccessNotificationWithTokens,
-  sleep,
-  showNotification,
   getSettings,
   closeCurrentTab,
 } from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
 import { encode } from 'gpt-tokenizer';
+import {
+  extractTranscriptText,
+  extractYouTubeTranscriptMarkdown,
+  extractYouTubeTranscriptPayload,
+} from './youtubeTranscript.js';
+
+export { extractTranscriptText, extractYouTubeTranscriptMarkdown, extractYouTubeTranscriptPayload };
 
 let floatingButtonController = null;
 let isProcessing = false;
 
-async function expandDescription() {
-  const expandButton = document.querySelector('tp-yt-paper-button#expand');
-  if (expandButton) {
-    expandButton.click();
-    await sleep(500);
-  }
+function getCurrentVideoTitle() {
+  return document.querySelector('div#title h1 yt-formatted-string')?.textContent?.trim() || '';
 }
 
-async function clickShowTranscript() {
-  let showTranscriptButton = null;
-  let attempts = 0;
-  const maxAttempts = 20;
-  while (!showTranscriptButton && attempts < maxAttempts) {
-    showTranscriptButton = document.querySelector('button[aria-label="Show transcript"]');
-    if (!showTranscriptButton) {
-      await sleep(500);
-      attempts++;
-    }
-  }
-  if (showTranscriptButton) {
-    showTranscriptButton.click();
-  } else {
-    throw new Error(
-      'Show transcript button not found. This video might not have a transcript available.'
+async function getYouTubeTranscriptSettings() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(
+      {
+        includeTimestamps: true,
+        addTitleToTranscript: true,
+        addChannelToTranscript: true,
+        addUrlToTranscript: true,
+        jumpToDomain: false,
+        jumpToDomainUrl: 'https://chat.openai.com/',
+      },
+      resolve
     );
-  }
+  });
 }
 
-async function waitForTranscriptAndCopy(settings = {}) {
-  let transcriptContainer = null;
-  let attempts = 0;
-  const maxAttempts = 40;
-  while (!transcriptContainer && attempts < maxAttempts) {
-    transcriptContainer = document.querySelector(
-      'ytd-transcript-segment-list-renderer #segments-container, macro-markers-panel-item-view-model, transcript-segment-view-model'
-    );
-    if (!transcriptContainer) {
-      await sleep(500);
-      attempts++;
+async function handleTranscriptOutput(transcriptText) {
+  const outputSettings = await new Promise((resolve) => {
+    chrome.storage.sync.get({ downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 }, resolve);
+  });
+
+  if (outputSettings.downloadInsteadOfCopy) {
+    downloadMarkdownFile(transcriptText, getCurrentVideoTitle(), 'ExtractMD');
+    showSuccessNotificationWithTokens('Transcript downloaded as .md!', transcriptText);
+    return;
+  }
+
+  const threshold = parseInt(outputSettings.downloadIfTokensExceed, 10);
+  if (!isNaN(threshold) && threshold > 0) {
+    const tokens = encode(transcriptText).length;
+    if (tokens >= threshold * 1000) {
+      downloadMarkdownFile(transcriptText, getCurrentVideoTitle(), 'ExtractMD');
+      showSuccessNotificationWithTokens(
+        'Transcript downloaded as .md (token threshold)!',
+        transcriptText
+      );
+      return;
     }
   }
-  if (!transcriptContainer) {
-    showNotification(
-      '❌ Transcript not found or not available for this video. Please check if the video has a transcript. If this persists, contact the developer.',
-      'error',
-      true
-    );
-    throw new Error('Transcript failed to load within timeout period.');
-  }
-  let transcriptText = extractTranscriptText(settings.includeTimestamps !== false);
-  let metaMd = '';
-  if (
-    settings.addTitleToTranscript ||
-    settings.addChannelToTranscript ||
-    settings.addUrlToTranscript
-  ) {
-    let title = '';
-    let channelName = '';
-    let channelUrl = '';
-    let videoUrl = window.location.href;
-    const titleElem = document.querySelector('div#title h1 yt-formatted-string');
-    if (titleElem) title = titleElem.textContent.trim();
-    const channelElem = document.querySelector('ytd-channel-name#channel-name a');
-    if (channelElem) {
-      channelName = channelElem.textContent.trim();
-      channelUrl = channelElem.href.startsWith('http')
-        ? channelElem.href
-        : window.location.origin + channelElem.getAttribute('href');
-    }
-    if (settings.addTitleToTranscript && title) metaMd += `# ${title}\n`;
-    if (settings.addChannelToTranscript && channelName)
-      metaMd += `**Channel:** [${channelName}](${channelUrl})\n`;
-    if (settings.addUrlToTranscript && videoUrl) metaMd += `**Video URL:** ${videoUrl}\n`;
-    if (metaMd) metaMd += '\n';
-  }
-  transcriptText = metaMd + transcriptText;
+
+  await copyToClipboard(transcriptText, true);
+  showSuccessNotificationWithTokens('Transcript copied to clipboard!', transcriptText);
+}
+
+// Global function for watch-page extraction
+export async function copyYouTubeTranscript(settings = null) {
+  const mergedSettings = settings || (await getYouTubeTranscriptSettings());
+  const transcriptText = await extractYouTubeTranscriptMarkdown(mergedSettings);
+  await handleTranscriptOutput(transcriptText);
+
+  await incrementKpi('youtube');
   const userSettings = await getSettings();
-  chrome.storage.sync.get(
-    { downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 },
-    function (items) {
-      if (items.downloadInsteadOfCopy) {
-        // Use video title for filename
-        let title = '';
-        const titleElem = document.querySelector('div#title h1 yt-formatted-string');
-        if (titleElem) title = titleElem.textContent.trim();
-        downloadMarkdownFile(transcriptText, title, 'ExtractMD');
-        showSuccessNotificationWithTokens('Transcript downloaded as .md!', transcriptText);
-      } else {
-        // Check token threshold
-        let threshold = parseInt(items.downloadIfTokensExceed, 10);
-        if (!isNaN(threshold) && threshold > 0) {
-          const tokens = encode(transcriptText).length;
-          if (tokens >= threshold * 1000) {
-            let title = '';
-            const titleElem = document.querySelector('div#title h1 yt-formatted-string');
-            if (titleElem) title = titleElem.textContent.trim();
-            downloadMarkdownFile(transcriptText, title, 'ExtractMD');
-            showSuccessNotificationWithTokens(
-              'Transcript downloaded as .md (token threshold)!',
-              transcriptText
-            );
-            return;
-          }
-        }
-        // Timestamps already handled in extractTranscriptText, so pass true to avoid re-processing
-        copyToClipboard(transcriptText, true);
-        showSuccessNotificationWithTokens('Transcript copied to clipboard!', transcriptText);
-      }
-    }
-  );
-  // Increment KPI counter
-  incrementKpi('youtube');
 
-  // Close tab after extraction if setting is enabled
   if (userSettings.closeTabAfterExtraction) {
     setTimeout(() => {
       closeCurrentTab();
-    }, 500); // Wait 500ms after showing the notification
+    }, 500);
   }
-}
 
-export function extractTranscriptText(includeTimestamps = true) {
-  let transcript = '';
-  const allElements = Array.from(
-    document.querySelectorAll(
-      'ytd-transcript-segment-renderer, ytd-transcript-section-header-renderer, transcript-segment-view-model'
-    )
-  );
-  allElements.forEach((element) => {
-    if (element.tagName === 'YTD-TRANSCRIPT-SECTION-HEADER-RENDERER') {
-      const headerText = element
-        .querySelector('.shelf-header-layout-wiz__title')
-        ?.textContent?.trim();
-      if (headerText) {
-        transcript += `\n\n## ${headerText}\n`;
-      }
-    } else if (
-      element.tagName === 'YTD-TRANSCRIPT-SEGMENT-RENDERER' ||
-      element.tagName === 'TRANSCRIPT-SEGMENT-VIEW-MODEL'
-    ) {
-      const timestamp = element
-        .querySelector('.segment-timestamp, .ytwTranscriptSegmentViewModelTimestamp')
-        ?.textContent?.trim();
-      const text = element
-        .querySelector('.segment-text, .yt-core-attributed-string')
-        ?.textContent?.trim();
-      if (text) {
-        if (includeTimestamps && timestamp) {
-          transcript += `[${timestamp}] ${text}\n`;
-        } else {
-          transcript += `${text}\n`;
-        }
-      }
-    }
-  });
-  return transcript.trim();
-}
-
-// Global function for background script
-export async function copyYouTubeTranscript(settings = null) {
-  try {
-    let mergedSettings = settings;
-    if (!settings) {
-      mergedSettings = await new Promise((resolve) => {
-        chrome.storage.sync.get(
-          {
-            includeTimestamps: true,
-            addTitleToTranscript: true,
-            addChannelToTranscript: true,
-            addUrlToTranscript: true,
-            jumpToDomain: false,
-            jumpToDomainUrl: 'https://chat.openai.com/',
-          },
-          resolve
-        );
-      });
-    }
-    await expandDescription();
-    await clickShowTranscript();
-    await waitForTranscriptAndCopy(mergedSettings);
-    if (mergedSettings.jumpToDomain && mergedSettings.jumpToDomainUrl) {
-      chrome.runtime.sendMessage({ action: 'openNewTab', url: mergedSettings.jumpToDomainUrl });
-    }
-  } catch (error) {
-    showNotification('Error: ' + error.message, 'error');
-    throw error;
+  if (mergedSettings.jumpToDomain && mergedSettings.jumpToDomainUrl) {
+    chrome.runtime.sendMessage({ action: 'openNewTab', url: mergedSettings.jumpToDomainUrl });
   }
 }
 
 window.copyYouTubeTranscript = copyYouTubeTranscript;
+window.extractYouTubeTranscriptMarkdown = extractYouTubeTranscriptMarkdown;
+window.extractYouTubeTranscriptPayload = extractYouTubeTranscriptPayload;
 
 export function initYouTubeFeatures() {
-  console.debug('[ExtractMD] initYouTubeFeatures called');
-  chrome.storage.sync.get({ enableYouTubeIntegration: true }, function (items) {
+  chrome.storage.sync.get({ enableYouTubeIntegration: true }, (items) => {
     if (items.enableYouTubeIntegration === false) return;
-    // Ensure floating button is initialized after DOM is ready
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
-        console.debug('[ExtractMD] DOMContentLoaded for YouTube');
         initializeFloatingButton();
       });
     } else {
       initializeFloatingButton();
     }
 
-    // Also initialize on YouTube navigation (SPA behavior)
     let currentUrl = window.location.href;
     const observer = new MutationObserver(() => {
       if (window.location.href !== currentUrl) {
@@ -232,31 +115,25 @@ export function initYouTubeFeatures() {
         setTimeout(initializeFloatingButton, 1000);
       }
     });
+
     observer.observe(document.body, {
       childList: true,
       subtree: true,
     });
-
-    // Monitor for YouTube player state changes (theater mode, fullscreen buttons)
-    // No longer needed as FloatingButton handles this internally
   });
 }
 
 async function initializeFloatingButton() {
-  console.debug('[ExtractMD] initializeFloatingButton (YouTube) called');
   if (
     !(
       window.location.hostname.includes('youtube.com') &&
       window.location.pathname.includes('/watch')
     )
-  )
-    return;
-  if (document.getElementById('extractmd-floating-button')) {
-    console.debug('[ExtractMD] Floating button already exists (YouTube)');
+  ) {
     return;
   }
+  if (document.getElementById('extractmd-floating-button')) return;
 
-  // Load floating button settings
   const buttonSettings = await new Promise((resolve) => {
     chrome.storage.sync.get(
       {
@@ -275,6 +152,7 @@ async function initializeFloatingButton() {
       if (isProcessing) return;
       isProcessing = true;
       floatingButtonController.setLoading();
+
       try {
         await window.copyYouTubeTranscript();
         floatingButtonController.setSuccess();
@@ -294,6 +172,5 @@ async function initializeFloatingButton() {
 
   if (floatingButtonController) {
     floatingButtonController.appendTo(document.body);
-    console.debug('[ExtractMD] Floating button created and added to DOM (YouTube)');
   }
 }

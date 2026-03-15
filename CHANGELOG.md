@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Contribution Templates**: Added GitHub issue forms (bug report, feature request, question/support), issue template configuration, pull request template, and a new `CONTRIBUTING.md` guide to standardize community contributions.
 - **Frosted Glass Floating Button**: New "Glass" button style option that renders the floating button as a colorless frosted glass element using `backdrop-filter` blur and saturation, with subtle white borders and inset highlights. Glass is now the default style; users can switch back to solid (accent-colored) in settings.
 - **Floating Button Detection Hint**: Added a configurable floating-button hint badge that shows extraction mode (`Article` or `Page`) before click so users can tell what will be copied at a glance.
+- **YouTube Feed Quick Extract (WIP)**: Added UI scaffolding for card-level transcript extraction on YouTube Home, Subscriptions, and Playlist pages. Buttons appear on video cards and are toggleable in settings. Extraction logic is not yet wired up (see [#36](https://github.com/miguelcorderocollar/ExtractMD/issues/36)).
 
 ### Fixed
 

@@ -2,6 +2,7 @@
 import { showNotification, getSettings } from './content/utils.js';
 import { saveSetting } from './shared/storage.js';
 import { initYouTubeFeatures, copyYouTubeTranscript } from './content/youtube.js';
+import { initYouTubeFeedFeatures, isYouTubeFeedPage } from './content/youtubeFeed.js';
 import { initHackerNewsFeatures, performHNCopy } from './content/hackernews.js';
 import { initArticleFeatures, performArticleCopy } from './content/articles.js';
 import { initUniversalFeatures, performUniversalCopy } from './content/universal.js';
@@ -63,6 +64,10 @@ async function runInitForCurrentPage() {
     console.debug('[ExtractMD] Initializing YouTube features');
     window.copyExtractMD = copyYouTubeTranscript;
     initYouTubeFeatures();
+  } else if (isYouTubeDomain && isYouTubeFeedPage()) {
+    console.debug('[ExtractMD] Initializing YouTube feed quick extract features');
+    window.copyExtractMD = null;
+    initYouTubeFeedFeatures();
   } else if (isHNDomain && (window.location.pathname.startsWith('/item') || isHNNewsPage())) {
     console.debug('[ExtractMD] Initializing Hacker News features');
     window.copyExtractMD = () => performHNCopy(false);

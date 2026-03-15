@@ -55,6 +55,7 @@ describe('shared/defaults', () => {
 
     // Integration toggles
     expect(DEFAULTS.enableYouTubeIntegration).toBe(true);
+    expect(DEFAULTS.enableYouTubeFeedQuickExtract).toBe(true);
     expect(DEFAULTS.enableHackerNewsIntegration).toBe(true);
     expect(DEFAULTS.enableXIntegration).toBe(true);
     expect(DEFAULTS.enableArticleIntegration).toBe(true);

@@ -19,6 +19,7 @@ const SETTING_ELEMENTS = {
   addTitleToTranscript: { id: 'addTitleToTranscript', type: 'checkbox' },
   addChannelToTranscript: { id: 'addChannelToTranscript', type: 'checkbox' },
   addUrlToTranscript: { id: 'addUrlToTranscript', type: 'checkbox' },
+  enableYouTubeFeedQuickExtract: { id: 'enableYouTubeFeedQuickExtract', type: 'checkbox' },
 
   // HN Comments settings
   hnIncludeAuthor: { id: 'hnIncludeAuthor', type: 'checkbox' },

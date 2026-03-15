@@ -51,6 +51,7 @@ export const DEFAULTS = {
 
   // Integration toggles
   enableYouTubeIntegration: true,
+  enableYouTubeFeedQuickExtract: true,
   enableHackerNewsIntegration: true,
   enableXIntegration: true,
   enableArticleIntegration: true,
@@ -119,6 +120,7 @@ export const SETTING_SCHEMA = {
   showTokenCountInNotification: 'boolean',
   ignoredDomains: 'string',
   enableYouTubeIntegration: 'boolean',
+  enableYouTubeFeedQuickExtract: 'boolean',
   enableHackerNewsIntegration: 'boolean',
   enableXIntegration: 'boolean',
   enableArticleIntegration: 'boolean',
