@@ -3,18 +3,35 @@
 // =============================================================================
 // Icon Management - Update icon based on globalEnabled state
 // =============================================================================
+const DEFAULT_ICON_PATHS = {
+  16: 'icons/icon16.png',
+  48: 'icons/icon48.png',
+  128: 'icons/icon128.png',
+};
+
+function getEnabledIconPathsFromManifest() {
+  const manifest = chrome.runtime.getManifest();
+  const defaultIcon = manifest.action?.default_icon || manifest.icons || {};
+
+  return {
+    16: defaultIcon['16'] || defaultIcon[16] || DEFAULT_ICON_PATHS[16],
+    48: defaultIcon['48'] || defaultIcon[48] || DEFAULT_ICON_PATHS[48],
+    128: defaultIcon['128'] || defaultIcon[128] || DEFAULT_ICON_PATHS[128],
+  };
+}
+
+function toDisabledIconPath(iconPath) {
+  return iconPath.replace(/\.png$/i, '-disabled.png');
+}
+
 async function updateIcon(enabled) {
-  const iconPath = enabled
-    ? {
-        16: 'icons/icon16.png',
-        48: 'icons/icon48.png',
-        128: 'icons/icon128.png',
-      }
-    : {
-        16: 'icons/icon16-disabled.png',
-        48: 'icons/icon48-disabled.png',
-        128: 'icons/icon128-disabled.png',
-      };
+  const enabledIconPaths = getEnabledIconPathsFromManifest();
+  const disabledIconPaths = {
+    16: toDisabledIconPath(enabledIconPaths[16]),
+    48: toDisabledIconPath(enabledIconPaths[48]),
+    128: toDisabledIconPath(enabledIconPaths[128]),
+  };
+  const iconPath = enabled ? enabledIconPaths : disabledIconPaths;
 
   await chrome.action.setIcon({ path: iconPath });
 

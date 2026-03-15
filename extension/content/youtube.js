@@ -49,7 +49,7 @@ async function waitForTranscriptAndCopy(settings = {}) {
   const maxAttempts = 40;
   while (!transcriptContainer && attempts < maxAttempts) {
     transcriptContainer = document.querySelector(
-      'ytd-transcript-segment-list-renderer #segments-container'
+      'ytd-transcript-segment-list-renderer #segments-container, macro-markers-panel-item-view-model, transcript-segment-view-model'
     );
     if (!transcriptContainer) {
       await sleep(500);
@@ -140,7 +140,7 @@ export function extractTranscriptText(includeTimestamps = true) {
   let transcript = '';
   const allElements = Array.from(
     document.querySelectorAll(
-      'ytd-transcript-segment-renderer, ytd-transcript-section-header-renderer'
+      'ytd-transcript-segment-renderer, ytd-transcript-section-header-renderer, transcript-segment-view-model'
     )
   );
   allElements.forEach((element) => {
@@ -151,9 +151,16 @@ export function extractTranscriptText(includeTimestamps = true) {
       if (headerText) {
         transcript += `\n\n## ${headerText}\n`;
       }
-    } else if (element.tagName === 'YTD-TRANSCRIPT-SEGMENT-RENDERER') {
-      const timestamp = element.querySelector('.segment-timestamp')?.textContent?.trim();
-      const text = element.querySelector('.segment-text')?.textContent?.trim();
+    } else if (
+      element.tagName === 'YTD-TRANSCRIPT-SEGMENT-RENDERER' ||
+      element.tagName === 'TRANSCRIPT-SEGMENT-VIEW-MODEL'
+    ) {
+      const timestamp = element
+        .querySelector('.segment-timestamp, .ytwTranscriptSegmentViewModelTimestamp')
+        ?.textContent?.trim();
+      const text = element
+        .querySelector('.segment-text, .yt-core-attributed-string')
+        ?.textContent?.trim();
       if (text) {
         if (includeTimestamps && timestamp) {
           transcript += `[${timestamp}] ${text}\n`;
