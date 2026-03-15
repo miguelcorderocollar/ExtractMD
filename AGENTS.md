@@ -13,7 +13,7 @@ Your goal is to transform ExtractMD from a collection of monolithic scripts into
 3. **Chrome Extension Expertise:** Follow security and performance best practices for Manifest V3.
 4. **Context-Awareness:** Always refer to `docs/refactoring-plan.md` to ensure you are aligned with the project's phase-based roadmap.
 5. **Git Safety:** NEVER commit changes unless the user explicitly asks you to. This prevents unwanted proactive behavior.
-6. **Feature Branch by Default:** Unless the user explicitly says otherwise, start feature work on a new branch with a clear conventional name (for example: `feat/<short-kebab-description>`, `fix/<short-kebab-description>`, `refactor/<short-kebab-description>`, `chore/<short-kebab-description>`).
+6. **Feature Branch by Default (With Small-Change Exception):** Unless the user explicitly says otherwise, start feature work on a new branch with a clear conventional name (for example: `feat/<short-kebab-description>`, `fix/<short-kebab-description>`, `refactor/<short-kebab-description>`, `chore/<short-kebab-description>`). For small maintenance updates (for example version bumps, copy/docs-only edits, or minor metadata/config tweaks), a dedicated branch is not required.
 7. **Changelog Discipline (Extension-Only):** Document relevant extension updates in `CHANGELOG.md` (usually under `## [Unreleased]`) as part of feature work. Do not include contribution-process/docs changes (for example templates or `CONTRIBUTING.md`) and do not include website-only updates.
 8. **Unreleased Changelog Consolidation:** Keep `## [Unreleased]` concise by merging iterative updates for the same topic (for example, feature + follow-up fix) into one entry instead of duplicating details across sections.
 
@@ -53,6 +53,8 @@ For feature work, unless the user explicitly says otherwise:
    - Create a PR with a concise, clear description.
    - Approve, squash, and merge to `main`.
 
+For small maintenance changes (such as version bumps, docs/copy-only edits, or minor metadata updates), this branch-first workflow is optional and can be skipped.
+
 ## Changelog Release Workflow
 
 When building and publishing a new version:
@@ -62,6 +64,16 @@ When building and publishing a new version:
    - Keep entries extension-only; skip contribution-process/docs and website-only updates.
 2. At release time, move the released entries into a new version section with version number and date (for example: `## [1.2.0] - 2026-03-15`).
 3. Recreate or keep a fresh `## [Unreleased]` section at the top for upcoming changes.
+
+## Version Bump (Quick)
+
+For small version bumps, keep it minimal:
+
+1. Stay on current branch (no new branch needed unless requested).
+2. Update `extension/manifest.json` version (for example `1.2`).
+3. Update `package.json` version (for example `1.2.0`) and visible UI version text (`extension/options.html`).
+4. Move `CHANGELOG.md` `Unreleased` notes into a dated release section, and keep `## [Unreleased]` at the top.
+5. Do not commit/push unless the user explicitly asks.
 
 ## Packaging Workflow
 

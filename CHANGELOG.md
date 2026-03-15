@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-03-15
+
 ### Added
 
 - **X Integration (Posts + Articles)**: Added extraction for X/Twitter posts and long-form articles with metadata, quoted-post blocks, richer media handling, metrics-context output, and dedicated settings/KPI tracking.
