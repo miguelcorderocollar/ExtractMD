@@ -1,0 +1,224 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+vi.mock('../../../extension/content/components/FloatingButton.js', () => ({
+  createFloatingButton: vi.fn(() => ({
+    appendTo: vi.fn(),
+    show: vi.fn(),
+    remove: vi.fn(),
+    setLoading: vi.fn(),
+    setSuccess: vi.fn(),
+    setError: vi.fn(),
+    setNormal: vi.fn(),
+  })),
+}));
+
+vi.mock('../../../extension/content/utils.js', () => ({
+  showNotification: vi.fn(),
+}));
+
+vi.mock('../../../extension/content/handlers/copyHandler.js', () => ({
+  handleCopyOrDownload: vi.fn().mockResolvedValue({ action: 'copy', tokens: 42 }),
+}));
+
+import {
+  isXPostPage,
+  isXArticlePage,
+  findPrimaryXContainer,
+  waitForPrimaryXContainer,
+  extractXMarkdown,
+} from '../../../extension/content/x.js';
+
+const fixtureDir = join(dirname(fileURLToPath(import.meta.url)), '../fixtures/x');
+
+const loadFixture = (name) => {
+  document.body.innerHTML = readFileSync(join(fixtureDir, name), 'utf8');
+};
+
+describe('X content extractor', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    window.history.pushState({}, '', '/home');
+  });
+
+  it('detects X post and article routes', () => {
+    expect(isXPostPage('/writer/status/123456')).toBe(true);
+    expect(isXPostPage('/i/web/status/123456')).toBe(true);
+    expect(isXPostPage('/home')).toBe(false);
+
+    expect(isXArticlePage('/i/articles/987654')).toBe(true);
+    expect(isXArticlePage('/i/articles/how-to-build-ai-workflows')).toBe(true);
+    expect(isXArticlePage('/writer/status/123456')).toBe(false);
+  });
+
+  it('finds the primary post container for the current status URL', () => {
+    loadFixture('post-basic.html');
+    window.history.pushState({}, '', '/writer_one/status/2010751592346030461');
+
+    const container = findPrimaryXContainer(document);
+    expect(container).toBeTruthy();
+    expect(container.id).toBe('main-post');
+  });
+
+  it('waits for the primary container to appear', async () => {
+    window.history.pushState({}, '', '/writer_one/status/2010751592346030461');
+
+    const pendingContainer = waitForPrimaryXContainer({ timeoutMs: 200 });
+    setTimeout(() => {
+      loadFixture('post-basic.html');
+    }, 10);
+
+    const container = await pendingContainer;
+    expect(container).toBeTruthy();
+    expect(container.id).toBe('main-post');
+  });
+
+  it('times out when waiting for a primary container', async () => {
+    window.history.pushState({}, '', '/writer_one/status/2010751592346030461');
+
+    const container = await waitForPrimaryXContainer({ timeoutMs: 30 });
+    expect(container).toBeNull();
+  });
+
+  it('extracts metadata and markdown body from a standard post', () => {
+    loadFixture('post-basic.html');
+    window.history.pushState({}, '', '/writer_one/status/2010751592346030461');
+
+    const result = extractXMarkdown({
+      xIncludeImages: true,
+      xIncludeVideos: true,
+      xIncludeCards: true,
+      xIncludeQuotes: true,
+      xIncludeUrl: true,
+      xIncludeMetricsContext: false,
+    });
+
+    expect(result.title).toBe('Building in public with markdown extraction.');
+    expect(result.handle).toBe('@writer_one');
+    expect(result.link).toBe(`${window.location.origin}/writer_one/status/2010751592346030461`);
+    expect(result.markdown).not.toContain('# Building in public with markdown extraction.');
+    expect(result.markdown).toContain('**Author:** Writer One (@writer_one)');
+    expect(result.markdown).toContain('**Date:** 2026-01-17T12:34:56.000Z');
+    expect(result.markdown).toContain('[Read more](https://example.com/post)');
+    expect(result.markdown).not.toContain('This is a reply and should not be extracted.');
+  });
+
+  it('extracts rich media placeholders and quoted post markdown', () => {
+    loadFixture('post-media-quote.html');
+    window.history.pushState({}, '', '/creator_dev/status/2010751592346030461');
+
+    const result = extractXMarkdown({
+      xIncludeImages: true,
+      xIncludeVideos: true,
+      xIncludeCards: true,
+      xIncludeQuotes: true,
+      xIncludeUrl: true,
+      xIncludeMetricsContext: false,
+    });
+
+    expect(result.markdown).toContain(
+      '![Architecture sketch](https://pbs.twimg.com/media/example-one.jpg)'
+    );
+    expect(result.markdown).toContain(
+      '![State transitions](https://pbs.twimg.com/media/example-two.jpg)'
+    );
+    expect(result.markdown).toContain(
+      `- [Video attached on X](${window.location.origin}/creator_dev/status/2010751592346030461)`
+    );
+    expect(result.markdown).toContain('- [Launch note](https://example.com/launch-note)');
+    expect(result.markdown).toContain('> Quoted post by @quoted_author');
+    expect(result.markdown).toContain('> Quoted context that should render as blockquote text.');
+  });
+
+  it('falls back to permalink and poster thumbnail for blob-backed videos', () => {
+    loadFixture('post-video-blob.html');
+    window.history.pushState({}, '', '/video_author/status/2032872133513408838');
+
+    const result = extractXMarkdown({
+      xIncludeImages: true,
+      xIncludeVideos: true,
+      xIncludeCards: true,
+      xIncludeQuotes: true,
+      xIncludeUrl: true,
+      xIncludeMetricsContext: false,
+    });
+
+    expect(result.markdown).toContain(
+      `- [Video attached on X](${window.location.origin}/video_author/status/2032872133513408838)`
+    );
+    expect(result.markdown).toContain(
+      'https://pbs.twimg.com/ext_tw_video_thumb/2015389729387139072/pu/img/-qDumgPswjyOOHzS.jpg'
+    );
+    expect(result.markdown).not.toContain(
+      'blob:https://x.com/ac46159e-411b-4334-b63a-5ef83f856d8e'
+    );
+  });
+
+  it('extracts long-form article body and title from article routes', () => {
+    loadFixture('article-longform.html');
+    window.history.pushState({}, '', '/i/articles/2020202020202020202');
+
+    const result = extractXMarkdown({
+      xIncludeImages: true,
+      xIncludeVideos: true,
+      xIncludeCards: true,
+      xIncludeQuotes: true,
+      xIncludeUrl: true,
+      xIncludeMetricsContext: false,
+    });
+
+    expect(result.title).toBe('Designing resilient parsers for social content');
+    expect(result.handle).toBe('@longform_author');
+    expect(result.markdown).toContain(
+      '![Hero image](https://pbs.twimg.com/media/article-hero.jpg)'
+    );
+    expect(result.markdown).toContain('Long-form articles on X can include paragraphs');
+    expect(result.markdown).toContain('[this guide](https://example.com/guide)');
+    expect(result.markdown).toContain(
+      '![Longform diagram](https://pbs.twimg.com/media/article-image.jpg)'
+    );
+  });
+
+  it('honors X content toggles for media, quotes, and URL', () => {
+    loadFixture('post-media-quote.html');
+    window.history.pushState({}, '', '/creator_dev/status/2010751592346030461');
+
+    const result = extractXMarkdown({
+      xIncludeImages: false,
+      xIncludeVideos: false,
+      xIncludeCards: false,
+      xIncludeQuotes: false,
+      xIncludeUrl: false,
+      xIncludeMetricsContext: false,
+    });
+
+    expect(result.markdown).not.toContain('![Architecture sketch]');
+    expect(result.markdown).not.toContain('Video attached on X');
+    expect(result.markdown).not.toContain('Launch note');
+    expect(result.markdown).not.toContain('Quoted post by');
+    expect(result.markdown).not.toContain('**Link:**');
+  });
+
+  it('appends metrics context after metadata when enabled', () => {
+    loadFixture('post-basic.html');
+    window.history.pushState({}, '', '/writer_one/status/2010751592346030461');
+
+    const result = extractXMarkdown({
+      xIncludeMetricsContext: true,
+    });
+
+    expect(result.markdown).not.toContain('### Metrics Context');
+    const linkIndex = result.markdown.indexOf('**Link:**');
+    const extractedAtIndex = result.markdown.indexOf('- **Extracted At:**');
+    expect(linkIndex).toBeGreaterThan(-1);
+    expect(extractedAtIndex).toBeGreaterThan(linkIndex);
+    expect(result.markdown).toContain('- **Extracted At:**');
+    expect(result.markdown).toContain('- **Comments:** 123');
+    expect(result.markdown).toContain('- **Reposts:** 456');
+    expect(result.markdown).toContain('- **Likes:** 789');
+    expect(result.markdown).toContain('- **Bookmarks:** 10');
+    expect(result.markdown).toContain('- **Views:** 1112');
+  });
+});

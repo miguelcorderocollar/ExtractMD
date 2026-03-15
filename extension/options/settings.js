@@ -42,6 +42,14 @@ const SETTING_ELEMENTS = {
   articleExporterShowInfo: { id: 'articleExporterShowInfo', type: 'checkbox' },
   articleExporterIncludeUrl: { id: 'articleExporterIncludeUrl', type: 'checkbox' },
 
+  // X settings
+  xIncludeImages: { id: 'xIncludeImages', type: 'checkbox' },
+  xIncludeVideos: { id: 'xIncludeVideos', type: 'checkbox' },
+  xIncludeCards: { id: 'xIncludeCards', type: 'checkbox' },
+  xIncludeQuotes: { id: 'xIncludeQuotes', type: 'checkbox' },
+  xIncludeUrl: { id: 'xIncludeUrl', type: 'checkbox' },
+  xIncludeMetricsContext: { id: 'xIncludeMetricsContext', type: 'checkbox' },
+
   // Universal settings
   universalShowInfoNotification: { id: 'universalShowInfoNotification', type: 'checkbox' },
   universalIncludeImages: { id: 'universalIncludeImages', type: 'checkbox' },
@@ -72,6 +80,11 @@ const SETTING_ELEMENTS = {
   },
   enableHackerNewsIntegration: {
     id: 'enableHackerNewsIntegration',
+    type: 'checkbox',
+    invertDefault: true,
+  },
+  enableXIntegration: {
+    id: 'enableXIntegration',
     type: 'checkbox',
     invertDefault: true,
   },
@@ -227,6 +240,7 @@ export function attachSettingHandlers() {
         if (
           key === 'enableYouTubeIntegration' ||
           key === 'enableHackerNewsIntegration' ||
+          key === 'enableXIntegration' ||
           key === 'enableArticleIntegration' ||
           key === 'enableUniversalIntegration'
         ) {

@@ -6,6 +6,7 @@
 const INTEGRATION_SECTIONS = {
   enableYouTubeIntegration: 'youtube',
   enableHackerNewsIntegration: 'hackernews',
+  enableXIntegration: 'x',
   enableArticleIntegration: 'articles',
   enableUniversalIntegration: 'universal',
 };
@@ -19,6 +20,7 @@ export function updateIntegrationVisibility() {
     {
       enableYouTubeIntegration: true,
       enableHackerNewsIntegration: true,
+      enableXIntegration: true,
       enableArticleIntegration: true,
       enableUniversalIntegration: true,
     },

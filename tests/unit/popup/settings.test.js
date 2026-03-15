@@ -10,6 +10,7 @@ describe('popup.js - DEFAULTS', () => {
     expect(DEFAULTS).toHaveProperty('jumpToDomain');
     expect(DEFAULTS).toHaveProperty('enableYouTubeIntegration');
     expect(DEFAULTS).toHaveProperty('enableHackerNewsIntegration');
+    expect(DEFAULTS).toHaveProperty('enableXIntegration');
     expect(DEFAULTS).toHaveProperty('enableArticleIntegration');
   });
 

@@ -54,7 +54,7 @@ export function saveSetting(key, value) {
 
 /**
  * Increment a KPI counter if usage tracking is enabled
- * @param {string} type - KPI type (youtube, articles, hn_comments, hn_news)
+ * @param {string} type - KPI type (youtube, articles, hn_comments, hn_news, x_posts, universal)
  */
 export async function incrementKpi(type) {
   return new Promise((resolve) => {

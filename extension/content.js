@@ -5,6 +5,13 @@ import { initYouTubeFeatures, copyYouTubeTranscript } from './content/youtube.js
 import { initHackerNewsFeatures, performHNCopy } from './content/hackernews.js';
 import { initArticleFeatures, performArticleCopy } from './content/articles.js';
 import { initUniversalFeatures, performUniversalCopy } from './content/universal.js';
+import {
+  initXFeatures,
+  performXCopy,
+  isXPostPage,
+  isXArticlePage,
+  teardownXFeatures,
+} from './content/x.js';
 
 function isHNNewsPage() {
   if (!window.location.hostname.includes('ycombinator.com')) return false;
@@ -20,6 +27,7 @@ async function runInitForCurrentPage() {
     console.debug('[ExtractMD] Extension globally disabled, skipping initialization');
     // Clear any existing copy function and floating button
     window.copyExtractMD = null;
+    teardownXFeatures();
     const existingButton = document.getElementById('extractmd-floating-button');
     if (existingButton) {
       existingButton.remove();
@@ -32,15 +40,13 @@ async function runInitForCurrentPage() {
     .map((d) => d.trim())
     .filter((d) => d.length > 0);
 
-  if (ignoredDomains.includes(window.location.hostname)) {
-    console.debug(
-      `[ExtractMD] Domain ${window.location.hostname} is ignored, skipping initialization`
-    );
-    // Set global flag so feature modules know to not create buttons
+  const hostname = window.location.hostname;
+
+  if (ignoredDomains.includes(hostname)) {
+    console.debug(`[ExtractMD] Domain ${hostname} is ignored, skipping initialization`);
     window.__extractmd_domain_ignored = true;
-    // Clear any existing copy function if it was set before (e.g. during SPA navigation)
     window.copyExtractMD = null;
-    // Remove any existing floating button
+    teardownXFeatures();
     const existingButton = document.getElementById('extractmd-floating-button');
     if (existingButton) {
       existingButton.remove();
@@ -53,6 +59,8 @@ async function runInitForCurrentPage() {
 
   const isYouTubeDomain = window.location.hostname.includes('youtube.com');
   const isHNDomain = window.location.hostname.includes('ycombinator.com');
+  const isXDomain =
+    window.location.hostname.includes('x.com') || window.location.hostname.includes('twitter.com');
 
   if (isYouTubeDomain && window.location.pathname.includes('/watch')) {
     console.debug('[ExtractMD] Initializing YouTube features');
@@ -62,9 +70,25 @@ async function runInitForCurrentPage() {
     console.debug('[ExtractMD] Initializing Hacker News features');
     window.copyExtractMD = () => performHNCopy(false);
     initHackerNewsFeatures();
-  } else if (isYouTubeDomain || isHNDomain) {
-    // On YouTube/HN but not a supported page - do nothing, don't fall back to universal
-    console.debug('[ExtractMD] On YouTube/HN domain but not a supported page, skipping extraction');
+  } else if (isXDomain && (isXPostPage() || isXArticlePage())) {
+    if (settings.enableXIntegration === false) {
+      console.debug('[ExtractMD] X integration disabled by user setting');
+      window.copyExtractMD = null;
+      teardownXFeatures();
+      const existingButton = document.getElementById('extractmd-floating-button');
+      if (existingButton) {
+        existingButton.remove();
+      }
+    } else {
+      console.debug('[ExtractMD] Initializing X features');
+      window.copyExtractMD = () => performXCopy(false);
+      initXFeatures();
+    }
+  } else if (isYouTubeDomain || isHNDomain || isXDomain) {
+    // On YouTube/HN/X but not a supported page - do nothing, don't fall back to universal
+    console.debug(
+      '[ExtractMD] On YouTube/HN/X domain but not a supported page, skipping extraction'
+    );
     window.copyExtractMD = null;
     const existingButton = document.getElementById('extractmd-floating-button');
     if (existingButton) {

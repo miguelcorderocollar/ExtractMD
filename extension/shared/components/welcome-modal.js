@@ -17,6 +17,7 @@ export class WelcomeModal extends HTMLElement {
     this.integrations = {
       enableYouTubeIntegration: true,
       enableHackerNewsIntegration: true,
+      enableXIntegration: true,
       enableArticleIntegration: true,
       enableUniversalIntegration: true,
     };
@@ -114,6 +115,12 @@ export class WelcomeModal extends HTMLElement {
               <span>Hacker News discussions</span>
             </div>
             <div class="feature-item">
+              <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25h6.83l4.713 6.231L18.244 2.25zm-1.161 17.52h1.833L7.086 4.126H5.119L17.083 19.77z"/>
+              </svg>
+              <span>X posts and long-form articles</span>
+            </div>
+            <div class="feature-item">
               <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
@@ -163,6 +170,22 @@ export class WelcomeModal extends HTMLElement {
             </div>
             <label class="integration-toggle">
               <input type="checkbox" checked data-integration="enableHackerNewsIntegration">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="integration-card" data-integration="enableXIntegration">
+            <div class="integration-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25h6.83l4.713 6.231L18.244 2.25zm-1.161 17.52h1.833L7.086 4.126H5.119L17.083 19.77z"/>
+              </svg>
+            </div>
+            <div class="integration-info">
+              <h3>X</h3>
+              <p>Extract posts and long-form articles</p>
+            </div>
+            <label class="integration-toggle">
+              <input type="checkbox" checked data-integration="enableXIntegration">
               <span class="toggle-slider"></span>
             </label>
           </div>

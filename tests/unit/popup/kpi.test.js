@@ -49,17 +49,19 @@ describe('KPI functions', () => {
       articles: 30,
       hn_comments: 40,
       hn_news: 20,
+      x_posts: 35,
     };
 
     it('calculates correct totals', () => {
-      const stats = { youtube: 1, articles: 1, hn_comments: 1, hn_news: 1 };
+      const stats = { youtube: 1, articles: 1, hn_comments: 1, hn_news: 1, x_posts: 1 };
       const total =
         (stats.youtube || 0) * estimates.youtube +
         (stats.articles || 0) * estimates.articles +
         (stats.hn_comments || 0) * estimates.hn_comments +
-        (stats.hn_news || 0) * estimates.hn_news;
+        (stats.hn_news || 0) * estimates.hn_news +
+        (stats.x_posts || 0) * estimates.x_posts;
 
-      expect(total).toBe(150); // 60+30+40+20
+      expect(total).toBe(185); // 60+30+40+20+35
     });
 
     it('handles missing stats', () => {
@@ -68,7 +70,8 @@ describe('KPI functions', () => {
         (stats.youtube || 0) * estimates.youtube +
         (stats.articles || 0) * estimates.articles +
         (stats.hn_comments || 0) * estimates.hn_comments +
-        (stats.hn_news || 0) * estimates.hn_news;
+        (stats.hn_news || 0) * estimates.hn_news +
+        (stats.x_posts || 0) * estimates.x_posts;
 
       expect(total).toBe(300); // 5*60
     });
