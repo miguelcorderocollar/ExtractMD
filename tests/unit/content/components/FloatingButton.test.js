@@ -413,14 +413,13 @@ describe('FloatingButton component', () => {
       expect(controller.element.style.cursor).toBe('not-allowed');
     });
 
-    it('setLoading uses warning color for background', async () => {
+    it('setLoading uses translucent warning glass background by default', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
 
       controller.setLoading();
 
-      // Light mode loading color is #f59e0b = rgb(245, 158, 11)
-      expect(controller.element.style.background).toBe('rgb(245, 158, 11)');
+      expect(controller.element.style.background).toBe('rgba(245, 158, 11, 0.2)');
     });
 
     it('setSuccess updates button to success state with checkmark', async () => {
@@ -438,14 +437,36 @@ describe('FloatingButton component', () => {
       expect(innerHTML).toMatch(/points=['"]20\s+6\s+9\s+17\s+4\s+12['"]/);
     });
 
-    it('setSuccess uses success color for background', async () => {
+    it('setSuccess uses translucent success glass background by default', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
 
       controller.setSuccess();
 
-      // Light mode success color is #22c55e = rgb(34, 197, 94)
+      expect(controller.element.style.background).toBe('rgba(34, 197, 94, 0.2)');
+    });
+
+    it('solid style loading/success/error states keep opaque colors', async () => {
+      chrome.storage.sync.get = vi.fn((keys, callback) => {
+        callback({
+          floatingButtonSize: 'medium',
+          floatingButtonTransparency: 'medium',
+          floatingButtonStyle: 'solid',
+          accentColor: '#14b8a6',
+        });
+      });
+
+      const onClick = vi.fn();
+      const controller = await createFloatingButton({ onClick });
+
+      controller.setLoading();
+      expect(controller.element.style.background).toBe('rgb(245, 158, 11)');
+
+      controller.setSuccess();
       expect(controller.element.style.background).toBe('rgb(34, 197, 94)');
+
+      controller.setError();
+      expect(controller.element.style.background).toBe('rgb(239, 68, 68)');
     });
 
     it('setError updates button to error state with X icon', async () => {
@@ -463,14 +484,13 @@ describe('FloatingButton component', () => {
       expect(innerHTML).toMatch(/x2[=:]['"]6['"]/i);
     });
 
-    it('setError uses error color for background', async () => {
+    it('setError uses translucent error glass background by default', async () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
 
       controller.setError();
 
-      // Light mode error color is #ef4444 = rgb(239, 68, 68)
-      expect(controller.element.style.background).toBe('rgb(239, 68, 68)');
+      expect(controller.element.style.background).toBe('rgba(239, 68, 68, 0.2)');
     });
 
     it('setNormal resets button to initial state with clipboard icon', async () => {
@@ -903,7 +923,7 @@ describe('FloatingButton component', () => {
       expect(controller.element.style.background).toBe(initialBg);
     });
 
-    it('glass style loading/success/error states use opaque colors', async () => {
+    it('glass style loading/success/error states use translucent tinted backgrounds', async () => {
       chrome.storage.sync.get = vi.fn((keys, callback) => {
         callback({
           floatingButtonSize: 'medium',
@@ -917,13 +937,13 @@ describe('FloatingButton component', () => {
       const controller = await createFloatingButton({ onClick });
 
       controller.setLoading();
-      expect(controller.element.style.background).toBe('rgb(245, 158, 11)');
+      expect(controller.element.style.background).toBe('rgba(245, 158, 11, 0.2)');
 
       controller.setSuccess();
-      expect(controller.element.style.background).toBe('rgb(34, 197, 94)');
+      expect(controller.element.style.background).toBe('rgba(34, 197, 94, 0.2)');
 
       controller.setError();
-      expect(controller.element.style.background).toBe('rgb(239, 68, 68)');
+      expect(controller.element.style.background).toBe('rgba(239, 68, 68, 0.2)');
     });
   });
 
