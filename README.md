@@ -47,7 +47,7 @@
 
 1. Clone the repository
 2. Install dependencies: `pnpm install`
-3. Build the extension: `pnpm run build`
+3. Build the extension for local development: `pnpm run build`
 4. Load `extension/` folder in Chrome via `chrome://extensions/` (Developer mode)
 
 ## Usage
@@ -81,6 +81,9 @@
 # Run unit tests (Vitest)
 pnpm test
 
+# Build for local development (uses striped local icon variant)
+pnpm run build
+
 # Build for production
 pnpm run build:prod
 
@@ -90,6 +93,10 @@ pnpm run watch
 # Package extension for Chrome Web Store
 pnpm run package
 ```
+
+`pnpm run build` and `pnpm run watch` set manifest icon paths to `extension/icons/local/*`
+so the unpacked local extension is easy to distinguish. `pnpm run build:prod` and
+`pnpm run package` restore production icon paths (`extension/icons/*`) for release builds.
 
 ### Packaging
 

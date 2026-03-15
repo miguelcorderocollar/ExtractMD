@@ -17,7 +17,7 @@ try:
 except ImportError:
     HAS_CAIROSVG = False
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 # ExtractMD brand colors
 # Enabled state (teal)
@@ -35,6 +35,10 @@ RED_DARK_RGB = (220, 38, 38)
 # Common colors
 WHITE = "#fafafa"
 WHITE_RGB = (250, 250, 250)
+BLACK = "#0f172a"
+BLACK_RGB = (15, 23, 42)
+YELLOW = "#facc15"
+YELLOW_RGB = (250, 204, 21)
 
 # Paths
 SCRIPT_DIR = Path(__file__).parent
@@ -134,6 +138,27 @@ def design_floating_button_clipboard_pillow(size: int, bg_color_rgb: tuple = TEA
     return img
 
 
+def _local_border_svg(size: int) -> str:
+    """Return SVG markup for a yellow border with thin black outline inset."""
+    radius = int(size * 0.15)
+    # Yellow band sits at the outer edge; black outline on the inside of it.
+    band = max(1, round(size * 0.055))
+    black_stroke = max(0.5, size * 0.02)
+
+    # Yellow rounded-rect border drawn as a thick stroke centered on the edge
+    half = band / 2
+    return (
+        f'<rect x="{half}" y="{half}" '
+        f'width="{size - band}" height="{size - band}" '
+        f'rx="{max(0, radius - half)}" '
+        f'fill="none" stroke="{YELLOW}" stroke-width="{band}"/>\n'
+        f'<rect x="{band}" y="{band}" '
+        f'width="{size - band * 2}" height="{size - band * 2}" '
+        f'rx="{max(0, radius - band)}" '
+        f'fill="none" stroke="{BLACK}" stroke-width="{black_stroke}"/>\n'
+    )
+
+
 # =============================================================================
 # Design Registry
 # =============================================================================
@@ -150,7 +175,14 @@ DESIGNS = {
 # =============================================================================
 # Generation Functions
 # =============================================================================
-def generate_icon(design_key: str, size: int, output_path: Path, bg_color: str = TEAL, bg_color_rgb: tuple = TEAL_RGB) -> None:
+def generate_icon(
+    design_key: str,
+    size: int,
+    output_path: Path,
+    bg_color: str = TEAL,
+    bg_color_rgb: tuple = TEAL_RGB,
+    local_border: bool = False,
+) -> None:
     """Generate icon using specified design.
 
     Args:
@@ -164,42 +196,115 @@ def generate_icon(design_key: str, size: int, output_path: Path, bg_color: str =
 
     if HAS_CAIROSVG:
         svg_content = design['svg'](size, bg_color)
+        if local_border:
+            svg_content = svg_content.replace(
+                '<!-- Clipboard icon',
+                _local_border_svg(size) + '  <!-- Clipboard icon',
+                1,
+            )
         png_data = cairosvg.svg2png(bytestring=svg_content.encode('utf-8'))
         with open(output_path, 'wb') as f:
             f.write(png_data)
     else:
         img = design['pillow'](size, bg_color_rgb)
+        if local_border:
+            draw = ImageDraw.Draw(img)
+            radius = int(size * 0.15)
+            band = max(1, round(size * 0.055))
+            black_w = max(1, round(size * 0.02))
+            draw.rounded_rectangle(
+                [(0, 0), (size - 1, size - 1)],
+                radius=radius,
+                outline=YELLOW_RGB,
+                width=band,
+            )
+            draw.rounded_rectangle(
+                [(band, band), (size - 1 - band, size - 1 - band)],
+                radius=max(0, radius - band),
+                outline=BLACK_RGB,
+                width=black_w,
+            )
         img.save(output_path, 'PNG')
 
 
+def generate_icon_set(
+    design_key: str,
+    output_dir: Path,
+    enabled_color: str,
+    enabled_color_rgb: tuple,
+    disabled_color: str,
+    disabled_color_rgb: tuple,
+    label: str,
+    local_border: bool = False,
+) -> None:
+    """Generate all icon sizes for a single icon set."""
+    print(f"\n  📦 {label}:")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    print("    📘 Enabled:")
+    for size in SIZES:
+        output_path = output_dir / f"icon{size}.png"
+        generate_icon(
+            design_key,
+            size,
+            output_path,
+            enabled_color,
+            enabled_color_rgb,
+            local_border=local_border,
+        )
+        print(f"      ✓ {output_path.relative_to(PROJECT_ROOT)}")
+
+    print("    📕 Disabled:")
+    for size in SIZES:
+        output_path = output_dir / f"icon{size}-disabled.png"
+        generate_icon(
+            design_key,
+            size,
+            output_path,
+            disabled_color,
+            disabled_color_rgb,
+            local_border=local_border,
+        )
+        print(f"      ✓ {output_path.relative_to(PROJECT_ROOT)}")
+
+
 def generate_all_icons(design_key: str) -> None:
-    """Generate all icon sizes for a design in both enabled and disabled states."""
+    """Generate production and local icon sets."""
     print(f"\n🎨 Generating '{DESIGNS[design_key]['name']}' icons...")
 
     ICONS_DIR.mkdir(parents=True, exist_ok=True)
     IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Generate enabled icons (teal)
-    print("\n  📘 Enabled state (teal):")
-    for size in SIZES:
-        output_path = ICONS_DIR / f"icon{size}.png"
-        generate_icon(design_key, size, output_path, TEAL, TEAL_RGB)
-        print(f"    ✓ icon{size}.png")
+    # Production icon set (current default)
+    generate_icon_set(
+        design_key=design_key,
+        output_dir=ICONS_DIR,
+        enabled_color=TEAL,
+        enabled_color_rgb=TEAL_RGB,
+        disabled_color=RED,
+        disabled_color_rgb=RED_RGB,
+        label="Production icons",
+    )
 
-    # Generate disabled icons (red)
-    print("\n  📕 Disabled state (red):")
-    for size in SIZES:
-        output_path = ICONS_DIR / f"icon{size}-disabled.png"
-        generate_icon(design_key, size, output_path, RED, RED_RGB)
-        print(f"    ✓ icon{size}-disabled.png")
+    # Local development icon set
+    generate_icon_set(
+        design_key=design_key,
+        output_dir=ICONS_DIR / "local",
+        enabled_color=TEAL,
+        enabled_color_rgb=TEAL_RGB,
+        disabled_color=RED,
+        disabled_color_rgb=RED_RGB,
+        label="Local development icons",
+        local_border=True,
+    )
 
-    # Generate logo.svg (enabled state only)
+    # Generate logo.svg (production color only)
     print("\n  🎯 Logo:")
     svg_content = DESIGNS[design_key]['svg'](128, TEAL)
     svg_path = IMAGES_DIR / "logo.svg"
     with open(svg_path, 'w') as f:
         f.write(svg_content)
-    print(f"    ✓ logo.svg")
+    print("    ✓ extension/images/logo.svg")
 
     # Note: logo.png removed - only logo.svg is used
 
