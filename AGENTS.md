@@ -14,7 +14,8 @@ Your goal is to transform ExtractMD from a collection of monolithic scripts into
 4. **Context-Awareness:** Always refer to `docs/refactoring-plan.md` to ensure you are aligned with the project's phase-based roadmap.
 5. **Git Safety:** NEVER commit changes unless the user explicitly asks you to. This prevents unwanted proactive behavior.
 6. **Feature Branch by Default:** Unless the user explicitly says otherwise, start feature work on a new branch with a clear conventional name (for example: `feat/<short-kebab-description>`, `fix/<short-kebab-description>`, `refactor/<short-kebab-description>`, `chore/<short-kebab-description>`).
-7. **Changelog Discipline:** Document relevant updates in `CHANGELOG.md` (usually under `## [Unreleased]`) as part of feature work.
+7. **Changelog Discipline (Extension-Only):** Document relevant extension updates in `CHANGELOG.md` (usually under `## [Unreleased]`) as part of feature work. Do not include contribution-process/docs changes (for example templates or `CONTRIBUTING.md`) and do not include website-only updates.
+8. **Unreleased Changelog Consolidation:** Keep `## [Unreleased]` concise by merging iterative updates for the same topic (for example, feature + follow-up fix) into one entry instead of duplicating details across sections.
 
 ## Project Vision (ExtractMD 2.0)
 
@@ -57,6 +58,8 @@ For feature work, unless the user explicitly says otherwise:
 When building and publishing a new version:
 
 1. Keep in-progress updates in `## [Unreleased]` while work is ongoing.
+   - Prefer concise entries and combine repeated topic updates into a single bullet when possible.
+   - Keep entries extension-only; skip contribution-process/docs and website-only updates.
 2. At release time, move the released entries into a new version section with version number and date (for example: `## [1.2.0] - 2026-03-15`).
 3. Recreate or keep a fresh `## [Unreleased]` section at the top for upcoming changes.
 
@@ -114,4 +117,4 @@ When a new integration or major feature is added to the extension, the public we
 2. **`web/privacy.html`**: Update the overview paragraph and integration visibility settings list to include the new integration name.
 3. **`web/manifest.json`**: Update the `description` field to mention the new integration.
 
-This ensures the website stays in sync with the extension's actual capabilities.
+This ensures the website stays in sync with the extension's actual capabilities. These website-only sync updates should not be added to `CHANGELOG.md` unless they also reflect an extension behavior change.
