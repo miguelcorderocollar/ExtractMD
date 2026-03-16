@@ -65,6 +65,7 @@ When building and publishing a new version:
    - Keep entries extension-only; skip contribution-process/docs and website-only updates.
 2. At release time, move the released entries into a new version section with version number and date (for example: `## [1.2.0] - 2026-03-15`).
 3. Recreate or keep a fresh `## [Unreleased]` section at the top for upcoming changes.
+4. Before publishing/deploying, run `pnpm run build:web` to regenerate `web/changelog.html` from `CHANGELOG.md` (the website changelog automatically excludes `Unreleased`).
 
 ## Version Bump (Quick)
 

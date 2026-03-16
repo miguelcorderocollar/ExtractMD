@@ -93,6 +93,10 @@ pnpm run watch
 pnpm run package
 ```
 
+### Website Changelog Page
+
+Run `pnpm run build:web` when preparing a release. This command minifies `web/styles.css` and regenerates `web/changelog.html` from `CHANGELOG.md`, automatically omitting the `## [Unreleased]` section.
+
 `pnpm run build` and `pnpm run watch` set manifest icon paths to `extension/icons/local/*`
 so the unpacked local extension is easy to distinguish. `pnpm run build:prod` and
 `pnpm run package` restore production icon paths (`extension/icons/*`) for release builds.
