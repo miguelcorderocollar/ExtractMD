@@ -951,6 +951,84 @@ button.btn {
 }
 
 /* ============================================
+   Changelog Page
+   ============================================ */
+.changelog-page {
+  padding: 60px 0;
+}
+
+.changelog-content {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.changelog-content h1 {
+  font-family: var(--font-mono);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.changelog-meta {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.changelog-content h2 {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 40px 0 16px 0;
+}
+
+.changelog-content h3 {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 24px 0 12px 0;
+}
+
+.changelog-content p {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin: 0 0 16px 0;
+  line-height: 1.7;
+}
+
+.changelog-content ul {
+  margin: 0 0 16px 0;
+  padding-left: 24px;
+}
+
+.changelog-content li {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.changelog-content strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.changelog-content code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+}
+
+/* ============================================
    Responsive
    ============================================ */
 @media (max-width: 768px) {
@@ -990,7 +1068,8 @@ button.btn {
     text-align: center;
   }
 
-  .privacy-content h1 {
+  .privacy-content h1,
+  .changelog-content h1 {
     font-size: 28px;
   }
 }
