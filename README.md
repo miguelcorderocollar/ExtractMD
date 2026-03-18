@@ -114,6 +114,18 @@ The packaging script (`scripts/package.js`) prepares the extension for Chrome We
 
 The generated ZIP file (`packages/extractmd-{version}.zip`) is ready for upload to the Chrome Web Store Developer Dashboard.
 
+### Release Branching
+
+For versioned releases (e.g., 1.3), use a release-branch workflow:
+
+1. **Create a release branch** from `main`: `git checkout -b release/1.3 main`
+2. **Create feature branches** from `release/1.3` (e.g., `feat/reddit-extractor`)
+3. **Merge features** into `release/1.3` via PRs
+4. **Sync hotfixes from main**: When urgent fixes land on `main`, merge them into the release branch: `git checkout release/1.3 && git merge main`
+5. **Release**: When ready, merge `release/1.3` into `main`, tag `v1.3.0`, and delete the release branch
+
+Use **merge** (not rebase) when syncing `main` into `release/*` to keep history simple and avoid rewriting shared branches.
+
 ## Architecture
 
 - **Modular Design** - Shared components and utilities in `extension/shared/`

@@ -56,6 +56,18 @@ For feature work, unless the user explicitly says otherwise:
 
 For small maintenance changes (such as version bumps, docs/copy-only edits, or minor metadata updates), this branch-first workflow is optional and can be skipped.
 
+## Release Branching Workflow
+
+For versioned releases (e.g., 1.3), use a long-lived release branch:
+
+1. **Create release branch** from `main`: `git checkout -b release/1.3 main`
+2. **Create feature branches** from `release/1.3` (e.g., `feat/reddit-extractor`)
+3. **Merge features** into `release/1.3` via PRs; keep `main` stable
+4. **Sync hotfixes from main**: When urgent fixes land on `main`, merge into the release branch: `git checkout release/1.3 && git merge main` (use merge, not rebase, for shared branches)
+5. **Release**: When ready, merge `release/1.3` into `main`, tag `v1.3.0`, and delete the release branch
+
+Prefer **merge** over rebase when syncing `main` into `release/*` to avoid rewriting shared history.
+
 ## Changelog Release Workflow
 
 When building and publishing a new version:
