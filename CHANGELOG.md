@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Generic API Output Mode (X-first)**: Added configurable API profiles with template variables, a hover rocket action on X for API sending, local secret-variable storage for sensitive placeholders, and individual metric variables for API payload mapping.
+
 ## [1.2.0] - 2026-03-15
 
 ### Added

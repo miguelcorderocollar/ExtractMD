@@ -4,6 +4,7 @@
 import { showNotification } from './utils.js';
 import { createFloatingButton } from './components/FloatingButton.js';
 import { handleCopyOrDownload } from './handlers/copyHandler.js';
+import { sendToConfiguredApi } from './handlers/apiHandler.js';
 import { isXPostPage, isXArticlePage } from './x/detection.js';
 import { findPrimaryXContainer, waitForPrimaryXContainer } from './x/container.js';
 import { extractXMarkdown, X_SETTINGS_DEFAULTS } from './x/extractors.js';
@@ -12,6 +13,7 @@ export { isXPostPage, isXArticlePage, findPrimaryXContainer, waitForPrimaryXCont
 export { extractXMarkdown };
 
 let isProcessing = false;
+let isApiProcessing = false;
 let xObserver = null;
 let floatingButtonController = null;
 
@@ -68,6 +70,57 @@ export async function performXCopy(updateButton = false) {
   }
 }
 
+export async function performXApiSend(updateButton = false) {
+  if (isApiProcessing) return;
+  isApiProcessing = true;
+
+  if (updateButton && floatingButtonController) {
+    floatingButtonController.setLoading();
+  }
+
+  try {
+    const settings = await new Promise((resolve) => {
+      chrome.storage.sync.get(X_SETTINGS_DEFAULTS, resolve);
+    });
+
+    const readyContainer = await waitForPrimaryXContainer({ timeoutMs: 7000 });
+    if (!readyContainer) {
+      throw new Error('X content is still loading. Please try again in a moment.');
+    }
+
+    const result = extractXMarkdown(settings);
+    await sendToConfiguredApi({
+      integration: 'x',
+      variables: result.apiVariables,
+    });
+
+    if (updateButton && floatingButtonController) {
+      floatingButtonController.setSuccess();
+      setTimeout(() => {
+        floatingButtonController.setNormal();
+        isApiProcessing = false;
+      }, 2000);
+    } else {
+      isApiProcessing = false;
+    }
+  } catch (error) {
+    console.error('[ExtractMD] X API send failed:', error);
+    const message =
+      error instanceof Error && error.message ? error.message : 'Failed to send X content via API.';
+    showNotification(message, 'error');
+
+    if (updateButton && floatingButtonController) {
+      floatingButtonController.setError();
+      setTimeout(() => {
+        floatingButtonController.setNormal();
+        isApiProcessing = false;
+      }, 3000);
+    } else {
+      isApiProcessing = false;
+    }
+  }
+}
+
 async function manageFloatingButtonForX() {
   if (window.__extractmd_domain_ignored) {
     if (floatingButtonController) {
@@ -112,15 +165,34 @@ async function manageFloatingButtonForX() {
       {
         floatingButtonEnableDrag: true,
         floatingButtonEnableDismiss: true,
+        apiOutputEnabled: false,
+        apiEnableRocketAction: true,
+        apiEnabledForX: false,
       },
       resolve
     );
   });
 
+  const showApiRocket =
+    buttonSettings.apiOutputEnabled === true &&
+    buttonSettings.apiEnableRocketAction !== false &&
+    buttonSettings.apiEnabledForX === true;
+
+  const secondaryAction = showApiRocket
+    ? {
+        icon: '🚀',
+        title: 'Send extracted content to API',
+        onClick: async () => {
+          await performXApiSend(true);
+        },
+      }
+    : null;
+
   floatingButtonController = await createFloatingButton({
     domain: window.location.hostname,
     enableDrag: buttonSettings.floatingButtonEnableDrag,
     enableDismiss: buttonSettings.floatingButtonEnableDismiss,
+    secondaryAction,
     onClick: async () => {
       await performXCopy(true);
     },

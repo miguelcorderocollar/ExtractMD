@@ -119,6 +119,18 @@
             </svg>
             <span>Workflow</span>
           </button>
+          <button class="nav-item" data-section="api">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M4 13l7 7 9-16-16 9z" />
+            </svg>
+            <span>API</span>
+          </button>
           <button class="nav-item" data-section="data">
             <svg
               class="nav-icon"
@@ -631,6 +643,106 @@
               checked
             ></setting-toggle>
           </setting-group>
+        </section>
+
+        <!-- API Section -->
+        <section id="section-api" class="settings-section">
+          <div class="section-header">
+            <h2>API Output Settings</h2>
+            <p>Configure generic API delivery profiles and variables</p>
+          </div>
+
+          <setting-group title="Enable API Output">
+            <setting-toggle
+              setting-id="apiOutputEnabled"
+              label="Enable API Output Mode"
+              description="Allow extraction output to be sent to external APIs"
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="apiEnableRocketAction"
+              label="Show Hover Rocket Action"
+              description="Display rocket hover action on supported pages to send via API"
+              checked
+            ></setting-toggle>
+          </setting-group>
+
+          <setting-group title="Integration Availability">
+            <setting-toggle
+              setting-id="apiEnabledForX"
+              label="Enable for X"
+              description="Allow API output from X post extraction"
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="apiEnabledForYouTube"
+              label="Enable for YouTube"
+              description="Reserved for future rollout"
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="apiEnabledForHackerNews"
+              label="Enable for Hacker News"
+              description="Reserved for future rollout"
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="apiEnabledForArticles"
+              label="Enable for Articles"
+              description="Reserved for future rollout"
+            ></setting-toggle>
+            <setting-toggle
+              setting-id="apiEnabledForUniversal"
+              label="Enable for Universal"
+              description="Reserved for future rollout"
+            ></setting-toggle>
+          </setting-group>
+
+          <div class="settings-group">
+            <h3 class="group-title">Active Profile</h3>
+            <div class="setting-block">
+              <label class="setting-label-sm">Active Profile ID</label>
+              <input type="text" id="apiActiveProfileId" class="input-text" placeholder="default" />
+            </div>
+            <div class="setting-block">
+              <label class="setting-label-sm">API Profiles JSON</label>
+              <textarea
+                id="apiProfilesJson"
+                class="input-textarea"
+                placeholder='[{"id":"default",...}]'
+                style="min-height: 220px"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3 class="group-title">Secret Variables (Local Storage)</h3>
+            <p class="group-desc">
+              Store sensitive values in local storage and reference them in templates (for example
+              <code>{{secret_api_token}}</code>).
+            </p>
+            <div class="setting-block">
+              <label class="setting-label-sm">Secret Variables JSON</label>
+              <textarea
+                id="apiProfileSecretsJson"
+                class="input-textarea"
+                placeholder='{"secret_api_token":"abc123"}'
+                style="min-height: 140px"
+              ></textarea>
+            </div>
+            <div class="button-row">
+              <button id="loadApiSecretsBtn" class="btn btn-secondary">Load Secrets</button>
+              <button id="saveApiSecretsBtn" class="btn btn-secondary">Save Secrets</button>
+              <button id="testApiRequestBtn" class="btn btn-primary">Test API Request</button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3 class="group-title">Available X Variables</h3>
+            <p class="group-desc">
+              <code>{{title}}</code>, <code>{{author}}</code>, <code>{{display_name}}</code>,
+              <code>{{handle}}</code>, <code>{{date}}</code>, <code>{{link}}</code>,
+              <code>{{content}}</code>, <code>{{comments}}</code>, <code>{{reposts}}</code>,
+              <code>{{likes}}</code>, <code>{{bookmarks}}</code>, <code>{{views}}</code>,
+              <code>{{extracted_at}}</code>
+            </p>
+          </div>
         </section>
 
         <!-- Data Section -->

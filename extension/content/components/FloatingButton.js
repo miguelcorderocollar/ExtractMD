@@ -193,6 +193,12 @@ function injectAnimationStyles() {
  * @param {boolean} [options.enableDismiss=true] - Whether the dismiss (X) button is enabled
  * @param {boolean} [options.showDetectionHint=false] - Whether to render a mode hint badge
  * @param {string} [options.detectionHintText=''] - Mode hint text (e.g. "Article" or "Page")
+ * @param {Object} [options.secondaryAction] - Optional custom hover action configuration
+ * @param {string} [options.secondaryAction.icon] - Secondary action icon/label
+ * @param {string} [options.secondaryAction.title] - Secondary action title/label
+ * @param {Function} [options.secondaryAction.onClick] - Secondary action click handler
+ * @param {string} [options.secondaryAction.background] - Optional background color
+ * @param {string} [options.secondaryAction.color] - Optional text/icon color
  * @returns {Promise<Object|null>} Button controller with element and state methods
  */
 export async function createFloatingButton({
@@ -203,6 +209,7 @@ export async function createFloatingButton({
   enableDismiss = true,
   showDetectionHint = false,
   detectionHintText = '',
+  secondaryAction = null,
 }) {
   // Check if button already exists
   const existing = document.getElementById(id);
@@ -331,7 +338,10 @@ export async function createFloatingButton({
   // Create dismiss button (hidden by default)
   const dismissBtn = document.createElement('div');
   dismissBtn.className = 'extractmd-dismiss-btn';
-  dismissBtn.innerHTML = '×';
+  const hasSecondaryAction = Boolean(
+    secondaryAction && typeof secondaryAction.onClick === 'function'
+  );
+  dismissBtn.innerHTML = hasSecondaryAction ? secondaryAction.icon || '🚀' : '×';
 
   // Set dismiss button styles individually
   const ds = dismissBtn.style;
@@ -341,8 +351,10 @@ export async function createFloatingButton({
   ds.width = '18px';
   ds.height = '18px';
   ds.borderRadius = '50%';
-  ds.background = colors.error;
-  ds.color = 'white';
+  ds.background = hasSecondaryAction
+    ? secondaryAction.background || 'rgba(79, 70, 229, 0.95)'
+    : colors.error;
+  ds.color = hasSecondaryAction ? secondaryAction.color || 'white' : 'white';
   ds.fontSize = '14px';
   ds.lineHeight = '18px';
   ds.textAlign = 'center';
@@ -351,6 +363,11 @@ export async function createFloatingButton({
   ds.zIndex = '10001';
   ds.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
   ds.fontWeight = 'bold';
+  dismissBtn.setAttribute(
+    'aria-label',
+    hasSecondaryAction ? secondaryAction.title || 'Secondary action' : 'Dismiss for this domain'
+  );
+  dismissBtn.title = hasSecondaryAction ? secondaryAction.title || 'Secondary action' : 'Dismiss';
   button.appendChild(dismissBtn);
 
   // Calculate initial position with saved offset applied
@@ -514,8 +531,8 @@ export async function createFloatingButton({
         button.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
       }
 
-      // Start timer to show dismiss button (only if dismiss is enabled)
-      if (domain && enableDismiss) {
+      // Start timer to show hover action (dismiss or custom secondary action)
+      if ((domain && enableDismiss) || hasSecondaryAction) {
         hoverTimeout = setTimeout(() => {
           if (isHovering && !isDragging) {
             dismissBtn.style.display = 'block';
@@ -554,6 +571,15 @@ export async function createFloatingButton({
   // Dismiss button click handler
   dismissBtn.addEventListener('click', async (e) => {
     e.stopPropagation();
+
+    if (hasSecondaryAction) {
+      try {
+        await secondaryAction.onClick();
+      } catch (error) {
+        console.error('[ExtractMD] Secondary action failed:', error);
+      }
+      return;
+    }
 
     if (domain) {
       await addDomainToIgnoreList(domain);

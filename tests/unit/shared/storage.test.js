@@ -4,6 +4,8 @@ import {
   saveSetting,
   incrementKpi,
   getStorageUsage,
+  getApiProfileSecrets,
+  saveApiProfileSecrets,
 } from '../../../extension/shared/storage.js';
 import { DEFAULTS } from '../../../extension/shared/defaults.js';
 import { resetMockStorage } from '../setup.js';
@@ -182,6 +184,20 @@ describe('shared/storage', () => {
       // Large data should have more usage
       expect(largeUsage.bytes).toBeGreaterThan(smallUsage.bytes);
       expect(parseFloat(largeUsage.kb)).toBeGreaterThan(parseFloat(smallUsage.kb));
+    });
+  });
+
+  describe('API local secrets', () => {
+    it('saves and reads profile secrets from local storage', async () => {
+      await saveApiProfileSecrets('default', { secret_api_token: 'token-123' });
+      const secrets = await getApiProfileSecrets('default');
+
+      expect(secrets).toEqual({ secret_api_token: 'token-123' });
+    });
+
+    it('returns empty object when profile has no saved secrets', async () => {
+      const secrets = await getApiProfileSecrets('missing-profile');
+      expect(secrets).toEqual({});
     });
   });
 });

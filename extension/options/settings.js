@@ -73,6 +73,17 @@ const SETTING_ELEMENTS = {
   ignoredDomains: { id: 'ignoredDomains', type: 'textarea' },
   accentColor: { id: 'accentColor', type: 'color' },
 
+  // Generic API Output settings
+  apiOutputEnabled: { id: 'apiOutputEnabled', type: 'checkbox' },
+  apiEnableRocketAction: { id: 'apiEnableRocketAction', type: 'checkbox' },
+  apiEnabledForX: { id: 'apiEnabledForX', type: 'checkbox' },
+  apiEnabledForYouTube: { id: 'apiEnabledForYouTube', type: 'checkbox' },
+  apiEnabledForHackerNews: { id: 'apiEnabledForHackerNews', type: 'checkbox' },
+  apiEnabledForArticles: { id: 'apiEnabledForArticles', type: 'checkbox' },
+  apiEnabledForUniversal: { id: 'apiEnabledForUniversal', type: 'checkbox' },
+  apiActiveProfileId: { id: 'apiActiveProfileId', type: 'text' },
+  apiProfilesJson: { id: 'apiProfilesJson', type: 'textarea' },
+
   // Integration toggles
   enableYouTubeIntegration: {
     id: 'enableYouTubeIntegration',
@@ -252,7 +263,12 @@ export function attachSettingHandlers() {
       });
     } else if (config.type === 'text' || config.type === 'textarea' || config.type === 'color') {
       // Text inputs are handled separately (domain validation, etc.)
-      if (key === 'jumpToDomainUrl' || key === 'universalCustomSelector') {
+      if (
+        key === 'jumpToDomainUrl' ||
+        key === 'universalCustomSelector' ||
+        key === 'apiActiveProfileId' ||
+        key === 'apiProfilesJson'
+      ) {
         const inputEl = getInputElement(element);
         inputEl.addEventListener('input', function () {
           saveSetting(key, inputEl.value);

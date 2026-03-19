@@ -779,6 +779,36 @@ describe('FloatingButton component', () => {
 
       vi.useRealTimers();
     });
+
+    it('supports custom hover secondary action (rocket)', async () => {
+      vi.useFakeTimers();
+      const onClick = vi.fn();
+      const onSecondaryAction = vi.fn().mockResolvedValue(undefined);
+      const controller = await createFloatingButton({
+        onClick,
+        secondaryAction: {
+          icon: '🚀',
+          title: 'Send to API',
+          onClick: onSecondaryAction,
+        },
+      });
+      controller.appendTo(document.body);
+
+      const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
+      controller.element.dispatchEvent(mouseenterEvent);
+      vi.advanceTimersByTime(600);
+
+      const actionBtn = controller.element.querySelector('.extractmd-dismiss-btn');
+      expect(actionBtn).not.toBeNull();
+      expect(actionBtn.innerHTML).toBe('🚀');
+      expect(actionBtn.style.display).toBe('block');
+
+      actionBtn.click();
+      await Promise.resolve();
+
+      expect(onSecondaryAction).toHaveBeenCalledTimes(1);
+      vi.useRealTimers();
+    });
   });
 
   describe('hover effects', () => {
