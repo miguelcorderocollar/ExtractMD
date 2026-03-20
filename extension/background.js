@@ -52,6 +52,53 @@ async function cleanupLegacyLastExtraction() {
   }
 }
 
+async function dispatchApiRequest(request) {
+  if (!request || typeof request !== 'object') {
+    throw new Error('Invalid API request payload.');
+  }
+
+  const method = String(request.method || '').toUpperCase();
+  const url = String(request.url || '').trim();
+  const headers = request.headers && typeof request.headers === 'object' ? request.headers : {};
+  const body = request.body;
+
+  if (!['POST', 'PUT', 'PATCH'].includes(method)) {
+    throw new Error(`Unsupported request method: ${method}`);
+  }
+
+  if (!url) {
+    throw new Error('Request URL is empty.');
+  }
+
+  let response;
+  try {
+    response = await fetch(url, { method, headers, body });
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : 'Network error';
+    throw new Error(`Network request failed: ${reason}`);
+  }
+
+  const responseText = await response.text();
+  let responseBody = responseText;
+  try {
+    responseBody = responseText ? JSON.parse(responseText) : null;
+  } catch {
+    // Keep plain text when response is not JSON.
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `API responded with ${response.status} ${response.statusText}: ${typeof responseBody === 'string' ? responseBody : JSON.stringify(responseBody)}`
+    );
+  }
+
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    body: responseBody,
+  };
+}
+
 // Listen for storage changes to update icon when globalEnabled changes
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'sync' && changes.globalEnabled) {
@@ -90,10 +137,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'openNewTab' && message.url) {
     chrome.tabs.create({ url: message.url });
     sendResponse({ success: true });
+    return false;
   } else if (message.action === 'closeCurrentTab' && sender.tab) {
     chrome.tabs.remove(sender.tab.id);
     sendResponse({ success: true });
+    return false;
+  } else if (message.action === 'dispatchApiRequest') {
+    dispatchApiRequest(message.request)
+      .then((result) => {
+        sendResponse({ success: true, result });
+      })
+      .catch((error) => {
+        const message = error instanceof Error ? error.message : 'Unknown API dispatch error';
+        sendResponse({ success: false, error: message });
+      });
+    return true;
   }
+  return false;
 });
 
 // Handle keyboard shortcut command

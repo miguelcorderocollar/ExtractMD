@@ -119,6 +119,21 @@
             </svg>
             <span>Workflow</span>
           </button>
+          <button class="nav-item" data-section="api">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 11.5L21 3 12.5 21l-1.6-7.9L3 11.5z" />
+              <path d="M10.9 13.1L21 3" />
+            </svg>
+            <span>API</span>
+          </button>
           <button class="nav-item" data-section="data">
             <svg
               class="nav-icon"
@@ -631,6 +646,203 @@
               checked
             ></setting-toggle>
           </setting-group>
+        </section>
+
+        <!-- API Section -->
+        <section id="section-api" class="settings-section">
+          <div class="section-header">
+            <h2>API Output Settings</h2>
+            <p>Configure API integrations and floating action buttons</p>
+          </div>
+
+          <setting-group title="Enable API Output">
+            <setting-toggle
+              setting-id="apiOutputEnabled"
+              label="Enable API Output Mode"
+              description="Allow extraction output to be sent to external APIs"
+            ></setting-toggle>
+          </setting-group>
+
+          <div id="apiSettingsContent" hidden>
+            <div class="settings-group">
+              <h3 class="group-title">Integrations</h3>
+              <div id="apiIntegrationsPanel">
+                <div class="setting-block-header">
+                  <span class="setting-desc"
+                    >Add an integration or select a card to edit its details.</span
+                  >
+                  <button id="apiCreateIntegrationBtn" class="btn btn-primary btn-sm" type="button">
+                    Create New Integration
+                  </button>
+                </div>
+                <div id="apiIntegrationsEmptyHint" class="api-empty-state">
+                  <p class="group-desc">No API integrations created yet.</p>
+                </div>
+                <div id="apiIntegrationsGrid" class="api-integrations-grid"></div>
+              </div>
+            </div>
+
+            <div id="apiIntegrationEditor" class="settings-group api-integration-editor" hidden>
+              <div class="api-integration-editor-header">
+                <h3 class="group-title">Integration Details</h3>
+                <div class="api-integration-editor-actions">
+                  <button id="apiSaveIntegrationBtn" class="btn btn-primary btn-sm">
+                    Save Integration
+                  </button>
+                  <button id="apiDeleteIntegrationBtn" class="btn btn-secondary btn-sm">
+                    Delete Integration
+                  </button>
+                </div>
+              </div>
+              <p class="group-desc api-required-note">
+                <span class="required-indicator" aria-hidden="true">*</span> Required fields
+              </p>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <span class="setting-label">Integration Enabled</span>
+                  <span class="setting-desc"
+                    >Disabled integrations are hidden from floating actions.</span
+                  >
+                </div>
+                <label class="integration-toggle">
+                  <input type="checkbox" id="apiIntegrationEnabled" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="api-inline-fields api-integration-name-row">
+                <div class="setting-block">
+                  <label class="setting-label-sm"
+                    >Name <span class="required-indicator" aria-hidden="true">*</span></label
+                  >
+                  <input
+                    type="text"
+                    id="apiIntegrationName"
+                    class="input-text"
+                    placeholder="Notion X Posts"
+                    required
+                  />
+                  <span class="setting-desc" id="apiIntegrationIdPreview"
+                    >ID auto-generated from name: notion-x-posts</span
+                  >
+                </div>
+              </div>
+              <div class="api-inline-fields api-visual-fields">
+                <div class="setting-block">
+                  <label class="setting-label-sm">Emoji</label>
+                  <input
+                    type="text"
+                    id="apiIntegrationEmoji"
+                    class="input-text api-emoji-input"
+                    maxlength="2"
+                    placeholder="🚀"
+                  />
+                </div>
+                <div class="setting-block">
+                  <label class="setting-label-sm">Button Color</label>
+                  <input
+                    type="color"
+                    id="apiIntegrationBackground"
+                    class="api-color-input"
+                    value="#4f46e5"
+                  />
+                </div>
+              </div>
+
+              <div class="setting-block">
+                <label class="setting-label-sm"
+                  >Where available (sources)
+                  <span class="required-indicator" aria-hidden="true">*</span></label
+                >
+                <div class="api-source-grid">
+                  <label class="api-source-option"
+                    ><input type="checkbox" id="apiSourceX" /><span class="api-source-box"></span
+                    ><span>X</span></label
+                  >
+                  <label class="api-source-option"
+                    ><input type="checkbox" id="apiSourceYouTube" /><span
+                      class="api-source-box"
+                    ></span
+                    ><span>YouTube</span></label
+                  >
+                  <label class="api-source-option"
+                    ><input type="checkbox" id="apiSourceHackerNews" /><span
+                      class="api-source-box"
+                    ></span
+                    ><span>Hacker News</span></label
+                  >
+                  <label class="api-source-option"
+                    ><input type="checkbox" id="apiSourceArticles" /><span
+                      class="api-source-box"
+                    ></span
+                    ><span>Articles</span></label
+                  >
+                  <label class="api-source-option"
+                    ><input type="checkbox" id="apiSourceUniversal" /><span
+                      class="api-source-box"
+                    ></span
+                    ><span>Universal</span></label
+                  >
+                </div>
+              </div>
+
+              <div class="api-inline-fields api-method-row">
+                <div class="setting-block">
+                  <label class="setting-label-sm">Method</label>
+                  <select id="apiIntegrationMethod" class="input-select">
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="setting-block">
+                <label class="setting-label-sm"
+                  >URL <span class="required-indicator" aria-hidden="true">*</span></label
+                >
+                <input
+                  type="text"
+                  id="apiIntegrationUrl"
+                  class="input-text"
+                  placeholder="https://api.example.com/endpoint"
+                  required
+                />
+              </div>
+              <div class="setting-block">
+                <label class="setting-label-sm">Headers Template (JSON)</label>
+                <textarea
+                  id="apiIntegrationHeadersTemplate"
+                  class="input-textarea"
+                  placeholder='{"Content-Type":"application/json"}'
+                  style="min-height: 120px"
+                ></textarea>
+              </div>
+              <div class="setting-block">
+                <label class="setting-label-sm">Body Template</label>
+                <textarea
+                  id="apiIntegrationBodyTemplate"
+                  class="input-textarea"
+                  placeholder='{"content":"{{content}}"}'
+                  style="min-height: 180px"
+                ></textarea>
+              </div>
+              <div class="setting-block">
+                <label class="setting-label-sm">Secrets (JSON, local storage)</label>
+                <textarea
+                  id="apiIntegrationSecrets"
+                  class="input-textarea"
+                  placeholder='{"secret_api_token":"abc123"}'
+                  style="min-height: 120px"
+                ></textarea>
+              </div>
+            </div>
+
+            <div id="apiVariablesGroup" class="settings-group" hidden>
+              <h3 class="group-title">Available Variables</h3>
+              <p class="group-desc">Click a variable to copy it to clipboard.</p>
+              <div id="apiVariableChips" class="api-variable-chips"></div>
+            </div>
+          </div>
         </section>
 
         <!-- Data Section -->

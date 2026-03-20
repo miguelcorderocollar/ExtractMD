@@ -3,7 +3,10 @@ import {
   getSettings,
   saveSetting,
   incrementKpi,
+  incrementApiCallCount,
   getStorageUsage,
+  getApiProfileSecrets,
+  saveApiProfileSecrets,
 } from '../../../extension/shared/storage.js';
 import { DEFAULTS } from '../../../extension/shared/defaults.js';
 import { resetMockStorage } from '../setup.js';
@@ -121,6 +124,26 @@ describe('shared/storage', () => {
     });
   });
 
+  describe('incrementApiCallCount', () => {
+    it('increments apiCallCount', async () => {
+      await incrementApiCallCount();
+
+      expect(chrome.storage.sync.set).toHaveBeenCalledWith(
+        { apiCallCount: 1 },
+        expect.any(Function)
+      );
+    });
+
+    it('does not increment apiCallCount when KPI tracking is disabled', async () => {
+      await chrome.storage.sync.set({ enableUsageKpi: false });
+      vi.clearAllMocks();
+
+      await incrementApiCallCount();
+
+      expect(chrome.storage.sync.set).not.toHaveBeenCalled();
+    });
+  });
+
   describe('getStorageUsage', () => {
     it('calculates storage usage for empty storage', async () => {
       // Clear any existing data
@@ -182,6 +205,20 @@ describe('shared/storage', () => {
       // Large data should have more usage
       expect(largeUsage.bytes).toBeGreaterThan(smallUsage.bytes);
       expect(parseFloat(largeUsage.kb)).toBeGreaterThan(parseFloat(smallUsage.kb));
+    });
+  });
+
+  describe('API local secrets', () => {
+    it('saves and reads profile secrets from local storage', async () => {
+      await saveApiProfileSecrets('default', { secret_api_token: 'token-123' });
+      const secrets = await getApiProfileSecrets('default');
+
+      expect(secrets).toEqual({ secret_api_token: 'token-123' });
+    });
+
+    it('returns empty object when profile has no saved secrets', async () => {
+      const secrets = await getApiProfileSecrets('missing-profile');
+      expect(secrets).toEqual({});
     });
   });
 });

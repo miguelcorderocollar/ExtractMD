@@ -73,6 +73,9 @@ const SETTING_ELEMENTS = {
   ignoredDomains: { id: 'ignoredDomains', type: 'textarea' },
   accentColor: { id: 'accentColor', type: 'color' },
 
+  // Generic API Output settings
+  apiOutputEnabled: { id: 'apiOutputEnabled', type: 'checkbox' },
+
   // Integration toggles
   enableYouTubeIntegration: {
     id: 'enableYouTubeIntegration',
