@@ -10,7 +10,7 @@ import {
 } from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
-import { sendToConfiguredApi } from './handlers/apiHandler.js';
+import { runIntegrationApiSend } from './handlers/apiSendWorkflow.js';
 import {
   computeEnabledApiProfileSignature,
   getSecondaryApiActions,
@@ -313,61 +313,36 @@ export async function copyYouTubeTranscript(settings = null) {
 }
 
 async function performYouTubeApiSend({ updateButton = false, profileId = '' } = {}) {
-  if (isApiProcessing) return;
-  isApiProcessing = true;
+  await runIntegrationApiSend({
+    integration: 'youtube',
+    profileId,
+    updateButton,
+    defaultErrorMessage: 'Failed to send YouTube content via API.',
+    getIsProcessing: () => isApiProcessing,
+    setIsProcessing: (value) => {
+      isApiProcessing = value;
+    },
+    getFloatingButtonController: () => floatingButtonController,
+    prepareVariables: async () => {
+      const settings = await new Promise((resolve) => {
+        chrome.storage.sync.get(
+          {
+            includeTimestamps: true,
+            includeChapters: true,
+            addTitleToTranscript: true,
+            addChannelToTranscript: true,
+            addUrlToTranscript: true,
+          },
+          resolve
+        );
+      });
 
-  if (updateButton && floatingButtonController) {
-    floatingButtonController.setLoading();
-  }
-
-  try {
-    const settings = await new Promise((resolve) => {
-      chrome.storage.sync.get(
-        {
-          includeTimestamps: true,
-          includeChapters: true,
-          addTitleToTranscript: true,
-          addChannelToTranscript: true,
-          addUrlToTranscript: true,
-        },
-        resolve
-      );
-    });
-
-    await expandDescription();
-    await clickShowTranscript();
-    const { apiVariables } = await extractYouTubeTranscriptData(settings);
-    await sendToConfiguredApi({
-      integration: 'youtube',
-      variables: apiVariables,
-      profileId,
-    });
-
-    if (updateButton && floatingButtonController) {
-      floatingButtonController.setSuccess();
-      setTimeout(() => {
-        floatingButtonController.setNormal();
-        isApiProcessing = false;
-      }, 2000);
-    } else {
-      isApiProcessing = false;
-    }
-  } catch (error) {
-    const message =
-      error instanceof Error && error.message
-        ? error.message
-        : 'Failed to send YouTube content via API.';
-    showNotification(message, 'error');
-    if (updateButton && floatingButtonController) {
-      floatingButtonController.setError();
-      setTimeout(() => {
-        floatingButtonController.setNormal();
-        isApiProcessing = false;
-      }, 3000);
-    } else {
-      isApiProcessing = false;
-    }
-  }
+      await expandDescription();
+      await clickShowTranscript();
+      const { apiVariables } = await extractYouTubeTranscriptData(settings);
+      return apiVariables;
+    },
+  });
 }
 
 window.copyYouTubeTranscript = copyYouTubeTranscript;

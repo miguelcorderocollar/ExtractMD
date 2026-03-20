@@ -269,7 +269,6 @@ function saveIntegrationEnabledToggle() {
 
 function attachListeners() {
   const createButton = document.getElementById('apiCreateIntegrationBtn');
-  const createInlineButton = document.getElementById('apiCreateIntegrationInlineBtn');
   const saveButton = document.getElementById('apiSaveIntegrationBtn');
   const deleteButton = document.getElementById('apiDeleteIntegrationBtn');
   const nameInput = document.getElementById('apiIntegrationName');
@@ -277,7 +276,6 @@ function attachListeners() {
   const masterToggle = document.querySelector('[setting-id="apiOutputEnabled"]');
 
   if (createButton) createButton.addEventListener('click', createIntegration);
-  if (createInlineButton) createInlineButton.addEventListener('click', createIntegration);
   if (saveButton) saveButton.addEventListener('click', saveSelectedIntegration);
   if (deleteButton) deleteButton.addEventListener('click', deleteSelectedIntegration);
   if (enabledInput) enabledInput.addEventListener('change', saveIntegrationEnabledToggle);

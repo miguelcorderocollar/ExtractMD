@@ -10,7 +10,7 @@ import {
 } from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
-import { sendToConfiguredApi } from './handlers/apiHandler.js';
+import { runIntegrationApiSend } from './handlers/apiSendWorkflow.js';
 import {
   computeEnabledApiProfileSignature,
   getSecondaryApiActions,
@@ -219,63 +219,42 @@ export async function performArticleCopy(updateButton = false) {
 }
 
 async function performArticleApiSend({ updateButton = false, profileId = '' } = {}) {
-  if (isApiProcessing) return;
-  isApiProcessing = true;
-  if (updateButton && floatingButtonController) floatingButtonController.setLoading();
+  await runIntegrationApiSend({
+    integration: 'articles',
+    profileId,
+    updateButton,
+    defaultErrorMessage: 'Failed to send article via API.',
+    getIsProcessing: () => isApiProcessing,
+    setIsProcessing: (value) => {
+      isApiProcessing = value;
+    },
+    getFloatingButtonController: () => floatingButtonController,
+    prepareVariables: async () => {
+      const settings = await new Promise((resolve) => {
+        chrome.storage.sync.get(
+          {
+            articleExporterIncludeImages: true,
+            articleExporterOnlyLongest: false,
+            articleExporterIncludeUrl: true,
+          },
+          resolve
+        );
+      });
 
-  try {
-    const settings = await new Promise((resolve) => {
-      chrome.storage.sync.get(
-        {
-          articleExporterIncludeImages: true,
-          articleExporterOnlyLongest: false,
-          articleExporterIncludeUrl: true,
-        },
-        resolve
-      );
-    });
+      const payload = await buildArticleMarkdownPayload(settings);
+      let markdown = payload.markdown;
+      if (settings.articleExporterIncludeUrl) {
+        const pageUrl = window.location.href;
+        const pageTitle = document.title || 'Article';
+        markdown = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${markdown}`;
+      }
 
-    const payload = await buildArticleMarkdownPayload(settings);
-    let markdown = payload.markdown;
-    if (settings.articleExporterIncludeUrl) {
-      const pageUrl = window.location.href;
-      const pageTitle = document.title || 'Article';
-      markdown = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${markdown}`;
-    }
-
-    const apiVariables = buildArticleApiVariables({
-      markdown,
-      processedCount: payload.processedCount,
-    });
-    await sendToConfiguredApi({
-      integration: 'articles',
-      variables: apiVariables,
-      profileId,
-    });
-
-    if (updateButton && floatingButtonController) {
-      floatingButtonController.setSuccess();
-      setTimeout(() => {
-        floatingButtonController.setNormal();
-        isApiProcessing = false;
-      }, 2000);
-    } else {
-      isApiProcessing = false;
-    }
-  } catch (error) {
-    const message =
-      error instanceof Error && error.message ? error.message : 'Failed to send article via API.';
-    showNotification(message, 'error');
-    if (updateButton && floatingButtonController) {
-      floatingButtonController.setError();
-      setTimeout(() => {
-        floatingButtonController.setNormal();
-        isApiProcessing = false;
-      }, 3000);
-    } else {
-      isApiProcessing = false;
-    }
-  }
+      return buildArticleApiVariables({
+        markdown,
+        processedCount: payload.processedCount,
+      });
+    },
+  });
 }
 
 export function nodeToMarkdown(node, includeImages) {

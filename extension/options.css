@@ -1,6 +1,11 @@
 /* ExtractMD Options Page Styles */
 /* Minimal Developer Theme with Sidebar Navigation */
 
+/* Author `display` (e.g. flex on empty-state blocks) must not override the HTML `hidden` attribute. */
+[hidden] {
+  display: none !important;
+}
+
 /* ============================================
    Layout Structure
    ============================================ */

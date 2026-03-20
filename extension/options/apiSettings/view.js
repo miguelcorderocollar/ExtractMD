@@ -141,8 +141,7 @@ export function setUiVisibility({
   renderVariableChips,
 }) {
   const apiSettingsContent = document.getElementById('apiSettingsContent');
-  const emptyState = document.getElementById('apiIntegrationsEmptyState');
-  const panel = document.getElementById('apiIntegrationsPanel');
+  const emptyHint = document.getElementById('apiIntegrationsEmptyHint');
   const editor = document.getElementById('apiIntegrationEditor');
   const variablesGroup = document.getElementById('apiVariablesGroup');
 
@@ -157,8 +156,7 @@ export function setUiVisibility({
   }
 
   const hasProfiles = state.profiles.length > 0;
-  if (emptyState) emptyState.hidden = hasProfiles;
-  if (panel) panel.hidden = !hasProfiles;
+  if (emptyHint) emptyHint.hidden = hasProfiles;
 
   const selectedProfile = getSelectedProfile();
   const hasSelected = Boolean(selectedProfile);

@@ -4,7 +4,7 @@
 import { showNotification } from './utils.js';
 import { createFloatingButton } from './components/FloatingButton.js';
 import { handleCopyOrDownload } from './handlers/copyHandler.js';
-import { sendToConfiguredApi } from './handlers/apiHandler.js';
+import { runIntegrationApiSend } from './handlers/apiSendWorkflow.js';
 import {
   computeEnabledApiProfileSignature,
   getSecondaryApiActions,
@@ -78,55 +78,33 @@ export async function performXCopy(updateButton = false) {
 }
 
 export async function performXApiSend({ updateButton = false, profileId = '' } = {}) {
-  if (isApiProcessing) return;
-  isApiProcessing = true;
+  await runIntegrationApiSend({
+    integration: 'x',
+    profileId,
+    updateButton,
+    defaultErrorMessage: 'Failed to send X content via API.',
+    getIsProcessing: () => isApiProcessing,
+    setIsProcessing: (value) => {
+      isApiProcessing = value;
+    },
+    getFloatingButtonController: () => floatingButtonController,
+    onError: (error) => {
+      console.error('[ExtractMD] X API send failed:', error);
+    },
+    prepareVariables: async () => {
+      const settings = await new Promise((resolve) => {
+        chrome.storage.sync.get(X_SETTINGS_DEFAULTS, resolve);
+      });
 
-  if (updateButton && floatingButtonController) {
-    floatingButtonController.setLoading();
-  }
+      const readyContainer = await waitForPrimaryXContainer({ timeoutMs: 7000 });
+      if (!readyContainer) {
+        throw new Error('X content is still loading. Please try again in a moment.');
+      }
 
-  try {
-    const settings = await new Promise((resolve) => {
-      chrome.storage.sync.get(X_SETTINGS_DEFAULTS, resolve);
-    });
-
-    const readyContainer = await waitForPrimaryXContainer({ timeoutMs: 7000 });
-    if (!readyContainer) {
-      throw new Error('X content is still loading. Please try again in a moment.');
-    }
-
-    const result = extractXMarkdown(settings);
-    await sendToConfiguredApi({
-      integration: 'x',
-      variables: result.apiVariables,
-      profileId,
-    });
-
-    if (updateButton && floatingButtonController) {
-      floatingButtonController.setSuccess();
-      setTimeout(() => {
-        floatingButtonController.setNormal();
-        isApiProcessing = false;
-      }, 2000);
-    } else {
-      isApiProcessing = false;
-    }
-  } catch (error) {
-    console.error('[ExtractMD] X API send failed:', error);
-    const message =
-      error instanceof Error && error.message ? error.message : 'Failed to send X content via API.';
-    showNotification(message, 'error');
-
-    if (updateButton && floatingButtonController) {
-      floatingButtonController.setError();
-      setTimeout(() => {
-        floatingButtonController.setNormal();
-        isApiProcessing = false;
-      }, 3000);
-    } else {
-      isApiProcessing = false;
-    }
-  }
+      const result = extractXMarkdown(settings);
+      return result.apiVariables;
+    },
+  });
 }
 
 async function manageFloatingButtonForX() {

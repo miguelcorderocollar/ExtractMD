@@ -10,7 +10,7 @@ import {
 } from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
-import { sendToConfiguredApi } from './handlers/apiHandler.js';
+import { runIntegrationApiSend } from './handlers/apiSendWorkflow.js';
 import {
   computeEnabledApiProfileSignature,
   getSecondaryApiActions,
@@ -384,81 +384,58 @@ function getHnNewsPageApiVariables(markdown) {
 }
 
 async function performHnApiSend({ updateButton = false, profileId = '' } = {}) {
-  if (isApiProcessing) return;
-  isApiProcessing = true;
-  if (updateButton && floatingButtonController) floatingButtonController.setLoading();
+  await runIntegrationApiSend({
+    integration: 'hackernews',
+    profileId,
+    updateButton,
+    defaultErrorMessage: 'Failed to send Hacker News content via API.',
+    getIsProcessing: () => isApiProcessing,
+    setIsProcessing: (value) => {
+      isApiProcessing = value;
+    },
+    getFloatingButtonController: () => floatingButtonController,
+    prepareVariables: async () => {
+      let markdown = '';
 
-  try {
-    let markdown = '';
-    let apiVariables = {};
+      if (isHNItemPage()) {
+        const settings = await new Promise((resolve) => {
+          chrome.storage.sync.get(
+            {
+              hnIncludeAuthor: true,
+              hnIncludeTime: true,
+              hnIncludeReplies: true,
+              hnIncludeUrl: true,
+              hnIncludeItemText: true,
+            },
+            resolve
+          );
+        });
+        markdown = extractHNCommentsMarkdown(settings);
+        return getHnCommentsPageApiVariables(markdown);
+      }
 
-    if (isHNItemPage()) {
-      const settings = await new Promise((resolve) => {
-        chrome.storage.sync.get(
-          {
-            hnIncludeAuthor: true,
-            hnIncludeTime: true,
-            hnIncludeReplies: true,
-            hnIncludeUrl: true,
-            hnIncludeItemText: true,
-          },
-          resolve
-        );
-      });
-      markdown = extractHNCommentsMarkdown(settings);
-      apiVariables = getHnCommentsPageApiVariables(markdown);
-    } else if (isHNNewsPage()) {
-      const settings = await new Promise((resolve) => {
-        chrome.storage.sync.get(
-          {
-            hnNewsIncludeTitle: true,
-            hnNewsIncludeUrl: true,
-            hnNewsIncludeSite: true,
-            hnNewsIncludePoints: true,
-            hnNewsIncludeAuthor: true,
-            hnNewsIncludeTime: true,
-            hnNewsIncludeComments: true,
-          },
-          resolve
-        );
-      });
-      markdown = extractHNNewsMarkdown(settings);
-      apiVariables = getHnNewsPageApiVariables(markdown);
-    } else {
+      if (isHNNewsPage()) {
+        const settings = await new Promise((resolve) => {
+          chrome.storage.sync.get(
+            {
+              hnNewsIncludeTitle: true,
+              hnNewsIncludeUrl: true,
+              hnNewsIncludeSite: true,
+              hnNewsIncludePoints: true,
+              hnNewsIncludeAuthor: true,
+              hnNewsIncludeTime: true,
+              hnNewsIncludeComments: true,
+            },
+            resolve
+          );
+        });
+        markdown = extractHNNewsMarkdown(settings);
+        return getHnNewsPageApiVariables(markdown);
+      }
+
       throw new Error('Not a supported HN page.');
-    }
-
-    await sendToConfiguredApi({
-      integration: 'hackernews',
-      variables: apiVariables,
-      profileId,
-    });
-
-    if (updateButton && floatingButtonController) {
-      floatingButtonController.setSuccess();
-      setTimeout(() => {
-        floatingButtonController.setNormal();
-        isApiProcessing = false;
-      }, 2000);
-    } else {
-      isApiProcessing = false;
-    }
-  } catch (error) {
-    const message =
-      error instanceof Error && error.message
-        ? error.message
-        : 'Failed to send Hacker News content via API.';
-    showNotification(message, 'error');
-    if (updateButton && floatingButtonController) {
-      floatingButtonController.setError();
-      setTimeout(() => {
-        floatingButtonController.setNormal();
-        isApiProcessing = false;
-      }, 3000);
-    } else {
-      isApiProcessing = false;
-    }
-  }
+    },
+  });
 }
 
 export function initHackerNewsFeatures() {
