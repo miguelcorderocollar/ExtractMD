@@ -7,7 +7,14 @@ import {
 
 describe('shared/api/variables', () => {
   it('defines variables for all supported sources', () => {
-    expect(API_SOURCE_KEYS).toEqual(['x', 'youtube', 'hackernews', 'articles', 'universal']);
+    expect(API_SOURCE_KEYS).toEqual([
+      'x',
+      'youtube',
+      'hackernews',
+      'articles',
+      'universal',
+      'linkedin_jobs',
+    ]);
     API_SOURCE_KEYS.forEach((source) => {
       expect(API_SOURCE_VARIABLES[source]).toBeDefined();
       expect(API_SOURCE_VARIABLES[source].length).toBeGreaterThan(0);

@@ -6,11 +6,35 @@ import { initHackerNewsFeatures, performHNCopy } from './content/hackernews.js';
 import { initArticleFeatures, performArticleCopy } from './content/articles.js';
 import { initUniversalFeatures, performUniversalCopy } from './content/universal.js';
 import { initXFeatures, performXCopy, isXPostPage, isXArticlePage } from './content/x.js';
+import {
+  initLinkedInJobsFeatures,
+  performLinkedInJobsCopy,
+  isLinkedInJobPage,
+} from './content/linkedin-jobs.js';
 
 function isHNNewsPage() {
   if (!window.location.hostname.includes('ycombinator.com')) return false;
   const validPaths = ['', '/', '/news', '/newest', '/front', '/best', '/ask', '/show', '/jobs'];
   return validPaths.includes(window.location.pathname);
+}
+
+function initArticleOrUniversalFallback(settings) {
+  const articles = document.querySelectorAll('article');
+  const hasArticles =
+    articles.length > 0 && Array.from(articles).some((a) => (a.textContent?.length || 0) > 500);
+
+  if (hasArticles && settings.enableArticleIntegration !== false) {
+    console.debug('[ExtractMD] Initializing Article features');
+    window.copyExtractMD = () => performArticleCopy(false);
+    initArticleFeatures();
+  } else if (settings.enableUniversalIntegration !== false) {
+    console.debug('[ExtractMD] Initializing Universal features');
+    window.copyExtractMD = () => performUniversalCopy(false);
+    initUniversalFeatures();
+  } else {
+    console.debug('[ExtractMD] No extraction module available for this page');
+    window.copyExtractMD = null;
+  }
 }
 
 async function runInitForCurrentPage() {
@@ -38,7 +62,8 @@ async function runInitForCurrentPage() {
     ((hostname.includes('x.com') || hostname.includes('twitter.com')) &&
       settings.enableXIntegration !== false) ||
     (hostname.includes('youtube.com') && settings.enableYouTubeIntegration !== false) ||
-    (hostname.includes('ycombinator.com') && settings.enableHackerNewsIntegration !== false);
+    (hostname.includes('ycombinator.com') && settings.enableHackerNewsIntegration !== false) ||
+    (hostname.includes('linkedin.com') && settings.enableLinkedInJobsIntegration !== false);
 
   if (ignoredDomains.includes(hostname) && !isIntegrationDomainEnabled) {
     console.debug(`[ExtractMD] Domain ${hostname} is ignored, skipping initialization`);
@@ -58,6 +83,7 @@ async function runInitForCurrentPage() {
   const isHNDomain = window.location.hostname.includes('ycombinator.com');
   const isXDomain =
     window.location.hostname.includes('x.com') || window.location.hostname.includes('twitter.com');
+  const isLinkedInDomain = hostname.includes('linkedin.com');
 
   if (isYouTubeDomain && window.location.pathname.includes('/watch')) {
     console.debug('[ExtractMD] Initializing YouTube features');
@@ -90,25 +116,23 @@ async function runInitForCurrentPage() {
     if (existingButton) {
       existingButton.remove();
     }
-  } else {
-    // Check for articles with substantial content
-    const articles = document.querySelectorAll('article');
-    const hasArticles =
-      articles.length > 0 && Array.from(articles).some((a) => (a.textContent?.length || 0) > 500);
-
-    if (hasArticles && settings.enableArticleIntegration !== false) {
-      console.debug('[ExtractMD] Initializing Article features');
-      window.copyExtractMD = () => performArticleCopy(false);
-      initArticleFeatures();
-    } else if (settings.enableUniversalIntegration !== false) {
-      // Universal fallback
-      console.debug('[ExtractMD] Initializing Universal features');
-      window.copyExtractMD = () => performUniversalCopy(false);
-      initUniversalFeatures();
+  } else if (isLinkedInDomain) {
+    if (isLinkedInJobPage() && settings.enableLinkedInJobsIntegration !== false) {
+      console.debug('[ExtractMD] Initializing LinkedIn Jobs features');
+      window.copyExtractMD = () => performLinkedInJobsCopy(false);
+      initLinkedInJobsFeatures();
+    } else if (settings.linkedinJobsAllowNonJobFallback === true) {
+      initArticleOrUniversalFallback(settings);
     } else {
-      console.debug('[ExtractMD] No extraction module available for this page');
+      console.debug('[ExtractMD] LinkedIn: non-job page or integration disabled, skipping');
       window.copyExtractMD = null;
+      const existingButton = document.getElementById('extractmd-floating-button');
+      if (existingButton) {
+        existingButton.remove();
+      }
     }
+  } else {
+    initArticleOrUniversalFallback(settings);
   }
 }
 

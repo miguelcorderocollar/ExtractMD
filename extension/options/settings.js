@@ -102,6 +102,15 @@ const SETTING_ELEMENTS = {
     type: 'checkbox',
     invertDefault: true,
   },
+  enableLinkedInJobsIntegration: {
+    id: 'enableLinkedInJobsIntegration',
+    type: 'checkbox',
+    invertDefault: true,
+  },
+  linkedinJobsAllowNonJobFallback: {
+    id: 'linkedinJobsAllowNonJobFallback',
+    type: 'checkbox',
+  },
 
   // Floating Button settings
   floatingButtonEnableDrag: { id: 'floatingButtonEnableDrag', type: 'checkbox' },
@@ -248,7 +257,8 @@ export function attachSettingHandlers() {
           key === 'enableHackerNewsIntegration' ||
           key === 'enableXIntegration' ||
           key === 'enableArticleIntegration' ||
-          key === 'enableUniversalIntegration'
+          key === 'enableUniversalIntegration' ||
+          key === 'enableLinkedInJobsIntegration'
         ) {
           updateIntegrationVisibility();
         }

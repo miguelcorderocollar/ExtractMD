@@ -58,6 +58,8 @@ export const DEFAULTS = {
   enableXIntegration: true,
   enableArticleIntegration: true,
   enableUniversalIntegration: true,
+  enableLinkedInJobsIntegration: true,
+  linkedinJobsAllowNonJobFallback: false,
 
   // Universal (HTML-to-MD fallback)
   universalShowInfoNotification: false,
@@ -133,6 +135,8 @@ export const SETTING_SCHEMA = {
   enableXIntegration: 'boolean',
   enableArticleIntegration: 'boolean',
   enableUniversalIntegration: 'boolean',
+  enableLinkedInJobsIntegration: 'boolean',
+  linkedinJobsAllowNonJobFallback: 'boolean',
   universalShowInfoNotification: 'boolean',
   universalIncludeImages: 'boolean',
   universalIncludeLinks: 'boolean',

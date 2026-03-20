@@ -62,18 +62,19 @@ describe('options/kpi module', () => {
       renderKpiCounters(stats, 7);
 
       const cards = container.querySelectorAll('.kpi-card');
-      expect(cards.length).toBe(7);
+      expect(cards.length).toBe(8);
 
-      expect(container.querySelectorAll('.kpi-card-icon').length).toBe(7);
-      expect((container.innerHTML.match(/<svg\b/gi) || []).length).toBe(7);
+      expect(container.querySelectorAll('.kpi-card-icon').length).toBe(8);
+      expect((container.innerHTML.match(/<svg\b/gi) || []).length).toBe(8);
 
       expect(container.textContent).toContain('YouTube');
+      expect(container.textContent).toContain('LinkedIn');
       expect(container.textContent).toContain('API Calls');
 
       const values = [...container.querySelectorAll('.kpi-card-value')].map((el) =>
         el.textContent.trim()
       );
-      expect(values).toEqual(['2', '3', '1', '4', '5', '6', '7']);
+      expect(values).toEqual(['2', '3', '1', '4', '5', '6', '0', '7']);
     });
   });
 });

@@ -5,6 +5,7 @@ import {
   articleIcon,
   commentsIcon,
   hackernewsIcon,
+  linkedinIcon,
   universalIcon,
   xIcon,
   youtubeIcon,
@@ -19,6 +20,7 @@ const TIME_ESTIMATES = {
   hn_news: 20,
   x_posts: 35,
   universal: 25,
+  linkedin_jobs: 45,
 };
 
 /**
@@ -55,7 +57,8 @@ export function calculateTimeSaved(stats) {
     (stats.hn_comments || 0) * TIME_ESTIMATES.hn_comments +
     (stats.hn_news || 0) * TIME_ESTIMATES.hn_news +
     (stats.x_posts || 0) * TIME_ESTIMATES.x_posts +
-    (stats.universal || 0) * TIME_ESTIMATES.universal
+    (stats.universal || 0) * TIME_ESTIMATES.universal +
+    (stats.linkedin_jobs || 0) * TIME_ESTIMATES.linkedin_jobs
   );
 }
 
@@ -82,6 +85,7 @@ export function renderKpiCounters(stats, apiCallCount = 0) {
   const hnNews = stats.hn_news || 0;
   const xPosts = stats.x_posts || 0;
   const universal = stats.universal || 0;
+  const linkedInJobs = stats.linkedin_jobs || 0;
   const totalApiCalls = Number(apiCallCount || 0);
 
   kpiCounters.innerHTML = [
@@ -91,6 +95,7 @@ export function renderKpiCounters(stats, apiCallCount = 0) {
     kpiCard(hackernewsIcon, 'HN news exports', 'HN News', hnNews),
     kpiCard(xIcon, 'X post/article exports', 'X', xPosts),
     kpiCard(universalIcon, 'Universal page exports', 'Universal', universal),
+    kpiCard(linkedinIcon, 'LinkedIn Jobs exports', 'LinkedIn', linkedInJobs),
     kpiCard(apiIcon, 'Successful API requests sent from ExtractMD', 'API Calls', totalApiCalls),
   ].join('');
 
@@ -143,6 +148,7 @@ export function initializeKpi() {
             hn_news: 0,
             x_posts: 0,
             universal: 0,
+            linkedin_jobs: 0,
           },
           apiCallCount: 0,
         },

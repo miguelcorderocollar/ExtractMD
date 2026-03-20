@@ -77,6 +77,7 @@ export function createDefaultApiProfile(overrides = {}) {
       hackernews: false,
       articles: false,
       universal: false,
+      linkedin_jobs: false,
     },
     ...overrides,
   };

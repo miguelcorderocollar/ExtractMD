@@ -38,6 +38,7 @@ function parseProfileItem(rawProfile) {
             hackernews: rawProfile.integrationAvailability.hackernews === true,
             articles: rawProfile.integrationAvailability.articles === true,
             universal: rawProfile.integrationAvailability.universal === true,
+            linkedin_jobs: rawProfile.integrationAvailability.linkedin_jobs === true,
           }
         : {
             x: true,
@@ -45,6 +46,7 @@ function parseProfileItem(rawProfile) {
             hackernews: false,
             articles: false,
             universal: false,
+            linkedin_jobs: false,
           },
   });
 

@@ -25,6 +25,7 @@ import checkmarkIcon from '../images/icons/checkmark.svg';
 import xIcon from '../images/icons/x.svg';
 import commentsIcon from '../images/icons/comments.svg';
 import apiIcon from '../images/icons/api.svg';
+import linkedinIcon from '../images/icons/linkedin.svg';
 
 // Export all icons as a single object for easy access
 export const ICONS = {
@@ -52,6 +53,7 @@ export const ICONS = {
   x: xIcon,
   comments: commentsIcon,
   api: apiIcon,
+  linkedin: linkedinIcon,
 };
 
 // Also export individual icons for direct imports
@@ -80,4 +82,5 @@ export {
   xIcon,
   commentsIcon,
   apiIcon,
+  linkedinIcon,
 };

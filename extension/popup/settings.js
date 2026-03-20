@@ -74,6 +74,11 @@ const SETTING_ELEMENTS = {
     type: 'checkbox',
     invertDefault: true,
   },
+  enableLinkedInJobsIntegration: {
+    id: 'enableLinkedInJobsIntegration',
+    type: 'checkbox',
+    invertDefault: true,
+  },
 };
 
 /**
@@ -149,7 +154,8 @@ export function attachSettingHandlers() {
           key === 'enableYouTubeIntegration' ||
           key === 'enableHackerNewsIntegration' ||
           key === 'enableXIntegration' ||
-          key === 'enableArticleIntegration'
+          key === 'enableArticleIntegration' ||
+          key === 'enableLinkedInJobsIntegration'
         ) {
           updateIntegrationVisibility();
         }

@@ -46,6 +46,17 @@ export const API_SOURCE_VARIABLES = Object.freeze({
     'extracted_at',
   ],
   universal: ['title', 'link', 'content', 'site', 'domain', 'word_count', 'extracted_at'],
+  linkedin_jobs: [
+    'title',
+    'company',
+    'author',
+    'date',
+    'link',
+    'content',
+    'location',
+    'salary',
+    'extracted_at',
+  ],
 });
 
 export const API_SOURCE_KEYS = Object.freeze(Object.keys(API_SOURCE_VARIABLES));

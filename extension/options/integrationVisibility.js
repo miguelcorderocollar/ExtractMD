@@ -9,6 +9,7 @@ const INTEGRATION_SECTIONS = {
   enableXIntegration: 'x',
   enableArticleIntegration: 'articles',
   enableUniversalIntegration: 'universal',
+  enableLinkedInJobsIntegration: 'linkedin',
 };
 
 /**

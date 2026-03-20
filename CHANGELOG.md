@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Generic API output**: Send extractions to custom HTTP endpoints (URL, method, headers, body) with placeholder templates; sensitive values use separate secret fields.
-- **Per-source configuration**: Enable each integration per extractor (articles, YouTube, X, universal) and map variables to the fields each source provides.
+- **Per-source configuration**: Enable each integration per extractor (articles, YouTube, X, universal, LinkedIn Jobs) and map variables to the fields each source provides.
+- **LinkedIn Jobs integration**: Extract job details (title, company, location, description, apply links) from job view, search results, and collections pages. Includes non-job page fallback toggle and API variable support.
 
 ## [1.2.0] - 2026-03-15
 
