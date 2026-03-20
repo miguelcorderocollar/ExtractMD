@@ -22,6 +22,9 @@ import moonIcon from '../images/icons/moon.svg';
 import downloadIcon from '../images/icons/download.svg';
 import lockIcon from '../images/icons/lock.svg';
 import checkmarkIcon from '../images/icons/checkmark.svg';
+import xIcon from '../images/icons/x.svg';
+import commentsIcon from '../images/icons/comments.svg';
+import apiIcon from '../images/icons/api.svg';
 
 // Export all icons as a single object for easy access
 export const ICONS = {
@@ -46,6 +49,9 @@ export const ICONS = {
   download: downloadIcon,
   lock: lockIcon,
   checkmark: checkmarkIcon,
+  x: xIcon,
+  comments: commentsIcon,
+  api: apiIcon,
 };
 
 // Also export individual icons for direct imports
@@ -71,4 +77,7 @@ export {
   downloadIcon,
   lockIcon,
   checkmarkIcon,
+  xIcon,
+  commentsIcon,
+  apiIcon,
 };

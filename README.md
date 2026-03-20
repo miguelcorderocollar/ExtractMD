@@ -86,12 +86,38 @@ pnpm run build
 # Build for production
 pnpm run build:prod
 
+# Preview website locally (serves web/ at http://127.0.0.1:8000)
+pnpm run web:serve
+
 # Watch mode (auto-rebuild)
 pnpm run watch
 
 # Package extension for Chrome Web Store
 pnpm run package
 ```
+
+### Website Preview (Local Python Server)
+
+Use the local server to review website changes while developing:
+
+```bash
+# Start the server (default host: 127.0.0.1, port: 8000)
+pnpm run web:serve
+
+# Or run directly with custom host/port
+python3 scripts/serve-web.py --host 0.0.0.0 --port 8080
+```
+
+Then open:
+
+- `http://127.0.0.1:8000` (default)
+- `http://localhost:8000` (equivalent)
+
+Tips:
+
+- Press `Ctrl+C` to stop the server.
+- Refresh the browser after editing files in `web/`.
+- Run `pnpm run build:web` before release to regenerate website changelog/minified assets.
 
 ### Website Changelog Page
 

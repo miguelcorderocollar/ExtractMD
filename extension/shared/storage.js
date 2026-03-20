@@ -73,6 +73,23 @@ export async function incrementKpi(type) {
 }
 
 /**
+ * Increment total successful API call counter (settings KPI only)
+ * @returns {Promise<void>}
+ */
+export async function incrementApiCallCount() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get({ apiCallCount: 0, enableUsageKpi: true }, function (items) {
+      if (items.enableUsageKpi !== false) {
+        const nextCount = Number(items.apiCallCount || 0) + 1;
+        chrome.storage.sync.set({ apiCallCount: nextCount }, resolve);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+/**
  * Get chrome.storage.sync usage statistics
  * @returns {Promise<{bytes: number, kb: number, percentage: number}>} Storage usage info
  */

@@ -1,4 +1,4 @@
-export const API_PROFILE_VERSION = 1;
+export const API_PROFILE_VERSION = 2;
 export const DEFAULT_API_PROFILE_ID = 'default';
 export const NOTION_EXAMPLE_PROFILE_ID = 'notion-x-posts';
 
@@ -58,9 +58,12 @@ export const NOTION_X_POST_BODY_TEMPLATE = `{
 
 export function createDefaultApiProfile(overrides = {}) {
   return {
+    version: API_PROFILE_VERSION,
     id: DEFAULT_API_PROFILE_ID,
     name: 'Default API',
-    enabled: false,
+    enabled: true,
+    emoji: '🚀',
+    actionBackground: '#4f46e5',
     method: 'POST',
     url: '',
     contentType: 'json', // json | text
@@ -87,6 +90,8 @@ export function createNotionExampleProfile(overrides = {}) {
     method: 'POST',
     url: 'https://api.notion.com/v1/pages',
     contentType: 'json',
+    emoji: '📝',
+    actionBackground: '#0f766e',
     headersTemplate: NOTION_X_POST_HEADERS_TEMPLATE,
     queryParamsTemplate: '{}',
     bodyTemplate: NOTION_X_POST_BODY_TEMPLATE,
@@ -95,5 +100,5 @@ export function createNotionExampleProfile(overrides = {}) {
 }
 
 export function getDefaultApiProfilesJson() {
-  return JSON.stringify([createDefaultApiProfile()], null, 2);
+  return JSON.stringify([], null, 2);
 }

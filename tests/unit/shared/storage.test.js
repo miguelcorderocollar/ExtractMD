@@ -3,6 +3,7 @@ import {
   getSettings,
   saveSetting,
   incrementKpi,
+  incrementApiCallCount,
   getStorageUsage,
   getApiProfileSecrets,
   saveApiProfileSecrets,
@@ -119,6 +120,26 @@ describe('shared/storage', () => {
       await incrementKpi('youtube');
 
       // Should not call set
+      expect(chrome.storage.sync.set).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('incrementApiCallCount', () => {
+    it('increments apiCallCount', async () => {
+      await incrementApiCallCount();
+
+      expect(chrome.storage.sync.set).toHaveBeenCalledWith(
+        { apiCallCount: 1 },
+        expect.any(Function)
+      );
+    });
+
+    it('does not increment apiCallCount when KPI tracking is disabled', async () => {
+      await chrome.storage.sync.set({ enableUsageKpi: false });
+      vi.clearAllMocks();
+
+      await incrementApiCallCount();
+
       expect(chrome.storage.sync.set).not.toHaveBeenCalled();
     });
   });

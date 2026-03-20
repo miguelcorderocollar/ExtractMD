@@ -15,4 +15,11 @@ export {
   collectTemplateVariableKeys,
 } from './template.js';
 export { buildResolvedApiRequest } from './requestBuilder.js';
-export { parseApiProfilesJson, getActiveApiProfile, mergeApiVariables } from './profiles.js';
+export {
+  parseApiProfilesJson,
+  getActiveApiProfile,
+  getApiProfileById,
+  getEnabledApiProfilesForIntegration,
+  isLegacyApiProfilesConfig,
+  mergeApiVariables,
+} from './profiles.js';

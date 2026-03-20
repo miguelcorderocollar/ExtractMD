@@ -10,11 +10,86 @@ import {
 } from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
+import { sendToConfiguredApi } from './handlers/apiHandler.js';
+import {
+  computeEnabledApiProfileSignature,
+  getSecondaryApiActions,
+} from './handlers/apiSecondaryActions.js';
 import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
+let isApiProcessing = false;
 let articleObserver = null;
 let floatingButtonController = null;
+let floatingButtonArticlesApiSignature = '';
+let articleStorageListenerAttached = false;
+
+async function buildArticleMarkdownPayload(settings) {
+  const currentArticles = Array.from(document.querySelectorAll('article'));
+  let markdown = '';
+  const totalArticles = currentArticles.length;
+  let processedCount = totalArticles;
+
+  if (settings.articleExporterOnlyLongest && currentArticles.length > 1) {
+    const articleLengths = await Promise.all(
+      currentArticles.map(async (article, index) => {
+        const articleMd = await extractArticleMarkdown(
+          article,
+          settings.articleExporterIncludeImages
+        );
+        return { index, length: articleMd.length, markdown: articleMd };
+      })
+    );
+    articleLengths.sort((a, b) => b.length - a.length);
+    markdown = articleLengths[0]?.markdown || '';
+    processedCount = 1;
+  } else if (currentArticles.length === 1) {
+    markdown = await extractArticleMarkdown(
+      currentArticles[0],
+      settings.articleExporterIncludeImages
+    );
+  } else {
+    const mdArr = await Promise.all(
+      currentArticles.map((article, index) =>
+        extractArticleMarkdown(article, settings.articleExporterIncludeImages).then(
+          (articleMarkdown) => `## Article ${index + 1}\n\n${articleMarkdown}`
+        )
+      )
+    );
+    markdown = mdArr.join('\n\n---\n\n');
+  }
+
+  return {
+    markdown,
+    totalArticles,
+    processedCount,
+  };
+}
+
+function buildArticleApiVariables({ markdown, processedCount }) {
+  const pageTitle = document.title || 'Article';
+  const pageUrl = window.location.href;
+  const metaAuthor = document.querySelector('meta[name="author"]')?.getAttribute('content') || '';
+  const publishedDate =
+    document.querySelector('meta[property="article:published_time"]')?.getAttribute('content') ||
+    document.querySelector('time[datetime]')?.getAttribute('datetime') ||
+    '';
+  const excerpt = String(markdown || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 280);
+
+  return {
+    title: pageTitle,
+    author: metaAuthor,
+    date: publishedDate,
+    link: pageUrl,
+    content: markdown,
+    excerpt,
+    article_count: processedCount,
+    extracted_at: new Date().toISOString(),
+  };
+}
 
 // Shared copy logic
 export async function performArticleCopy(updateButton = false) {
@@ -36,58 +111,13 @@ export async function performArticleCopy(updateButton = false) {
         resolve
       );
     });
-    const currentArticles = Array.from(document.querySelectorAll('article'));
-    let md = '';
-    let totalArticles = currentArticles.length;
-
-    // If only longest article is enabled and there are multiple articles
-    if (settings.articleExporterOnlyLongest && currentArticles.length > 1) {
-      // Find the longest article by text content length
-      const articleLengths = await Promise.all(
-        currentArticles.map(async (article, index) => {
-          const articleMd = await extractArticleMarkdown(
-            article,
-            settings.articleExporterIncludeImages
-          );
-          return { index, length: articleMd.length, article, markdown: articleMd };
-        })
-      );
-
-      // Sort by length (descending) and take the longest
-      articleLengths.sort((a, b) => b.length - a.length);
-      const longestArticle = articleLengths[0];
-      md = longestArticle.markdown;
-
-      // Add URL if setting is enabled
-      if (settings.articleExporterIncludeUrl) {
-        const pageUrl = window.location.href;
-        const pageTitle = document.title || 'Article';
-        md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
-      }
-    } else {
-      // Process all articles as before
-      if (currentArticles.length === 1) {
-        md = await extractArticleMarkdown(
-          currentArticles[0],
-          settings.articleExporterIncludeImages
-        );
-      } else {
-        const mdArr = await Promise.all(
-          currentArticles.map((a, i) =>
-            extractArticleMarkdown(a, settings.articleExporterIncludeImages).then(
-              (md) => `## Article ${i + 1}\n\n${md}`
-            )
-          )
-        );
-        md = mdArr.join('\n\n---\n\n');
-      }
-    }
+    const payload = await buildArticleMarkdownPayload(settings);
+    let md = payload.markdown;
+    const totalArticles = payload.totalArticles;
+    const processedCount = payload.processedCount;
 
     // Add URL if setting is enabled
-    if (
-      settings.articleExporterIncludeUrl &&
-      !(settings.articleExporterOnlyLongest && currentArticles.length > 1)
-    ) {
+    if (settings.articleExporterIncludeUrl) {
       const pageUrl = window.location.href;
       const pageTitle = document.title || 'Article';
       md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
@@ -96,8 +126,6 @@ export async function performArticleCopy(updateButton = false) {
     chrome.storage.sync.get(
       { downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 },
       function (items) {
-        const processedCount =
-          settings.articleExporterOnlyLongest && totalArticles > 1 ? 1 : totalArticles;
         if (items.downloadInsteadOfCopy) {
           downloadMarkdownFile(md, document.title, 'ExtractMD');
           if (updateButton && floatingButtonController) floatingButtonController.setSuccess();
@@ -187,6 +215,66 @@ export async function performArticleCopy(updateButton = false) {
       isProcessing = false;
     }
     showNotification('Failed to copy article(s).', 'error');
+  }
+}
+
+async function performArticleApiSend({ updateButton = false, profileId = '' } = {}) {
+  if (isApiProcessing) return;
+  isApiProcessing = true;
+  if (updateButton && floatingButtonController) floatingButtonController.setLoading();
+
+  try {
+    const settings = await new Promise((resolve) => {
+      chrome.storage.sync.get(
+        {
+          articleExporterIncludeImages: true,
+          articleExporterOnlyLongest: false,
+          articleExporterIncludeUrl: true,
+        },
+        resolve
+      );
+    });
+
+    const payload = await buildArticleMarkdownPayload(settings);
+    let markdown = payload.markdown;
+    if (settings.articleExporterIncludeUrl) {
+      const pageUrl = window.location.href;
+      const pageTitle = document.title || 'Article';
+      markdown = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${markdown}`;
+    }
+
+    const apiVariables = buildArticleApiVariables({
+      markdown,
+      processedCount: payload.processedCount,
+    });
+    await sendToConfiguredApi({
+      integration: 'articles',
+      variables: apiVariables,
+      profileId,
+    });
+
+    if (updateButton && floatingButtonController) {
+      floatingButtonController.setSuccess();
+      setTimeout(() => {
+        floatingButtonController.setNormal();
+        isApiProcessing = false;
+      }, 2000);
+    } else {
+      isApiProcessing = false;
+    }
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message ? error.message : 'Failed to send article via API.';
+    showNotification(message, 'error');
+    if (updateButton && floatingButtonController) {
+      floatingButtonController.setError();
+      setTimeout(() => {
+        floatingButtonController.setNormal();
+        isApiProcessing = false;
+      }, 3000);
+    } else {
+      isApiProcessing = false;
+    }
   }
 }
 
@@ -338,55 +426,85 @@ async function manageFloatingButtonForArticles() {
   }
 
   const articles = Array.from(document.querySelectorAll('article'));
-  const existingButton = document.getElementById('extractmd-floating-button');
 
   if (articles.length > 0) {
-    if (!existingButton) {
-      // Load floating button settings
-      const buttonSettings = await new Promise((resolve) => {
-        chrome.storage.sync.get(
-          {
-            floatingButtonEnableDrag: true,
-            floatingButtonEnableDismiss: true,
-            floatingButtonShowDetectionHint: true,
-          },
-          resolve
-        );
-      });
-
-      floatingButtonController = await createFloatingButton({
-        domain: window.location.hostname,
-        enableDrag: buttonSettings.floatingButtonEnableDrag,
-        enableDismiss: buttonSettings.floatingButtonEnableDismiss,
-        showDetectionHint: buttonSettings.floatingButtonShowDetectionHint !== false,
-        detectionHintText: 'Article',
-        onClick: async () => {
-          await performArticleCopy(true);
+    // Load floating button settings
+    const buttonSettings = await new Promise((resolve) => {
+      chrome.storage.sync.get(
+        {
+          floatingButtonEnableDrag: true,
+          floatingButtonEnableDismiss: true,
+          floatingButtonShowDetectionHint: true,
+          apiOutputEnabled: false,
+          apiProfilesJson: '[]',
         },
-      });
+        resolve
+      );
+    });
 
-      if (floatingButtonController) {
-        floatingButtonController.appendTo(document.body);
-        console.debug('[ExtractMD] Floating button created and added to DOM (Article)');
+    const apiSignature = computeEnabledApiProfileSignature({
+      apiProfilesJson: buttonSettings.apiProfilesJson,
+      apiOutputEnabled: buttonSettings.apiOutputEnabled,
+      integration: 'articles',
+    });
 
-        // Show article info notification if setting is enabled
-        chrome.storage.sync.get(
-          { articleExporterShowInfo: false, articleExporterOnlyLongest: false },
-          function (settings) {
-            if (settings.articleExporterShowInfo) {
-              showArticleInfoNotification(articles, settings.articleExporterOnlyLongest);
-            }
-          }
-        );
+    const existingButton = document.getElementById('extractmd-floating-button');
+    if (existingButton && floatingButtonController) {
+      if (apiSignature !== floatingButtonArticlesApiSignature) {
+        floatingButtonController.remove();
+        floatingButtonController = null;
+      } else {
+        floatingButtonController.show();
+        return;
       }
-    } else if (floatingButtonController) {
-      floatingButtonController.show();
+    } else if (existingButton && !floatingButtonController) {
+      existingButton.remove();
+    }
+
+    if (document.getElementById('extractmd-floating-button')) return;
+
+    floatingButtonArticlesApiSignature = apiSignature;
+    const secondaryActions = getSecondaryApiActions({
+      apiProfilesJson: buttonSettings.apiProfilesJson,
+      apiOutputEnabled: buttonSettings.apiOutputEnabled,
+      integration: 'articles',
+      onProfileAction: async (profileId) => {
+        await performArticleApiSend({ updateButton: true, profileId });
+      },
+    });
+
+    floatingButtonController = await createFloatingButton({
+      domain: window.location.hostname,
+      enableDrag: buttonSettings.floatingButtonEnableDrag,
+      enableDismiss: buttonSettings.floatingButtonEnableDismiss,
+      showDetectionHint: buttonSettings.floatingButtonShowDetectionHint !== false,
+      detectionHintText: 'Article',
+      secondaryActions,
+      onClick: async () => {
+        await performArticleCopy(true);
+      },
+    });
+
+    if (floatingButtonController) {
+      floatingButtonController.appendTo(document.body);
+      console.debug('[ExtractMD] Floating button created and added to DOM (Article)');
+
+      // Show article info notification if setting is enabled
+      chrome.storage.sync.get(
+        { articleExporterShowInfo: false, articleExporterOnlyLongest: false },
+        function (settings) {
+          if (settings.articleExporterShowInfo) {
+            showArticleInfoNotification(articles, settings.articleExporterOnlyLongest);
+          }
+        }
+      );
     }
   } else {
     if (floatingButtonController) {
       floatingButtonController.remove();
       floatingButtonController = null;
     }
+    floatingButtonArticlesApiSignature = '';
   }
 }
 
@@ -403,5 +521,13 @@ export function initArticleFeatures() {
     if (items.enableArticleIntegration === false) return;
     setupArticleMutationObserver();
     manageFloatingButtonForArticles();
+    if (!articleStorageListenerAttached && chrome.storage?.onChanged) {
+      articleStorageListenerAttached = true;
+      chrome.storage.onChanged.addListener((changes, areaName) => {
+        if (areaName !== 'sync') return;
+        if (!changes.apiProfilesJson && !changes.apiOutputEnabled) return;
+        manageFloatingButtonForArticles();
+      });
+    }
   });
 }

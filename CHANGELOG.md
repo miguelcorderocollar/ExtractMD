@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Generic API Output Mode (X-first)**: Added configurable API profiles with template variables, a hover rocket action on X for API sending, local secret-variable storage for sensitive placeholders, and individual metric variables for API payload mapping.
+- **Generic API Output Mode (All Integrations)**: Added configurable API integrations with templates/secrets, per-source availability and variable mapping, source-grouped variable helpers, and X floating API actions, with fly-in toast feedback and action-aware API settings UX; options **Usage Statistics** KPI cards show per-integration and API link icons for quicker scanning (shared with API source picker icons). Deleting an integration in options now asks for confirmation (same native `confirm` pattern as reset floating-button positions). **Clear Statistics** also confirms before zeroing usage counters and API call counts.
 
 ## [1.2.0] - 2026-03-15
 

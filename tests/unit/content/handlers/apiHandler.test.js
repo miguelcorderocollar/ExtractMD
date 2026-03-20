@@ -3,10 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../../extension/shared/storage.js', () => ({
   getSettings: vi.fn(),
   getApiProfileSecrets: vi.fn(),
+  incrementApiCallCount: vi.fn(),
 }));
 
 vi.mock('../../../../extension/shared/api/index.js', () => ({
+  getApiProfileById: vi.fn(),
   getActiveApiProfile: vi.fn(),
+  getEnabledApiProfilesForIntegration: vi.fn(),
   mergeApiVariables: vi.fn((base, secret) => ({ ...base, ...secret })),
   buildResolvedApiRequest: vi.fn(),
 }));
@@ -16,10 +19,16 @@ vi.mock('../../../../extension/content/utils.js', () => ({
 }));
 
 import { sendToConfiguredApi } from '../../../../extension/content/handlers/apiHandler.js';
-import { getSettings, getApiProfileSecrets } from '../../../../extension/shared/storage.js';
+import {
+  getSettings,
+  getApiProfileSecrets,
+  incrementApiCallCount,
+} from '../../../../extension/shared/storage.js';
 import {
   buildResolvedApiRequest,
+  getApiProfileById,
   getActiveApiProfile,
+  getEnabledApiProfilesForIntegration,
 } from '../../../../extension/shared/api/index.js';
 import { showNotification } from '../../../../extension/content/utils.js';
 
@@ -33,7 +42,8 @@ describe('content/handlers/apiHandler', () => {
 
     getSettings.mockResolvedValue({
       apiOutputEnabled: true,
-      apiEnabledForX: true,
+      apiProfilesJson: '[]',
+      apiActiveProfileId: 'default',
     });
 
     getActiveApiProfile.mockReturnValue({
@@ -41,6 +51,25 @@ describe('content/handlers/apiHandler', () => {
       enabled: true,
       method: 'POST',
       url: 'https://example.test/receiver',
+      integrationAvailability: {
+        x: true,
+      },
+    });
+
+    getEnabledApiProfilesForIntegration.mockReturnValue([
+      {
+        id: 'default',
+        enabled: true,
+        integrationAvailability: { x: true },
+      },
+    ]);
+
+    getApiProfileById.mockReturnValue({
+      id: 'target-profile',
+      enabled: true,
+      method: 'POST',
+      url: 'https://example.test/receiver',
+      integrationAvailability: { x: true },
     });
 
     getApiProfileSecrets.mockResolvedValue({ secret_api_token: 'abc' });
@@ -55,7 +84,8 @@ describe('content/handlers/apiHandler', () => {
   it('rejects when API output is disabled', async () => {
     getSettings.mockResolvedValue({
       apiOutputEnabled: false,
-      apiEnabledForX: true,
+      apiProfilesJson: '[]',
+      apiActiveProfileId: 'default',
     });
 
     await expect(
@@ -66,8 +96,10 @@ describe('content/handlers/apiHandler', () => {
   it('rejects when integration is disabled', async () => {
     getSettings.mockResolvedValue({
       apiOutputEnabled: true,
-      apiEnabledForX: false,
+      apiProfilesJson: '[]',
+      apiActiveProfileId: 'default',
     });
+    getEnabledApiProfilesForIntegration.mockReturnValue([]);
 
     await expect(
       sendToConfiguredApi({ integration: 'x', variables: { author: 'Test' } })
@@ -91,5 +123,35 @@ describe('content/handlers/apiHandler', () => {
       expect.any(Function)
     );
     expect(showNotification).toHaveBeenCalled();
+    expect(incrementApiCallCount).toHaveBeenCalledTimes(1);
+  });
+
+  it('dispatches request using explicit profile id', async () => {
+    const result = await sendToConfiguredApi({
+      integration: 'x',
+      profileId: 'target-profile',
+      variables: { author: 'Synthetic Author' },
+    });
+
+    expect(result).toEqual({ status: 200 });
+    expect(getApiProfileById).toHaveBeenCalledWith(
+      expect.objectContaining({
+        profileId: 'target-profile',
+      })
+    );
+    expect(getEnabledApiProfilesForIntegration).not.toHaveBeenCalled();
+  });
+
+  it('passes non-x integration key when selecting enabled profiles', async () => {
+    await sendToConfiguredApi({
+      integration: 'youtube',
+      variables: { author: 'Synthetic Channel' },
+    });
+
+    expect(getEnabledApiProfilesForIntegration).toHaveBeenCalledWith(
+      expect.objectContaining({
+        integration: 'youtube',
+      })
+    );
   });
 });

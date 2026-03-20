@@ -1,30 +1,14 @@
-import { getSettings, getApiProfileSecrets } from '../../shared/storage.js';
+import { getSettings, getApiProfileSecrets, incrementApiCallCount } from '../../shared/storage.js';
 import {
   buildResolvedApiRequest,
+  getApiProfileById,
   getActiveApiProfile,
+  getEnabledApiProfilesForIntegration,
   mergeApiVariables,
 } from '../../shared/api/index.js';
 import { showNotification } from '../utils.js';
 
-const API_SETTINGS_KEYS = [
-  'apiOutputEnabled',
-  'apiProfilesJson',
-  'apiActiveProfileId',
-  'apiEnabledForX',
-  'apiEnabledForYouTube',
-  'apiEnabledForHackerNews',
-  'apiEnabledForArticles',
-  'apiEnabledForUniversal',
-];
-
-function isIntegrationEnabled(integration, settings) {
-  if (integration === 'x') return settings.apiEnabledForX === true;
-  if (integration === 'youtube') return settings.apiEnabledForYouTube === true;
-  if (integration === 'hackernews') return settings.apiEnabledForHackerNews === true;
-  if (integration === 'articles') return settings.apiEnabledForArticles === true;
-  if (integration === 'universal') return settings.apiEnabledForUniversal === true;
-  return false;
-}
+const API_SETTINGS_KEYS = ['apiOutputEnabled', 'apiProfilesJson', 'apiActiveProfileId'];
 
 function sendMessageAsync(payload) {
   return new Promise((resolve, reject) => {
@@ -38,18 +22,48 @@ function sendMessageAsync(payload) {
   });
 }
 
-export async function sendToConfiguredApi({ integration, variables }) {
+export async function sendToConfiguredApi({ integration, variables, profileId = '' }) {
   const settings = await getSettings(API_SETTINGS_KEYS);
 
   if (settings.apiOutputEnabled !== true) {
     throw new Error('API output mode is disabled.');
   }
 
-  if (!isIntegrationEnabled(integration, settings)) {
-    throw new Error(`API output is not enabled for ${integration}.`);
+  const targetIntegration = String(integration || '')
+    .trim()
+    .toLowerCase();
+  const explicitProfileId = String(profileId || '').trim();
+
+  let profile = null;
+  if (explicitProfileId) {
+    profile = getApiProfileById({
+      apiProfilesJson: settings.apiProfilesJson,
+      profileId: explicitProfileId,
+    });
+    if (!profile) {
+      throw new Error(`API profile '${explicitProfileId}' was not found.`);
+    }
+    if (profile.integrationAvailability?.[targetIntegration] !== true) {
+      throw new Error(
+        `API profile '${explicitProfileId}' is not enabled for ${targetIntegration}.`
+      );
+    }
+  } else {
+    const enabledProfiles = getEnabledApiProfilesForIntegration({
+      apiProfilesJson: settings.apiProfilesJson,
+      integration: targetIntegration,
+    });
+    if (enabledProfiles.length === 0) {
+      throw new Error(`API output is not enabled for ${targetIntegration}.`);
+    }
+    const activeProfile = getActiveApiProfile(settings);
+    profile =
+      activeProfile.enabled === true &&
+      activeProfile.integrationAvailability?.[targetIntegration] === true
+        ? activeProfile
+        : enabledProfiles[0];
   }
 
-  const profile = getActiveApiProfile(settings);
   if (!profile.enabled) {
     throw new Error('Active API profile is disabled.');
   }
@@ -66,6 +80,8 @@ export async function sendToConfiguredApi({ integration, variables }) {
   if (!response?.success) {
     throw new Error(response?.error || 'API dispatch failed.');
   }
+
+  await incrementApiCallCount();
 
   showNotification(
     `API request sent successfully<br><span>${request.method} ${request.url}</span>`,

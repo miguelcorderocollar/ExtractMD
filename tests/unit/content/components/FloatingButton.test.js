@@ -1,6 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createFloatingButton } from '../../../../extension/content/components/FloatingButton.js';
 
+/** Raw SVG markup or legacy data-URI–encoded icon HTML from jsdom */
+function iconInnerHtmlForAssert(html) {
+  try {
+    return decodeURIComponent(html);
+  } catch {
+    return html;
+  }
+}
+
 describe('FloatingButton component', () => {
   let container;
 
@@ -67,11 +76,9 @@ describe('FloatingButton component', () => {
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
 
-      // SVG is inside the content container - jsdom converts SVG to data URI
       const contentContainer = controller.element.querySelector('.extractmd-button-content');
       expect(contentContainer).not.toBeNull();
-      // Decode URL-encoded content to check SVG
-      const innerHTML = decodeURIComponent(contentContainer.innerHTML);
+      const innerHTML = iconInnerHtmlForAssert(contentContainer.innerHTML);
       expect(innerHTML).toContain('viewBox');
       expect(innerHTML).toContain('M16 4h2a2 2 0 0 1 2 2v14');
     });
@@ -428,10 +435,9 @@ describe('FloatingButton component', () => {
 
       controller.setSuccess();
 
-      // Should contain checkmark polyline - decode URL-encoded content
       const contentContainer = controller.element.querySelector('.extractmd-button-content');
       expect(contentContainer).not.toBeNull();
-      const innerHTML = decodeURIComponent(contentContainer.innerHTML);
+      const innerHTML = iconInnerHtmlForAssert(contentContainer.innerHTML);
       expect(innerHTML).toContain('polyline');
       // SVG may use single or double quotes
       expect(innerHTML).toMatch(/points=['"]20\s+6\s+9\s+17\s+4\s+12['"]/);
@@ -500,10 +506,9 @@ describe('FloatingButton component', () => {
       controller.setLoading();
       controller.setNormal();
 
-      // Should contain clipboard path again - decode URL-encoded content
       const contentContainer = controller.element.querySelector('.extractmd-button-content');
       expect(contentContainer).not.toBeNull();
-      const innerHTML = decodeURIComponent(contentContainer.innerHTML);
+      const innerHTML = iconInnerHtmlForAssert(contentContainer.innerHTML);
       expect(innerHTML).toContain('M16 4h2a2 2 0 0 1 2 2v14');
       expect(controller.element.dataset.processing).toBeUndefined();
       expect(controller.element.style.cursor).toBe('pointer');
@@ -671,8 +676,11 @@ describe('FloatingButton component', () => {
       // Advance timer past HOVER_DELAY_MS (500ms)
       vi.advanceTimersByTime(600);
 
+      const actionsContainer = controller.element.querySelector('.extractmd-hover-actions');
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
-      expect(dismissBtn.style.display).toBe('block');
+      expect(actionsContainer).not.toBeNull();
+      expect(actionsContainer.style.display).toBe('block');
+      expect(dismissBtn).not.toBeNull();
 
       vi.useRealTimers();
     });
@@ -690,14 +698,17 @@ describe('FloatingButton component', () => {
       vi.advanceTimersByTime(600);
 
       // Verify it's visible
+      const actionsContainer = controller.element.querySelector('.extractmd-hover-actions');
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
-      expect(dismissBtn.style.display).toBe('block');
+      expect(actionsContainer.style.display).toBe('block');
+      expect(dismissBtn).not.toBeNull();
 
       // Simulate mouseleave
       const mouseleaveEvent = new MouseEvent('mouseleave', { bubbles: true });
       controller.element.dispatchEvent(mouseleaveEvent);
+      vi.advanceTimersByTime(250);
 
-      expect(dismissBtn.style.display).toBe('none');
+      expect(actionsContainer.style.display).toBe('none');
 
       vi.useRealTimers();
     });
@@ -772,10 +783,9 @@ describe('FloatingButton component', () => {
       // Advance timer past HOVER_DELAY_MS
       vi.advanceTimersByTime(600);
 
-      // Dismiss button should still be hidden (no domain = no dismiss functionality)
+      // No domain = no dismiss action
       const dismissBtn = controller.element.querySelector('.extractmd-dismiss-btn');
-      // Check that display is still none (not changed to block)
-      expect(dismissBtn.style.display).not.toBe('block');
+      expect(dismissBtn).toBeNull();
 
       vi.useRealTimers();
     });
@@ -786,11 +796,13 @@ describe('FloatingButton component', () => {
       const onSecondaryAction = vi.fn().mockResolvedValue(undefined);
       const controller = await createFloatingButton({
         onClick,
-        secondaryAction: {
-          icon: '🚀',
-          title: 'Send to API',
-          onClick: onSecondaryAction,
-        },
+        secondaryActions: [
+          {
+            icon: '🚀',
+            title: 'Send to API',
+            onClick: onSecondaryAction,
+          },
+        ],
       });
       controller.appendTo(document.body);
 
@@ -798,15 +810,41 @@ describe('FloatingButton component', () => {
       controller.element.dispatchEvent(mouseenterEvent);
       vi.advanceTimersByTime(600);
 
-      const actionBtn = controller.element.querySelector('.extractmd-dismiss-btn');
+      const actionsContainer = controller.element.querySelector('.extractmd-hover-actions');
+      const actionBtn = controller.element.querySelector('.extractmd-hover-action-btn');
+      expect(actionsContainer).not.toBeNull();
       expect(actionBtn).not.toBeNull();
       expect(actionBtn.innerHTML).toBe('🚀');
-      expect(actionBtn.style.display).toBe('block');
+      expect(actionsContainer.style.display).toBe('block');
 
       actionBtn.click();
       await Promise.resolve();
 
       expect(onSecondaryAction).toHaveBeenCalledTimes(1);
+      vi.useRealTimers();
+    });
+
+    it('caps secondary hover actions to three buttons', async () => {
+      vi.useFakeTimers();
+      const onClick = vi.fn();
+      const actions = Array.from({ length: 7 }, (_, index) => ({
+        icon: `${index + 1}`,
+        title: `Action ${index + 1}`,
+        onClick: vi.fn(),
+      }));
+
+      const controller = await createFloatingButton({
+        onClick,
+        secondaryActions: actions,
+      });
+      controller.appendTo(document.body);
+
+      const mouseenterEvent = new MouseEvent('mouseenter', { bubbles: true });
+      controller.element.dispatchEvent(mouseenterEvent);
+      vi.advanceTimersByTime(600);
+
+      const actionButtons = controller.element.querySelectorAll('.extractmd-hover-action-btn');
+      expect(actionButtons.length).toBe(3);
       vi.useRealTimers();
     });
   });
@@ -829,6 +867,7 @@ describe('FloatingButton component', () => {
     });
 
     it('reduces opacity back to configured transparency on mouseleave', async () => {
+      vi.useFakeTimers();
       const onClick = vi.fn();
       const controller = await createFloatingButton({ onClick });
       controller.appendTo(document.body);
@@ -841,7 +880,9 @@ describe('FloatingButton component', () => {
       // Leave (should return to default medium = 0.5)
       const mouseleaveEvent = new MouseEvent('mouseleave', { bubbles: true });
       controller.element.dispatchEvent(mouseleaveEvent);
+      vi.advanceTimersByTime(250);
       expect(controller.element.style.opacity).toBe('0.5');
+      vi.useRealTimers();
     });
 
     it('applies scale transform on hover', async () => {

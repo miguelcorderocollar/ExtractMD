@@ -87,12 +87,7 @@ export const DEFAULTS = {
   apiOutputEnabled: false,
   apiProfilesJson: getDefaultApiProfilesJson(),
   apiActiveProfileId: DEFAULT_API_PROFILE_ID,
-  apiEnableRocketAction: true,
-  apiEnabledForX: false,
-  apiEnabledForYouTube: false,
-  apiEnabledForHackerNews: false,
-  apiEnabledForArticles: false,
-  apiEnabledForUniversal: false,
+  apiCallCount: 0,
 };
 
 // Schema for validation during import
@@ -157,10 +152,5 @@ export const SETTING_SCHEMA = {
   apiOutputEnabled: 'boolean',
   apiProfilesJson: 'string',
   apiActiveProfileId: 'string',
-  apiEnableRocketAction: 'boolean',
-  apiEnabledForX: 'boolean',
-  apiEnabledForYouTube: 'boolean',
-  apiEnabledForHackerNews: 'boolean',
-  apiEnabledForArticles: 'boolean',
-  apiEnabledForUniversal: 'boolean',
+  apiCallCount: 'number',
 };

@@ -12,11 +12,19 @@ import {
 } from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
+import { sendToConfiguredApi } from './handlers/apiHandler.js';
+import {
+  computeEnabledApiProfileSignature,
+  getSecondaryApiActions,
+} from './handlers/apiSecondaryActions.js';
 import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
+let isApiProcessing = false;
 let universalObserver = null;
 let floatingButtonController = null;
+let floatingButtonUniversalApiSignature = '';
+let universalStorageListenerAttached = false;
 
 /**
  * Create and configure a Turndown service instance
@@ -92,6 +100,55 @@ function findMainContent(mode, customSelector) {
   );
 }
 
+function buildUniversalApiVariables(markdown) {
+  const pageTitle = document.title || 'Page';
+  const pageUrl = window.location.href;
+  const hostname = window.location.hostname || '';
+  const wordCount = String(markdown || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+
+  return {
+    title: pageTitle,
+    link: pageUrl,
+    content: markdown,
+    site: hostname,
+    domain: hostname,
+    word_count: wordCount,
+    extracted_at: new Date().toISOString(),
+  };
+}
+
+function extractUniversalMarkdown(settings) {
+  const contentElement = findMainContent(
+    settings.universalContentMode,
+    settings.universalCustomSelector
+  );
+  if (!contentElement || !contentElement.textContent?.trim()) {
+    throw new Error('No content found on this page');
+  }
+
+  const turndown = createTurndownService(settings);
+  let markdown = turndown.turndown(contentElement.innerHTML);
+  markdown = markdown.replace(/\n{3,}/g, '\n\n').trim();
+
+  if (markdown.length < 100 && contentElement.textContent.trim().length > 100) {
+    markdown = contentElement.textContent
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/\n\s*\n/g, '\n\n');
+  }
+
+  if (settings.universalIncludeUrl) {
+    const pageUrl = window.location.href;
+    const pageTitle = document.title || 'Page';
+    markdown = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${markdown}`;
+  }
+
+  return markdown;
+}
+
 /**
  * Perform the universal HTML-to-Markdown extraction
  */
@@ -118,40 +175,7 @@ export async function performUniversalCopy(updateButton = false) {
       );
     });
 
-    // Find the content element
-    const contentElement = findMainContent(
-      settings.universalContentMode,
-      settings.universalCustomSelector
-    );
-
-    if (!contentElement || !contentElement.textContent?.trim()) {
-      throw new Error('No content found on this page');
-    }
-
-    // Create Turndown service
-    const turndown = createTurndownService(settings);
-
-    // Convert to Markdown using innerHTML (Turndown handles HTML string better)
-    let md = turndown.turndown(contentElement.innerHTML);
-
-    // Clean up excessive whitespace
-    md = md.replace(/\n{3,}/g, '\n\n').trim();
-
-    // If we got very little content, the page might use complex structures
-    // Fallback to just extracting text content
-    if (md.length < 100 && contentElement.textContent.trim().length > 100) {
-      md = contentElement.textContent
-        .trim()
-        .replace(/\s+/g, ' ')
-        .replace(/\n\s*\n/g, '\n\n');
-    }
-
-    // Add URL header if setting is enabled
-    if (settings.universalIncludeUrl) {
-      const pageUrl = window.location.href;
-      const pageTitle = document.title || 'Page';
-      md = `# ${pageTitle}\n\n**URL:** ${pageUrl}\n\n---\n\n${md}`;
-    }
+    const md = extractUniversalMarkdown(settings);
 
     // Handle copy/download based on settings
     const globalSettings = await getSettings();
@@ -198,6 +222,63 @@ export async function performUniversalCopy(updateButton = false) {
       isProcessing = false;
     }
     showNotification('Failed to extract page content.', 'error');
+  }
+}
+
+async function performUniversalApiSend({ updateButton = false, profileId = '' } = {}) {
+  if (isApiProcessing) return;
+  isApiProcessing = true;
+  if (updateButton && floatingButtonController) floatingButtonController.setLoading();
+
+  try {
+    const settings = await new Promise((resolve) => {
+      chrome.storage.sync.get(
+        {
+          universalIncludeImages: true,
+          universalIncludeLinks: true,
+          universalIncludeUrl: true,
+          universalContentMode: 'auto',
+          universalCustomSelector: '',
+          universalStripNav: true,
+          universalPreserveCodeBlocks: true,
+        },
+        resolve
+      );
+    });
+
+    const markdown = extractUniversalMarkdown(settings);
+    const apiVariables = buildUniversalApiVariables(markdown);
+
+    await sendToConfiguredApi({
+      integration: 'universal',
+      variables: apiVariables,
+      profileId,
+    });
+
+    if (updateButton && floatingButtonController) {
+      floatingButtonController.setSuccess();
+      setTimeout(() => {
+        floatingButtonController.setNormal();
+        isApiProcessing = false;
+      }, 2000);
+    } else {
+      isApiProcessing = false;
+    }
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message
+        ? error.message
+        : 'Failed to send page content via API.';
+    showNotification(message, 'error');
+    if (updateButton && floatingButtonController) {
+      floatingButtonController.setError();
+      setTimeout(() => {
+        floatingButtonController.setNormal();
+        isApiProcessing = false;
+      }, 3000);
+    } else {
+      isApiProcessing = false;
+    }
   }
 }
 
@@ -251,56 +332,84 @@ async function manageFloatingButtonForUniversal() {
     return;
   }
 
-  const existingButton = document.getElementById('extractmd-floating-button');
-
   // Check if there's meaningful content on the page
   const contentElement = findMainContent('auto', '');
   const hasContent = contentElement && contentElement.textContent?.trim().length > 100;
 
   if (hasContent) {
-    if (!existingButton) {
-      // Load floating button settings
-      const buttonSettings = await new Promise((resolve) => {
-        chrome.storage.sync.get(
-          {
-            floatingButtonEnableDrag: true,
-            floatingButtonEnableDismiss: true,
-            floatingButtonShowDetectionHint: true,
-          },
-          resolve
-        );
-      });
-
-      floatingButtonController = await createFloatingButton({
-        domain: window.location.hostname,
-        enableDrag: buttonSettings.floatingButtonEnableDrag,
-        enableDismiss: buttonSettings.floatingButtonEnableDismiss,
-        showDetectionHint: buttonSettings.floatingButtonShowDetectionHint !== false,
-        detectionHintText: 'Page',
-        onClick: async () => {
-          await performUniversalCopy(true);
+    const buttonSettings = await new Promise((resolve) => {
+      chrome.storage.sync.get(
+        {
+          floatingButtonEnableDrag: true,
+          floatingButtonEnableDismiss: true,
+          floatingButtonShowDetectionHint: true,
+          apiOutputEnabled: false,
+          apiProfilesJson: '[]',
         },
-      });
+        resolve
+      );
+    });
 
-      if (floatingButtonController) {
-        floatingButtonController.appendTo(document.body);
-        console.debug('[ExtractMD] Floating button created and added to DOM (Universal)');
+    const apiSignature = computeEnabledApiProfileSignature({
+      apiProfilesJson: buttonSettings.apiProfilesJson,
+      apiOutputEnabled: buttonSettings.apiOutputEnabled,
+      integration: 'universal',
+    });
 
-        // Show content info notification if setting is enabled
-        chrome.storage.sync.get({ universalShowInfoNotification: false }, function (settings) {
-          if (settings.universalShowInfoNotification) {
-            showContentInfoNotification(contentElement);
-          }
-        });
+    const existingButton = document.getElementById('extractmd-floating-button');
+    if (existingButton && floatingButtonController) {
+      if (apiSignature !== floatingButtonUniversalApiSignature) {
+        floatingButtonController.remove();
+        floatingButtonController = null;
+      } else {
+        floatingButtonController.show();
+        return;
       }
-    } else if (floatingButtonController) {
-      floatingButtonController.show();
+    } else if (existingButton && !floatingButtonController) {
+      existingButton.remove();
+    }
+
+    if (document.getElementById('extractmd-floating-button')) return;
+
+    floatingButtonUniversalApiSignature = apiSignature;
+    const secondaryActions = getSecondaryApiActions({
+      apiProfilesJson: buttonSettings.apiProfilesJson,
+      apiOutputEnabled: buttonSettings.apiOutputEnabled,
+      integration: 'universal',
+      onProfileAction: async (profileId) => {
+        await performUniversalApiSend({ updateButton: true, profileId });
+      },
+    });
+
+    floatingButtonController = await createFloatingButton({
+      domain: window.location.hostname,
+      enableDrag: buttonSettings.floatingButtonEnableDrag,
+      enableDismiss: buttonSettings.floatingButtonEnableDismiss,
+      showDetectionHint: buttonSettings.floatingButtonShowDetectionHint !== false,
+      detectionHintText: 'Page',
+      secondaryActions,
+      onClick: async () => {
+        await performUniversalCopy(true);
+      },
+    });
+
+    if (floatingButtonController) {
+      floatingButtonController.appendTo(document.body);
+      console.debug('[ExtractMD] Floating button created and added to DOM (Universal)');
+
+      // Show content info notification if setting is enabled
+      chrome.storage.sync.get({ universalShowInfoNotification: false }, function (settings) {
+        if (settings.universalShowInfoNotification) {
+          showContentInfoNotification(contentElement);
+        }
+      });
     }
   } else {
     if (floatingButtonController) {
       floatingButtonController.remove();
       floatingButtonController = null;
     }
+    floatingButtonUniversalApiSignature = '';
   }
 }
 
@@ -330,5 +439,13 @@ export function initUniversalFeatures() {
     if (items.enableUniversalIntegration === false) return;
     setupUniversalMutationObserver();
     manageFloatingButtonForUniversal();
+    if (!universalStorageListenerAttached && chrome.storage?.onChanged) {
+      universalStorageListenerAttached = true;
+      chrome.storage.onChanged.addListener((changes, areaName) => {
+        if (areaName !== 'sync') return;
+        if (!changes.apiProfilesJson && !changes.apiOutputEnabled) return;
+        manageFloatingButtonForUniversal();
+      });
+    }
   });
 }
