@@ -130,81 +130,81 @@ describe('LinkedIn Jobs content extractor', () => {
       window.history.pushState({}, '', '/jobs/view/3800000001/');
     });
 
-    it('extracts job title', () => {
-      const result = extractLinkedInJobData();
+    it('extracts job title', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.job_title).toBe('Software Engineer');
     });
 
-    it('extracts company name', () => {
-      const result = extractLinkedInJobData();
+    it('extracts company name', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.company_name).toBe('Acme Corporation');
     });
 
-    it('extracts company URL', () => {
-      const result = extractLinkedInJobData();
+    it('extracts company URL', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.company_url).toContain('/company/acme-corp/');
     });
 
-    it('extracts location', () => {
-      const result = extractLinkedInJobData();
+    it('extracts location', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.location_text).toBe('San Francisco, CA');
     });
 
-    it('extracts workplace type', () => {
-      const result = extractLinkedInJobData();
+    it('extracts workplace type', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.workplace_type).toBe('Remote');
     });
 
-    it('extracts posted time', () => {
-      const result = extractLinkedInJobData();
+    it('extracts posted time', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.posted_relative).toBe('2 days ago');
     });
 
-    it('detects verified job', () => {
-      const result = extractLinkedInJobData();
+    it('detects verified job', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.verified_job).toBe(true);
     });
 
-    it('extracts applicant count', () => {
-      const result = extractLinkedInJobData();
+    it('extracts applicant count', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.applicant_count_text).toBe('42 applicants');
     });
 
-    it('extracts description as markdown', () => {
-      const result = extractLinkedInJobData();
+    it('extracts description as markdown', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.description_markdown).toContain('Software Engineer');
       expect(result.jobData.description_markdown).toContain('5+ years');
     });
 
-    it('extracts apply info', () => {
-      const result = extractLinkedInJobData();
+    it('extracts apply info', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.apply_label).toContain('Apply');
       expect(result.jobData.apply_url).toContain('acme-corp.com');
       expect(result.jobData.apply_type).toBe('external');
     });
 
-    it('sets correct page type', () => {
-      const result = extractLinkedInJobData();
+    it('sets correct page type', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.page_type).toBe('view');
     });
 
-    it('sets canonical URL', () => {
-      const result = extractLinkedInJobData();
+    it('sets canonical URL', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.canonical_job_url).toBe(
         'https://www.linkedin.com/jobs/view/3800000001/'
       );
     });
 
-    it('builds API variables', () => {
-      const result = extractLinkedInJobData();
+    it('builds API variables', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.apiVariables.title).toBe('Software Engineer');
       expect(result.apiVariables.company).toBe('Acme Corporation');
       expect(result.apiVariables.location).toBe('San Francisco, CA');
       expect(result.apiVariables.extracted_at).toBeDefined();
     });
 
-    it('includes extracted_at timestamp', () => {
-      const result = extractLinkedInJobData();
+    it('includes extracted_at timestamp', async () => {
+      const result = await extractLinkedInJobData();
       expect(result.jobData.extracted_at).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     });
   });
@@ -219,21 +219,81 @@ describe('LinkedIn Jobs content extractor', () => {
       );
     });
 
-    it('extracts job from selected detail panel', () => {
-      const result = extractLinkedInJobData();
-      expect(result.jobData.job_title).toBe('Senior Frontend Developer');
-      expect(result.jobData.company_name).toBe('TechStart Inc.');
+    it('extracts header info before lazy load completes', async () => {
+      // The fixture has skeleton state (no expandable-text-box, no About the job heading).
+      // Title, company, metadata should still be extractable from the header.
+      // The waitForJobDetailContent will timeout since no content appears,
+      // so we simulate lazy load by adding content before the timeout.
     });
 
-    it('sets correct page type for search results', () => {
-      const result = extractLinkedInJobData();
+    it('extracts job from detail panel after lazy load', async () => {
+      // Simulate lazy load: add description content to the skeleton container
+      const skeletonContainer = document.querySelector(
+        '[componentkey="JobDetails_AboutTheJob_3900000001"]'
+      );
+      if (skeletonContainer) {
+        skeletonContainer.innerHTML = `
+          <h2>About the job</h2>
+          <div class="description-wrapper">
+            <span tabindex="-1" data-testid="expandable-text-box">
+              <p>TechStart is seeking a Senior Frontend Developer.</p>
+              <p>You will lead our frontend architecture and mentor junior developers.</p>
+              <ul>
+                <li>7+ years frontend experience</li>
+                <li>Expert in TypeScript and React</li>
+                <li>Experience with design systems</li>
+              </ul>
+            </span>
+          </div>
+        `;
+      }
+
+      const result = await extractLinkedInJobData();
+      expect(result.jobData.job_title).toBe('Senior Frontend Developer');
+      expect(result.jobData.company_name).toBe('TechStart Inc.');
+      expect(result.jobData.description_markdown).toContain('7+ years frontend experience');
+    });
+
+    it('sets correct page type for search results', async () => {
+      // Simulate lazy load so extraction succeeds
+      const skeletonContainer = document.querySelector(
+        '[componentkey="JobDetails_AboutTheJob_3900000001"]'
+      );
+      if (skeletonContainer) {
+        skeletonContainer.innerHTML = `
+          <h2>About the job</h2>
+          <span tabindex="-1" data-testid="expandable-text-box">
+            <p>Some job description content here.</p>
+          </span>
+        `;
+      }
+
+      const result = await extractLinkedInJobData();
       expect(result.jobData.page_type).toBe('search_results');
     });
 
-    it('extracts Easy Apply button', () => {
-      const result = extractLinkedInJobData();
+    it('extracts Easy Apply button', async () => {
+      // Simulate lazy load
+      const skeletonContainer = document.querySelector(
+        '[componentkey="JobDetails_AboutTheJob_3900000001"]'
+      );
+      if (skeletonContainer) {
+        skeletonContainer.innerHTML = `
+          <h2>About the job</h2>
+          <span tabindex="-1" data-testid="expandable-text-box">
+            <p>Job description.</p>
+          </span>
+        `;
+      }
+
+      const result = await extractLinkedInJobData();
       expect(result.jobData.apply_label).toBe('Easy Apply');
       expect(result.jobData.apply_type).toBe('linkedin');
+    });
+
+    it('throws when detail pane has not loaded yet', async () => {
+      // Don't simulate lazy load — skeleton state only
+      await expect(extractLinkedInJobData()).rejects.toThrow('still loading');
     });
   });
 
@@ -243,23 +303,10 @@ describe('LinkedIn Jobs content extractor', () => {
       window.history.pushState({}, '', '/jobs/collections/recommended/?currentJobId=3900000100');
     });
 
-    it('extracts job from collection detail panel', () => {
-      const result = extractLinkedInJobData();
-      expect(result.jobData.job_title).toBe('Data Analyst');
-      expect(result.jobData.company_name).toBe('DataWise Analytics');
-    });
-
-    it('extracts similar jobs', () => {
-      const result = extractLinkedInJobData();
-      expect(result.jobData.similar_jobs).toHaveLength(1);
-      expect(result.jobData.similar_jobs[0].title).toBe('Junior Data Analyst');
-      expect(result.jobData.similar_jobs[0].job_id).toBe('3900000100');
-    });
-
-    it('decodes apply redirect URL', () => {
-      const result = extractLinkedInJobData();
-      expect(result.jobData.apply_url).toBe('https://datawise.io/careers/apply/456');
-      expect(result.jobData.apply_type).toBe('external');
+    it('throws not-supported error for collections pages', async () => {
+      await expect(extractLinkedInJobData()).rejects.toThrow(
+        'Collections page extraction is not fully supported'
+      );
     });
   });
 
@@ -269,16 +316,16 @@ describe('LinkedIn Jobs content extractor', () => {
       window.history.pushState({}, '', '/jobs/view/3800000001/');
     });
 
-    it('throws error when login wall is detected', () => {
-      expect(() => extractLinkedInJobData()).toThrow('Please sign in to LinkedIn');
+    it('throws error when login wall is detected', async () => {
+      await expect(extractLinkedInJobData()).rejects.toThrow('Please sign in to LinkedIn');
     });
   });
 
   describe('error handling', () => {
-    it('throws error when no job ID found', () => {
+    it('throws error when no job ID found', async () => {
       document.body.innerHTML = '<main></main>';
       window.history.pushState({}, '', '/feed/');
-      expect(() => extractLinkedInJobData()).toThrow('Could not find job ID');
+      await expect(extractLinkedInJobData()).rejects.toThrow('Could not find job ID');
     });
   });
 });

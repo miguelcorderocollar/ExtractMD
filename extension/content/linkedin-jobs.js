@@ -26,6 +26,8 @@ export function isLinkedInJobPage() {
   if (pathname.startsWith('/jobs/search-results/')) {
     return new URLSearchParams(search).has('currentJobId');
   }
+  // DEPRIORITIZED: /jobs/collections/ uses a legacy Ember-based DOM (no SDUI attributes).
+  // Detection is kept so the floating button appears, but extraction throws a clear error.
   if (pathname.startsWith('/jobs/collections/')) {
     return new URLSearchParams(search).has('currentJobId');
   }
@@ -140,7 +142,7 @@ function extractJobTitle() {
         if (text.length > 3 && text.length < 200 && !text.includes('·') && !text.includes('ago')) {
           const aboutHeading = findAboutTheJobHeading();
           if (
-            aboutHeading &&
+            !aboutHeading ||
             p.compareDocumentPosition(aboutHeading) & Node.DOCUMENT_POSITION_FOLLOWING
           ) {
             return text.replace(/\s+/g, ' ').trim();
@@ -179,6 +181,46 @@ function findAboutTheJobHeading() {
     if (h.textContent?.trim() === 'About the job') return h;
   }
   return null;
+}
+
+/**
+ * Check whether the job description content has been loaded into the DOM.
+ * On individual job pages the content is present immediately; on search-results
+ * pages the detail pane is lazy-loaded and may still contain skeleton placeholders.
+ */
+function isJobDetailContentReady() {
+  return Boolean(
+    document.querySelector('[data-testid="expandable-text-box"]') ||
+    document.querySelector('[data-sdui-component*="aboutTheJob"]') ||
+    findAboutTheJobHeading()
+  );
+}
+
+/**
+ * Wait for job description content to appear in the DOM.
+ * Needed on search-results pages where the detail pane is lazy-loaded.
+ * @param {string} pageType
+ * @param {number} timeoutMs
+ * @returns {Promise<void>}
+ */
+async function waitForJobDetailContent(pageType, timeoutMs = 4000) {
+  // Individual job pages have content immediately
+  if (pageType === 'view') return;
+
+  if (isJobDetailContentReady()) return;
+
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+    const interval = setInterval(() => {
+      if (isJobDetailContentReady()) {
+        clearInterval(interval);
+        resolve();
+      } else if (Date.now() - start > timeoutMs) {
+        clearInterval(interval);
+        reject(new Error('Job details are still loading. Please try again in a moment.'));
+      }
+    }, 250);
+  });
 }
 
 /**
@@ -497,11 +539,24 @@ function buildMarkdown(jobData) {
 /**
  * Extract all job data from the current page
  */
-export function extractLinkedInJobData() {
+export async function extractLinkedInJobData() {
   const jobId = getLinkedInJobId();
   if (!jobId) {
     throw new Error('Could not find job ID on this page.');
   }
+
+  const pageType = getPageType();
+
+  // DEPRIORITIZED: /jobs/collections/ uses a legacy Ember-based DOM (no SDUI attributes).
+  // Extraction may produce incomplete results. Navigate to the individual job page for full support.
+  if (pageType === 'collections') {
+    throw new Error(
+      'Collections page extraction is not fully supported. Please open the job directly.'
+    );
+  }
+
+  // On search-results pages the detail pane is lazy-loaded; wait for content to appear
+  await waitForJobDetailContent(pageType);
 
   // Check for login wall
   const loginWall =
@@ -531,7 +586,6 @@ export function extractLinkedInJobData() {
     throw new Error('Could not extract job details. The page may still be loading.');
   }
 
-  const pageType = getPageType();
   const sourceUrl = window.location.href;
   const canonicalUrl = getCanonicalJobUrl(jobId);
 
@@ -585,7 +639,7 @@ export async function performLinkedInJobsCopy(updateButton = false) {
   }
 
   try {
-    const result = extractLinkedInJobData();
+    const result = await extractLinkedInJobData();
 
     await handleCopyOrDownload(result.markdown, {
       title: result.jobData.job_title || document.title || 'LinkedIn Job',
@@ -639,7 +693,7 @@ export async function performLinkedInJobsApiSend({ updateButton = false, profile
       console.error('[ExtractMD] LinkedIn Jobs API send failed:', error);
     },
     prepareVariables: async () => {
-      const result = extractLinkedInJobData();
+      const result = await extractLinkedInJobData();
       return result.apiVariables;
     },
   });

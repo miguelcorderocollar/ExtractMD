@@ -5,48 +5,41 @@
     <title>Search Results | LinkedIn</title>
   </head>
   <body>
-    <main>
-      <div data-sdui-component="com.linkedin.sdui.generated.jobseeker.dsl.impl.aboutTheJob">
-        <div class="card-container">
-          <div class="card-header">
-            <div aria-label="Company, TechStart Inc..">
-              <div aria-label="Company logo for, TechStart Inc..">
-                <img alt="Company logo for, TechStart Inc.." />
-              </div>
-            </div>
-            <p class="title-text">Senior Frontend Developer</p>
-            <p class="metadata-text">
-              <span>New York, NY</span> · <span>1 week ago</span> · <span>128 applicants</span>
-            </p>
+    <div role="main" data-sdui-screen="com.linkedin.sdui.flagshipnav.jobs.SemanticJobDetails">
+      <div data-component-type="LazyColumn" data-testid="lazy-column">
+        <!-- Detail pane header (loaded immediately) -->
+        <div aria-label="Company, TechStart Inc..">
+          <figure aria-label="Company logo for, TechStart Inc..">
+            <img alt="Company logo for, TechStart Inc.." />
+          </figure>
+        </div>
+        <p class="fd835fbb _2cb5ff3c">
+          <a href="/jobs/view/3900000001/">Senior Frontend Developer</a>
+        </p>
+        <p class="fd835fbb _48172d42">
+          <span>New York, NY</span> · <span>1 week ago</span> · <span>128 applicants</span>
+        </p>
+        <div>
+          <a href="/jobs/search-results/?keywords=dev&amp;currentJobId=3900000001"
+            ><span>Hybrid</span></a
+          >
+          <a href="/jobs/search-results/?keywords=dev&amp;currentJobId=3900000001"
+            ><span>Full-time</span></a
+          >
+        </div>
+        <button aria-label="Easy Apply">Easy Apply</button>
+
+        <!-- Detail pane body (lazy-loaded — skeleton state) -->
+        <div class="c4cfd6e3" componentkey="JobDetails_AboutTheJob_3900000001">
+          <div componentkey="JobDetails_AboutTheJob_3900000001">
             <div>
-              <a href="/jobs/search-results/?keywords=dev&amp;currentJobId=3900000001"
-                ><span>Hybrid</span></a
-              >
-              <a href="/jobs/search-results/?keywords=dev&amp;currentJobId=3900000001"
-                ><span>Full-time</span></a
-              >
-            </div>
-            <div>
-              <button aria-label="Easy Apply">Easy Apply</button>
-              <button aria-label="Save the job">Save</button>
-            </div>
-          </div>
-          <div class="card-body">
-            <h2>About the job</h2>
-            <div class="description-wrapper">
-              <span tabindex="-1" data-testid="expandable-text-box"
-                >TechStart is seeking a Senior Frontend Developer.
-                <p>You will lead our frontend architecture and mentor junior developers.</p>
-                <ul>
-                  <li>7+ years frontend experience</li>
-                  <li>Expert in TypeScript and React</li>
-                  <li>Experience with design systems</li>
-                </ul></span
-              >
+              <div class="_0f8a0d8c skeleton-placeholder" style="width: 48.4rem"></div>
+              <div class="_0f8a0d8c skeleton-placeholder" style="width: 32rem"></div>
+              <div class="_0f8a0d8c skeleton-placeholder" style="width: 40rem"></div>
             </div>
           </div>
         </div>
       </div>
-    </main>
+    </div>
   </body>
 </html>
