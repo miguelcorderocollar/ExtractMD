@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import {
+  buildYouTubeApiVariables,
   extractTranscriptText,
   extractChapters,
   formatChaptersSection,
@@ -263,6 +264,31 @@ describe('YouTube content script logic', () => {
 
     it('returns empty string when no chapters', () => {
       expect(formatChaptersSection([])).toBe('');
+    });
+  });
+
+  describe('buildYouTubeApiVariables', () => {
+    it('maps extracted YouTube data to API variables', () => {
+      const variables = buildYouTubeApiVariables({
+        title: 'Synthetic Product Review',
+        channelName: 'Fictional Creator',
+        channelUrl: 'https://youtube.com/@fictional',
+        publishedDate: '2026-03-10',
+        videoUrl: 'https://youtube.com/watch?v=abc123',
+        transcriptMarkdown: 'Intro transcript block',
+        extractedAt: '2026-03-20T12:00:00.000Z',
+      });
+
+      expect(variables).toEqual({
+        title: 'Synthetic Product Review',
+        author: 'Fictional Creator',
+        channel_name: 'Fictional Creator',
+        channel_url: 'https://youtube.com/@fictional',
+        date: '2026-03-10',
+        link: 'https://youtube.com/watch?v=abc123',
+        content: 'Intro transcript block',
+        extracted_at: '2026-03-20T12:00:00.000Z',
+      });
     });
   });
 });

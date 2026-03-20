@@ -1,7 +1,7 @@
 {
   "name": "ExtractMD - Convert Any Webpage to Markdown",
   "short_name": "ExtractMD",
-  "description": "Extract and copy content as Markdown from any webpage. Built-in support for YouTube transcripts, Hacker News, X (Twitter) posts, and articles.",
+  "description": "Extract and copy content as Markdown from any webpage. Built-in support for YouTube transcripts, Hacker News, X (Twitter) posts, and articles, with output actions to copy, download, or send via API Output Mode.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

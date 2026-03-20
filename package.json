@@ -14,6 +14,7 @@
     "build": "node scripts/prepare-manifest.js --mode local && node build.js",
     "build:prod": "node scripts/prepare-manifest.js --mode prod && node build.js --production",
     "build:web": "node scripts/minify-css.js && node scripts/build-changelog.js",
+    "web:serve": "python3 scripts/serve-web.py",
     "watch": "node scripts/prepare-manifest.js --mode local && node scripts/watch.js",
     "package": "node scripts/prepare-manifest.js --mode prod && node scripts/package.js",
     "lint": "eslint .",

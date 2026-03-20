@@ -12,6 +12,8 @@ const DEFAULT_RIGHT = 20;
 const DEFAULT_BOTTOM = 20;
 const DRAG_THRESHOLD = 5; // pixels - movement less than this triggers click
 const HOVER_DELAY_MS = 500; // ms before showing dismiss button
+const HOVER_HIDE_DELAY_MS = 180; // keeps hover actions clickable
+const MAX_SECONDARY_ACTIONS = 3; // user-facing cap for API actions
 
 // Size configurations
 const SIZE_CONFIG = {
@@ -193,6 +195,12 @@ function injectAnimationStyles() {
  * @param {boolean} [options.enableDismiss=true] - Whether the dismiss (X) button is enabled
  * @param {boolean} [options.showDetectionHint=false] - Whether to render a mode hint badge
  * @param {string} [options.detectionHintText=''] - Mode hint text (e.g. "Article" or "Page")
+ * @param {Object[]} [options.secondaryActions] - Optional custom hover action list (max 3)
+ * @param {string} [options.secondaryActions[].icon] - Secondary action icon/label
+ * @param {string} [options.secondaryActions[].title] - Secondary action title/label
+ * @param {Function} [options.secondaryActions[].onClick] - Secondary action click handler
+ * @param {string} [options.secondaryActions[].background] - Optional background color
+ * @param {string} [options.secondaryActions[].color] - Optional text/icon color
  * @returns {Promise<Object|null>} Button controller with element and state methods
  */
 export async function createFloatingButton({
@@ -203,6 +211,7 @@ export async function createFloatingButton({
   enableDismiss = true,
   showDetectionHint = false,
   detectionHintText = '',
+  secondaryActions = [],
 }) {
   // Check if button already exists
   const existing = document.getElementById(id);
@@ -328,30 +337,120 @@ export async function createFloatingButton({
     button.appendChild(hintBadge);
   }
 
-  // Create dismiss button (hidden by default)
-  const dismissBtn = document.createElement('div');
-  dismissBtn.className = 'extractmd-dismiss-btn';
-  dismissBtn.innerHTML = '×';
+  const normalizedSecondaryActions = Array.isArray(secondaryActions)
+    ? secondaryActions
+        .filter((action) => action && typeof action.onClick === 'function')
+        .slice(0, MAX_SECONDARY_ACTIONS)
+    : [];
+  const hasSecondaryActions = normalizedSecondaryActions.length > 0;
+  const hasDismissAction = Boolean(domain && enableDismiss);
+  const hasHoverActions = hasDismissAction || hasSecondaryActions;
 
-  // Set dismiss button styles individually
-  const ds = dismissBtn.style;
-  ds.position = 'absolute';
-  ds.top = '-6px';
-  ds.right = '-6px';
-  ds.width = '18px';
-  ds.height = '18px';
-  ds.borderRadius = '50%';
-  ds.background = colors.error;
-  ds.color = 'white';
-  ds.fontSize = '14px';
-  ds.lineHeight = '18px';
-  ds.textAlign = 'center';
-  ds.cursor = 'pointer';
-  ds.display = 'none';
-  ds.zIndex = '10001';
-  ds.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-  ds.fontWeight = 'bold';
-  button.appendChild(dismissBtn);
+  const hoverActionsContainer = document.createElement('div');
+  hoverActionsContainer.className = 'extractmd-hover-actions';
+  const hs = hoverActionsContainer.style;
+  hs.position = 'absolute';
+  hs.inset = '0';
+  hs.display = 'none';
+  hs.pointerEvents = 'none';
+  hs.zIndex = '10001';
+
+  const createHoverActionButton = ({
+    icon = '•',
+    title = 'Action',
+    background = 'rgba(79, 70, 229, 0.95)',
+    color = 'white',
+    className = 'extractmd-hover-action-btn',
+    corner = {},
+    onClick: onActionClick,
+  }) => {
+    const actionBtn = document.createElement('button');
+    actionBtn.type = 'button';
+    actionBtn.className = className;
+    actionBtn.innerHTML = icon;
+    const as = actionBtn.style;
+    const actionSize = Math.max(18, Math.round(sizeConfig.size * 0.45));
+    const cornerOffset = Math.round(actionSize * 0.55);
+    as.width = `${actionSize}px`;
+    as.height = `${actionSize}px`;
+    as.borderRadius = '50%';
+    as.background = background;
+    as.color = color;
+    as.fontSize = `${Math.max(12, Math.round(actionSize * 0.7))}px`;
+    as.lineHeight = `${actionSize}px`;
+    as.textAlign = 'center';
+    as.cursor = 'pointer';
+    as.display = 'inline-flex';
+    as.alignItems = 'center';
+    as.justifyContent = 'center';
+    as.padding = '0';
+    as.border = 'none';
+    as.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+    as.fontWeight = '700';
+    as.position = 'absolute';
+    // Container uses pointer-events: none so the main FAB stays clickable; each
+    // corner control opts in to receive pointer events.
+    as.pointerEvents = 'auto';
+    if (corner.top !== undefined) as.top = `-${cornerOffset}px`;
+    if (corner.right !== undefined) as.right = `-${cornerOffset}px`;
+    if (corner.bottom !== undefined) as.bottom = `-${cornerOffset}px`;
+    if (corner.left !== undefined) as.left = `-${cornerOffset}px`;
+    actionBtn.setAttribute('aria-label', title);
+    actionBtn.title = title;
+    actionBtn.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      try {
+        await onActionClick();
+      } catch (error) {
+        console.error('[ExtractMD] Secondary action failed:', error);
+      }
+    });
+    return actionBtn;
+  };
+
+  const apiActionCorners = [
+    { top: '0', left: '0' }, // top-left
+    { bottom: '0', left: '0' }, // bottom-left
+    { bottom: '0', right: '0' }, // bottom-right
+  ];
+
+  normalizedSecondaryActions.forEach((action) => {
+    const buttonEl = createHoverActionButton({
+      icon: action.icon || '🚀',
+      title: action.title || 'Secondary action',
+      background: action.background || 'rgba(79, 70, 229, 0.95)',
+      color: action.color || 'white',
+      corner: apiActionCorners.shift() || { bottom: '0', right: '0' },
+      onClick: action.onClick,
+    });
+    hoverActionsContainer.appendChild(buttonEl);
+  });
+
+  if (hasDismissAction) {
+    const dismissButtonEl = createHoverActionButton({
+      icon: '×',
+      title: 'Dismiss for this domain',
+      background: colors.error,
+      color: 'white',
+      className: 'extractmd-dismiss-btn',
+      corner: { top: '0', right: '0' },
+      onClick: async () => {
+        await addDomainToIgnoreList(domain);
+
+        // Set global flag to prevent mutation observers from recreating the button
+        window.__extractmd_domain_ignored = true;
+
+        // Clear the copy function
+        window.copyExtractMD = null;
+
+        // Full cleanup via controller
+        controller.remove();
+      },
+    });
+    hoverActionsContainer.appendChild(dismissButtonEl);
+  }
+
+  button.appendChild(hoverActionsContainer);
 
   // Calculate initial position with saved offset applied
   const initialRight = DEFAULT_RIGHT + currentOffset.left;
@@ -396,14 +495,73 @@ export async function createFloatingButton({
   let hasMoved = false;
   let justFinishedDragging = false; // Flag to prevent click after drag
 
-  // Hover state for dismiss button
+  // Hover state for action buttons
   let hoverTimeout = null;
-  let isHovering = false;
+  let hoverHideTimeout = null;
+  let isHoveringButton = false;
+  let isHoveringActions = false;
+
+  const showHoverActions = () => {
+    if (!hasHoverActions) return;
+    hoverActionsContainer.style.display = 'block';
+  };
+
+  const hideHoverActions = () => {
+    hoverActionsContainer.style.display = 'none';
+  };
+
+  const applyHoverVisual = () => {
+    button.style.opacity = '1';
+    button.style.transform = 'scale(1.05)';
+
+    if (isGlass) {
+      button.style.background = glassHoverBg;
+      button.style.boxShadow = glassHoverBoxShadow;
+    } else {
+      button.style.background = colors.accentHover;
+      button.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
+    }
+  };
+
+  const applyIdleVisual = () => {
+    button.style.opacity = idleOpacity.toString();
+    button.style.transform = 'scale(1)';
+
+    if (isGlass) {
+      button.style.background = glassBg;
+      button.style.boxShadow = glassBoxShadow;
+    } else {
+      button.style.background = colors.accent;
+      button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    }
+  };
+
+  const clearHoverTimers = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+    if (hoverHideTimeout) {
+      clearTimeout(hoverHideTimeout);
+      hoverHideTimeout = null;
+    }
+  };
+
+  const scheduleHoverActionsHide = () => {
+    if (button.dataset.processing) return;
+    if (isHoveringButton || isHoveringActions) return;
+    clearHoverTimers();
+    hoverHideTimeout = setTimeout(() => {
+      if (isHoveringButton || isHoveringActions) return;
+      hideHoverActions();
+      applyIdleVisual();
+    }, HOVER_HIDE_DELAY_MS);
+  };
 
   // Mouse down - start potential drag (only if dragging is enabled)
   button.addEventListener('mousedown', (e) => {
     if (!enableDrag) return; // Dragging disabled
-    if (e.target === dismissBtn) return; // Don't start drag on dismiss button
+    if (hoverActionsContainer.contains(e.target)) return; // Don't start drag on action buttons
     if (button.dataset.processing) return;
 
     isDragging = true;
@@ -490,7 +648,7 @@ export async function createFloatingButton({
 
   // Click handler - only trigger if not dragging
   button.addEventListener('click', (e) => {
-    if (e.target === dismissBtn) return; // Don't trigger on dismiss button
+    if (hoverActionsContainer.contains(e.target)) return; // Don't trigger on action buttons
     if (button.dataset.processing) return;
 
     // If we just finished dragging, don't trigger click
@@ -502,23 +660,15 @@ export async function createFloatingButton({
   // Hover effects
   button.addEventListener('mouseenter', () => {
     if (!button.dataset.processing) {
-      isHovering = true;
-      button.style.opacity = '1';
-      button.style.transform = 'scale(1.05)';
+      isHoveringButton = true;
+      clearHoverTimers();
+      applyHoverVisual();
 
-      if (isGlass) {
-        button.style.background = glassHoverBg;
-        button.style.boxShadow = glassHoverBoxShadow;
-      } else {
-        button.style.background = colors.accentHover;
-        button.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
-      }
-
-      // Start timer to show dismiss button (only if dismiss is enabled)
-      if (domain && enableDismiss) {
+      // Start timer to show hover actions
+      if (hasHoverActions) {
         hoverTimeout = setTimeout(() => {
-          if (isHovering && !isDragging) {
-            dismissBtn.style.display = 'block';
+          if ((isHoveringButton || isHoveringActions) && !isDragging) {
+            showHoverActions();
           }
         }, HOVER_DELAY_MS);
       }
@@ -526,47 +676,21 @@ export async function createFloatingButton({
   });
 
   button.addEventListener('mouseleave', () => {
-    isHovering = false;
-
-    // Clear hover timeout
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      hoverTimeout = null;
-    }
-
-    // Hide dismiss button
-    dismissBtn.style.display = 'none';
-
-    if (!button.dataset.processing) {
-      button.style.opacity = idleOpacity.toString();
-      button.style.transform = 'scale(1)';
-
-      if (isGlass) {
-        button.style.background = glassBg;
-        button.style.boxShadow = glassBoxShadow;
-      } else {
-        button.style.background = colors.accent;
-        button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-      }
-    }
+    isHoveringButton = false;
+    scheduleHoverActionsHide();
   });
 
-  // Dismiss button click handler
-  dismissBtn.addEventListener('click', async (e) => {
-    e.stopPropagation();
+  hoverActionsContainer.addEventListener('mouseenter', () => {
+    if (button.dataset.processing) return;
+    isHoveringActions = true;
+    clearHoverTimers();
+    showHoverActions();
+    applyHoverVisual();
+  });
 
-    if (domain) {
-      await addDomainToIgnoreList(domain);
-
-      // Set global flag to prevent mutation observers from recreating the button
-      window.__extractmd_domain_ignored = true;
-
-      // Clear the copy function
-      window.copyExtractMD = null;
-
-      // Full cleanup via controller
-      controller.remove();
-    }
+  hoverActionsContainer.addEventListener('mouseleave', () => {
+    isHoveringActions = false;
+    scheduleHoverActionsHide();
   });
 
   // Helper to update icon
@@ -641,7 +765,10 @@ export async function createFloatingButton({
       button.style.cursor = 'not-allowed';
       button.style.opacity = '1';
       button.style.transform = 'scale(1)';
-      dismissBtn.style.display = 'none';
+      isHoveringButton = false;
+      isHoveringActions = false;
+      clearHoverTimers();
+      hideHoverActions();
     },
 
     /**
@@ -677,6 +804,9 @@ export async function createFloatingButton({
       button.style.cursor = 'pointer';
       button.style.opacity = idleOpacity.toString();
       button.style.transform = 'scale(1)';
+      if (!isHoveringButton && !isHoveringActions) {
+        hideHoverActions();
+      }
     },
 
     /**
@@ -708,6 +838,9 @@ export async function createFloatingButton({
       }
       if (hoverTimeout) {
         clearTimeout(hoverTimeout);
+      }
+      if (hoverHideTimeout) {
+        clearTimeout(hoverHideTimeout);
       }
       if (button.parentNode) {
         button.parentNode.removeChild(button);

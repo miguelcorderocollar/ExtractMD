@@ -17,6 +17,8 @@ Your goal is to transform ExtractMD from a collection of monolithic scripts into
 7. **Changelog Discipline (Extension-Only):** Document relevant extension updates in `CHANGELOG.md` (usually under `## [Unreleased]`) as part of feature work. Do not include contribution-process/docs changes (for example templates or `CONTRIBUTING.md`) and do not include website-only updates.
 8. **Unreleased Changelog Consolidation:** Keep `## [Unreleased]` concise by merging iterative updates for the same topic (for example, feature + follow-up fix) into one entry instead of duplicating details across sections.
 9. **Sanitized Test Content:** Always use fictional/synthetic names, handles, quotes, transcripts, and IDs in fixtures, temp samples, and test assertions. Never copy real-world personal or sensitive content into test assets.
+10. **Options/Settings Notifications:** For options/settings UI feedback (including validation errors), use the compact fly-in toast pattern (`showSaveToast`) instead of the legacy bottom status line. Choose message, icon variant, and semantic color (`success`/`error`) to match the action context.
+11. **Unreleased Feature Notes (Concise):** While a feature is still unreleased, keep it documented as a concise single entry under `## [Unreleased]` (usually in `### Added`) and fold follow-up fixes/tweaks into that same entry instead of adding separate `Fixed`/`Changed` churn.
 
 ## Project Vision (ExtractMD 2.0)
 

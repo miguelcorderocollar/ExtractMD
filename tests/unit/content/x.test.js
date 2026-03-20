@@ -280,5 +280,20 @@ describe('X content extractor', () => {
     expect(result.markdown).toContain('- **Likes:** 789');
     expect(result.markdown).toContain('- **Bookmarks:** 10');
     expect(result.markdown).toContain('- **Views:** 1112');
+    expect(result.metricVariables).toEqual({
+      comments: '123',
+      reposts: '456',
+      likes: '789',
+      bookmarks: '10',
+      views: '1112',
+    });
+    expect(result.apiVariables.comments).toBe(123);
+    expect(result.apiVariables.reposts).toBe(456);
+    expect(result.apiVariables.likes).toBe(789);
+    expect(result.apiVariables.bookmarks).toBe(10);
+    expect(result.apiVariables.views).toBe(1112);
+    expect(result.apiVariables.comments_text).toBe('123');
+    expect(result.apiVariables.reposts_text).toBe('456');
+    expect(result.apiVariables.content).toContain('Building in public');
   });
 });

@@ -29,6 +29,80 @@ const X_SETTINGS_DEFAULTS = {
 
 export { X_SETTINGS_DEFAULTS };
 
+function toMetricVariables(metrics) {
+  const metricVariables = {
+    comments: '',
+    reposts: '',
+    likes: '',
+    bookmarks: '',
+    views: '',
+  };
+
+  metrics.forEach(({ label, value }) => {
+    const key = String(label || '')
+      .trim()
+      .toLowerCase();
+    if (key === 'comments') metricVariables.comments = value;
+    if (key === 'reposts') metricVariables.reposts = value;
+    if (key === 'likes') metricVariables.likes = value;
+    if (key === 'bookmarks') metricVariables.bookmarks = value;
+    if (key === 'views') metricVariables.views = value;
+  });
+
+  return metricVariables;
+}
+
+function parseCompactMetricNumber(value) {
+  const normalized = String(value || '')
+    .trim()
+    .replace(/,/g, '');
+  if (!normalized) return 0;
+
+  const match = normalized.match(/^(\d+(?:\.\d+)?)([kKmMbB])?$/);
+  if (!match) return 0;
+
+  const base = Number.parseFloat(match[1]);
+  if (Number.isNaN(base)) return 0;
+
+  const suffix = match[2] ? match[2].toLowerCase() : '';
+  const multiplier =
+    suffix === 'k' ? 1_000 : suffix === 'm' ? 1_000_000 : suffix === 'b' ? 1_000_000_000 : 1;
+  return Math.round(base * multiplier);
+}
+
+export function buildXApiVariables({
+  title,
+  displayName,
+  handle,
+  date,
+  link,
+  bodyMarkdown,
+  metricVariables,
+}) {
+  const author = handle ? `${displayName || handle} (${handle})` : displayName || handle || '';
+
+  return {
+    title: title || '',
+    author,
+    display_name: displayName || '',
+    handle: handle || '',
+    date: date || '',
+    link: link || '',
+    content: bodyMarkdown || '',
+    comments: parseCompactMetricNumber(metricVariables.comments),
+    reposts: parseCompactMetricNumber(metricVariables.reposts),
+    likes: parseCompactMetricNumber(metricVariables.likes),
+    bookmarks: parseCompactMetricNumber(metricVariables.bookmarks),
+    views: parseCompactMetricNumber(metricVariables.views),
+    comments_text: metricVariables.comments || '',
+    reposts_text: metricVariables.reposts || '',
+    likes_text: metricVariables.likes || '',
+    bookmarks_text: metricVariables.bookmarks || '',
+    views_text: metricVariables.views || '',
+    extracted_at: new Date().toISOString(),
+  };
+}
+
 export function extractXMarkdown(settings = {}) {
   const effectiveSettings = { ...X_SETTINGS_DEFAULTS, ...settings };
   const container = findPrimaryXContainer(document);
@@ -42,6 +116,8 @@ export function extractXMarkdown(settings = {}) {
   const link = extractPermalink();
   const bodyMarkdown = extractMainBodyMarkdown(container);
   const title = getTitleFromContent(container, bodyMarkdown);
+  const metrics = extractMetricsContext(container);
+  const metricVariables = toMetricVariables(metrics);
   const isLongformContent = isXArticlePage() || isLongformPost(container);
   const includeTitleHeading = isLongformContent;
   const headerImageMarkdown =
@@ -65,7 +141,6 @@ export function extractXMarkdown(settings = {}) {
     markdown += `**Link:** ${link}\n`;
   }
   if (effectiveSettings.xIncludeMetricsContext) {
-    const metrics = extractMetricsContext(container);
     markdown += `- **Extracted At:** ${new Date().toISOString()}\n`;
     metrics.forEach(({ label, value }) => {
       markdown += `- **${label}:** ${value}\n`;
@@ -116,6 +191,16 @@ export function extractXMarkdown(settings = {}) {
     }
   }
 
+  const apiVariables = buildXApiVariables({
+    title,
+    displayName,
+    handle,
+    date,
+    link,
+    bodyMarkdown,
+    metricVariables,
+  });
+
   return {
     markdown: markdown.replace(/\n{3,}/g, '\n\n').trim(),
     title,
@@ -123,5 +208,9 @@ export function extractXMarkdown(settings = {}) {
     handle,
     date,
     link,
+    bodyMarkdown,
+    metrics,
+    metricVariables,
+    apiVariables,
   };
 }
