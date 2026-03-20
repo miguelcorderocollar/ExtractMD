@@ -9,10 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Generic API output**: Define one or more HTTP integrations (URL, method, headers, body) and send Markdown extractions to your own services. Templates support placeholders; sensitive values live in separate secret fields.
-- **Per-source configuration**: Turn each integration on or off per extractor (e.g. articles, YouTube, X, universal) and map variables to the fields each source provides, so one integration can behave correctly everywhere it is enabled.
-- **Consistent send workflow**: Content scripts share a single API-send path for notifications, errors, and floating-button feedback after a successful or failed request.
-- **Options UX**: API settings include clearer integration management (e.g. confirmation before removing an integration or clearing usage statistics) and small polish so empty states and usage KPIs stay readable as you add integrations.
+- **Generic API output**: Send extractions to custom HTTP endpoints (URL, method, headers, body) with placeholder templates; sensitive values use separate secret fields.
+- **Per-source configuration**: Enable each integration per extractor (articles, YouTube, X, universal) and map variables to the fields each source provides.
 
 ## [1.2.0] - 2026-03-15
 

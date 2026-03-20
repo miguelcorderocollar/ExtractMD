@@ -824,6 +824,39 @@ describe('FloatingButton component', () => {
       vi.useRealTimers();
     });
 
+    it('keeps main FAB clickable while dismiss and secondary hover actions are visible', async () => {
+      vi.useFakeTimers();
+      const onClick = vi.fn();
+      const onSecondaryAction = vi.fn().mockResolvedValue(undefined);
+      const controller = await createFloatingButton({
+        onClick,
+        domain: 'example.test',
+        secondaryActions: [
+          {
+            icon: '🚀',
+            title: 'Send to API',
+            onClick: onSecondaryAction,
+          },
+        ],
+      });
+      controller.appendTo(document.body);
+
+      controller.element.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      vi.advanceTimersByTime(600);
+
+      const actionsContainer = controller.element.querySelector('.extractmd-hover-actions');
+      expect(actionsContainer.style.display).toBe('block');
+      expect(actionsContainer.style.pointerEvents).toBe('none');
+
+      const content = controller.element.querySelector('.extractmd-button-content');
+      content.click();
+
+      expect(onClick).toHaveBeenCalledTimes(1);
+      expect(onSecondaryAction).not.toHaveBeenCalled();
+
+      vi.useRealTimers();
+    });
+
     it('caps secondary hover actions to three buttons', async () => {
       vi.useFakeTimers();
       const onClick = vi.fn();

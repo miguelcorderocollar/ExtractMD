@@ -388,6 +388,9 @@ export async function createFloatingButton({
     as.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
     as.fontWeight = '700';
     as.position = 'absolute';
+    // Container uses pointer-events: none so the main FAB stays clickable; each
+    // corner control opts in to receive pointer events.
+    as.pointerEvents = 'auto';
     if (corner.top !== undefined) as.top = `-${cornerOffset}px`;
     if (corner.right !== undefined) as.right = `-${cornerOffset}px`;
     if (corner.bottom !== undefined) as.bottom = `-${cornerOffset}px`;
@@ -501,12 +504,10 @@ export async function createFloatingButton({
   const showHoverActions = () => {
     if (!hasHoverActions) return;
     hoverActionsContainer.style.display = 'block';
-    hoverActionsContainer.style.pointerEvents = 'auto';
   };
 
   const hideHoverActions = () => {
     hoverActionsContainer.style.display = 'none';
-    hoverActionsContainer.style.pointerEvents = 'none';
   };
 
   const applyHoverVisual = () => {
