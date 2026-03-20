@@ -6,11 +6,11 @@
     <title>ExtractMD - Convert Any Webpage to Markdown</title>
     <meta
       name="description"
-      content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube transcripts, Hacker News, X (Twitter) posts, and articles, with output actions to copy, download, or send via API Output Mode."
+      content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube transcripts, Hacker News, X (Twitter) posts, and articles."
     />
     <meta
       name="keywords"
-      content="markdown, chrome extension, youtube transcript, hacker news, x twitter, article extractor, clipboard, api integration, automation"
+      content="markdown, chrome extension, youtube transcript, hacker news, x twitter, article extractor, clipboard"
     />
     <meta name="author" content="ExtractMD" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
@@ -35,7 +35,7 @@
     <meta property="og:title" content="ExtractMD - Convert Any Webpage to Markdown" />
     <meta
       property="og:description"
-      content="Extract Markdown from YouTube, Hacker News, X, and articles, then copy, download, or send via API Output Mode."
+      content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, X (Twitter), and articles."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://extractmd.miguelcorderocollar.com" />
@@ -53,7 +53,7 @@
     <meta name="twitter:title" content="ExtractMD - Convert Any Webpage to Markdown" />
     <meta
       name="twitter:description"
-      content="Extract Markdown from YouTube, Hacker News, X, and articles, then copy, download, or send via API Output Mode."
+      content="Extract and copy content as Markdown from any webpage. Built-in support for YouTube, Hacker News, X (Twitter), and articles."
     />
     <meta
       name="twitter:image"
@@ -85,7 +85,7 @@
           "ratingValue": "5",
           "ratingCount": "1"
         },
-        "description": "Extract and copy content as Markdown from any webpage. Built-in support for YouTube transcripts, Hacker News, X (Twitter) posts, and articles, with output actions to copy, download, or send via API Output Mode.",
+        "description": "Extract and copy content as Markdown from any webpage. Built-in support for YouTube transcripts, Hacker News, X (Twitter) posts, and articles.",
         "url": "https://extractmd.miguelcorderocollar.com",
         "screenshot": "https://extractmd.miguelcorderocollar.com/images/promotional-banner.png",
         "featureList": [
@@ -94,11 +94,9 @@
           "X (Twitter) post and article extraction",
           "Article extraction",
           "Universal webpage extraction",
-          "Output actions: copy, download, or API send",
-          "API Output Mode with custom endpoints and templates",
           "One-click Markdown conversion",
           "Keyboard shortcuts",
-          "Privacy-first local extraction with optional API output"
+          "Privacy-first (no data collection)"
         ]
       }
     </script>
@@ -186,8 +184,7 @@
         <h1>Convert Any Webpage<br />to Markdown</h1>
         <p class="hero-tagline">
           Extract and copy content as clean, formatted Markdown with a single click. Perfect for
-          notes, documentation, and AI tools, with output actions to copy, download, or send via
-          API.
+          notes, documentation, and AI tools.
         </p>
         <div class="hero-cta">
           <div class="install-btn-wrapper">
@@ -277,7 +274,7 @@
           <p>Optimized extractors for popular platforms</p>
         </div>
 
-        <div class="feature-grid feature-grid--layout-3-2">
+        <div class="feature-grid">
           <!-- YouTube -->
           <div class="feature-card">
             <div class="feature-icon">
@@ -391,64 +388,8 @@
           </div>
           <div class="step">
             <div class="step-number">3</div>
-            <h3>Use Output Action</h3>
-            <p>Copy to clipboard, auto-download as .md, or send to your API workflow</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Output Actions -->
-    <section class="features" id="output-actions">
-      <div class="container">
-        <div class="section-header">
-          <h2>Output Actions</h2>
-          <p>Choose how extracted Markdown fits your workflow</p>
-        </div>
-
-        <div class="feature-grid feature-grid--cols-3">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <!-- Source: extension/images/icons/copy.svg (simplified version) -->
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-            </div>
-            <h3>Copy to Clipboard</h3>
-            <p>Instantly copy clean Markdown and paste it into notes, docs, chats, or AI tools.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">
-              <!-- Source: extension/images/icons/download.svg -->
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-            </div>
-            <h3>Download as .md</h3>
-            <p>
-              Save output as a Markdown file automatically when content is too long for your target
-              app.
-            </p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">
-              <!-- Source: extension/images/icons/api.svg (simplified version) -->
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                <path d="M4 12h16" />
-                <path d="M14 6l6 6-6 6" />
-                <circle cx="6" cy="12" r="2" />
-              </svg>
-            </div>
-            <h3>Send via API</h3>
-            <p>
-              Use API Output Mode to send user-initiated requests to your own endpoint with JSON
-              templates, variables, and per-source availability.
-            </p>
+            <h3>Paste</h3>
+            <p>Markdown is copied to your clipboard</p>
           </div>
         </div>
       </div>
@@ -462,7 +403,7 @@
           <p>Everything you need for efficient content extraction</p>
         </div>
 
-        <div class="feature-grid feature-grid--cols-2">
+        <div class="feature-grid">
           <div class="feature-card">
             <div class="feature-icon">
               <!-- Source: extension/images/icons/settings.svg (simplified version) -->
@@ -518,8 +459,7 @@
             </div>
             <h3>Highly Configurable</h3>
             <p>
-              Theme, button position, source toggles, API Output Mode integrations, content
-              selection mode, and more.
+              Theme, button position, per-integration toggles, content selection mode, and more.
             </p>
           </div>
         </div>
@@ -531,7 +471,7 @@
       <div class="container">
         <div class="section-header">
           <h2>Privacy First</h2>
-          <p>Local-first extraction with optional API output</p>
+          <p>Your data never leaves your browser</p>
         </div>
 
         <div class="privacy-terminal">
@@ -546,9 +486,9 @@
               <span class="config-value config-false">false</span>
             </div>
             <div class="config-line">
-              <span class="config-key">api_output_mode</span>
+              <span class="config-key">external_servers</span>
               <span class="config-colon">:</span>
-              <span class="config-value config-true">optional</span>
+              <span class="config-value config-false">false</span>
             </div>
             <div class="config-line">
               <span class="config-key">analytics</span>
@@ -566,7 +506,7 @@
               <span class="config-value config-true">true</span>
             </div>
             <div class="config-line">
-              <span class="config-key">local_first</span>
+              <span class="config-key">local_only</span>
               <span class="config-colon">:</span>
               <span class="config-value config-true">true</span>
             </div>

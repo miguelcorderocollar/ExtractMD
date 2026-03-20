@@ -123,37 +123,26 @@
           <h1>Privacy Policy</h1>
           <p class="privacy-meta">
             <strong>Effective Date:</strong> January 2026<br />
-            <strong>Last Updated:</strong> March 2026
+            <strong>Last Updated:</strong> January 2026
           </p>
 
           <h2>Overview</h2>
           <p>
             ExtractMD is a Chrome browser extension that extracts and copies content as Markdown
-            from web pages including YouTube, Hacker News, X (Twitter), and general articles. By
-            default, extraction runs locally in your browser. If you enable API Output Mode, you can
-            optionally send extracted output to endpoints you configure. This privacy policy
-            explains how ExtractMD handles user data.
+            from web pages including YouTube, Hacker News, X (Twitter), and general articles. This
+            privacy policy explains how ExtractMD handles user data.
           </p>
 
           <h2>Data Collection</h2>
-          <p>
-            <strong
-              >ExtractMD does NOT collect, sell, or share personal data, and does not run data
-              collection servers.</strong
-            >
-          </p>
+          <p><strong>ExtractMD does NOT collect, transmit, or share any personal data.</strong></p>
 
           <h3>What We Don't Do</h3>
           <ul class="no-collect-list">
-            <li>We do NOT send your data to ExtractMD-operated servers</li>
+            <li>We do NOT send any data to external servers</li>
             <li>We do NOT collect personal information</li>
             <li>We do NOT use analytics or tracking services</li>
             <li>We do NOT share data with third parties</li>
             <li>We do NOT monitor your browsing activity</li>
-            <li>
-              We do NOT send extracted content anywhere unless you explicitly trigger an output
-              action
-            </li>
           </ul>
 
           <h3>What We Do Store Locally</h3>
@@ -163,31 +152,22 @@
             <li>
               <strong>User Preferences & Settings</strong><br />
               Theme preferences (light/dark mode), integration visibility settings (YouTube, Hacker
-              News, X, Articles, Universal), output format preferences, floating button position and
-              behavior, API Output Mode integration settings, ignored domains list.
+              News, Articles, Universal), output format preferences, floating button position and
+              behavior, ignored domains list.
             </li>
             <li>
               <strong>Usage Statistics (KPIs)</strong><br />
               Number of extractions performed (by type), token counts for extracted content, last
               extraction timestamp. These statistics are stored locally and are never transmitted.
             </li>
-            <li>
-              <strong>API Secrets (Optional)</strong><br />
-              If you use API Output Mode, integration secrets are stored only in local extension
-              storage on your device and are not synced to your Chrome account.
-            </li>
           </ul>
 
-          <p>ExtractMD uses Chrome storage APIs in two ways:</p>
+          <p>
+            All data is stored using Chrome's built-in <code>chrome.storage.sync</code> API, which
+            means:
+          </p>
           <ul>
-            <li>
-              Most preferences use <code>chrome.storage.sync</code> and can sync through your
-              personal Chrome account
-            </li>
-            <li>
-              Optional API secrets use <code>chrome.storage.local</code> and stay on your current
-              device
-            </li>
+            <li>Data stays on your device or syncs to your personal Chrome account</li>
             <li>Data is encrypted in transit when syncing between your devices</li>
             <li>Only you have access to your data</li>
           </ul>
@@ -197,24 +177,9 @@
           <ol>
             <li>The extension reads the visible content of the current web page</li>
             <li>Content is processed entirely within your browser</li>
-            <li>Extracted Markdown is copied to your clipboard or downloaded as a file</li>
-            <li>
-              If API Output Mode is enabled and you trigger API send, content is sent directly to
-              your configured endpoint
-            </li>
-            <li><strong>No content is routed through ExtractMD servers</strong></li>
+            <li>Extracted Markdown is copied to your clipboard</li>
+            <li><strong>No content is ever sent to external servers</strong></li>
           </ol>
-
-          <h3>Optional API Output Mode</h3>
-          <p>If you choose to enable API Output Mode:</p>
-          <ul>
-            <li>You configure the destination URL and request templates</li>
-            <li>Requests are user-initiated from extension actions</li>
-            <li>ExtractMD does not proxy, inspect, or retain API payloads</li>
-            <li>
-              The destination API's own privacy policy governs what that service does with data
-            </li>
-          </ul>
 
           <h2>Permissions Explained</h2>
           <p>ExtractMD requests the following permissions:</p>
@@ -245,10 +210,7 @@
               </tr>
               <tr>
                 <td><code>&lt;all_urls&gt;</code></td>
-                <td>
-                  Enable Universal extraction on any website and optional API send to
-                  user-configured HTTPS destinations
-                </td>
+                <td>Enable the Universal Article Extractor to work on any website</td>
               </tr>
             </tbody>
           </table>
@@ -256,8 +218,8 @@
           <h3>Why <code>&lt;all_urls&gt;</code> Permission?</h3>
           <p>
             ExtractMD includes a Universal Article Extractor that allows you to extract Markdown
-            from <strong>any webpage</strong>, not just YouTube, Hacker News, and X. It also allows
-            optional API sends to endpoints you configure. This enables extraction from:
+            from <strong>any webpage</strong>, not just YouTube, Hacker News, and X. This enables
+            extraction from:
           </p>
           <ul>
             <li>Blog posts</li>
@@ -281,8 +243,8 @@
               extension popup
             </li>
             <li>
-              <strong>Extracted Content:</strong> Used in-memory for copy/download/API actions and
-              not persistently stored by ExtractMD
+              <strong>Extracted Content:</strong> Only exists in your clipboard; not stored by the
+              extension
             </li>
           </ul>
 
@@ -306,12 +268,9 @@
 
           <h2>Data Security</h2>
           <ul>
-            <li>Default extraction and formatting happen locally in your browser</li>
-            <li>ExtractMD does not run external collection servers or analytics pipelines</li>
-            <li>
-              Optional API requests are sent only to endpoints you configure and only when you
-              trigger them
-            </li>
+            <li>All data processing happens locally in your browser</li>
+            <li>No data is transmitted over the internet (except Chrome's built-in sync)</li>
+            <li>No external servers or databases are used</li>
             <li>The extension source code is open for review</li>
           </ul>
 
@@ -361,9 +320,9 @@
           <hr style="margin: 48px 0 24px; border: none; border-top: 1px solid var(--border)" />
 
           <p style="font-size: 14px; color: var(--text-muted); text-align: center">
-            <strong>Summary:</strong> ExtractMD is local-first and does not collect personal data.
-            Your settings and usage statistics remain under your control, and optional API Output
-            Mode only sends data to destinations you explicitly configure and trigger.
+            <strong>Summary:</strong> ExtractMD processes content entirely in your browser. No
+            personal data is collected, transmitted, or shared. Your settings and usage statistics
+            are stored locally and are fully under your control.
           </p>
         </div>
       </div>

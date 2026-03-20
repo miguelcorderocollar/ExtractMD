@@ -4,11 +4,6 @@
 import { showNotification } from './utils.js';
 import { createFloatingButton } from './components/FloatingButton.js';
 import { handleCopyOrDownload } from './handlers/copyHandler.js';
-import { runIntegrationApiSend } from './handlers/apiSendWorkflow.js';
-import {
-  computeEnabledApiProfileSignature,
-  getSecondaryApiActions,
-} from './handlers/apiSecondaryActions.js';
 import { isXPostPage, isXArticlePage } from './x/detection.js';
 import { findPrimaryXContainer, waitForPrimaryXContainer } from './x/container.js';
 import { extractXMarkdown, X_SETTINGS_DEFAULTS } from './x/extractors.js';
@@ -17,12 +12,8 @@ export { isXPostPage, isXArticlePage, findPrimaryXContainer, waitForPrimaryXCont
 export { extractXMarkdown };
 
 let isProcessing = false;
-let isApiProcessing = false;
 let xObserver = null;
 let floatingButtonController = null;
-/** Sorted profile ids for X API hover actions; used to detect settings changes without DOM mutations */
-let floatingButtonXApiSignature = '';
-let xStorageListenerAttached = false;
 
 export async function performXCopy(updateButton = false) {
   if (isProcessing) return;
@@ -77,36 +68,6 @@ export async function performXCopy(updateButton = false) {
   }
 }
 
-export async function performXApiSend({ updateButton = false, profileId = '' } = {}) {
-  await runIntegrationApiSend({
-    integration: 'x',
-    profileId,
-    updateButton,
-    defaultErrorMessage: 'Failed to send X content via API.',
-    getIsProcessing: () => isApiProcessing,
-    setIsProcessing: (value) => {
-      isApiProcessing = value;
-    },
-    getFloatingButtonController: () => floatingButtonController,
-    onError: (error) => {
-      console.error('[ExtractMD] X API send failed:', error);
-    },
-    prepareVariables: async () => {
-      const settings = await new Promise((resolve) => {
-        chrome.storage.sync.get(X_SETTINGS_DEFAULTS, resolve);
-      });
-
-      const readyContainer = await waitForPrimaryXContainer({ timeoutMs: 7000 });
-      if (!readyContainer) {
-        throw new Error('X content is still loading. Please try again in a moment.');
-      }
-
-      const result = extractXMarkdown(settings);
-      return result.apiVariables;
-    },
-  });
-}
-
 async function manageFloatingButtonForX() {
   if (window.__extractmd_domain_ignored) {
     if (floatingButtonController) {
@@ -133,37 +94,6 @@ async function manageFloatingButtonForX() {
     return;
   }
 
-  const buttonSettings = await new Promise((resolve) => {
-    chrome.storage.sync.get(
-      {
-        floatingButtonEnableDrag: true,
-        floatingButtonEnableDismiss: true,
-        apiOutputEnabled: false,
-        apiProfilesJson: '[]',
-      },
-      resolve
-    );
-  });
-
-  const apiSignature = computeEnabledApiProfileSignature({
-    apiProfilesJson: buttonSettings.apiProfilesJson,
-    apiOutputEnabled: buttonSettings.apiOutputEnabled,
-    integration: 'x',
-  });
-
-  const existingDomButton = document.getElementById('extractmd-floating-button');
-  if (existingDomButton && floatingButtonController) {
-    if (apiSignature !== floatingButtonXApiSignature) {
-      floatingButtonController.remove();
-      floatingButtonController = null;
-    } else {
-      floatingButtonController.show();
-      return;
-    }
-  } else if (existingDomButton && !floatingButtonController) {
-    existingDomButton.remove();
-  }
-
   if (document.getElementById('extractmd-floating-button')) {
     if (floatingButtonController) {
       floatingButtonController.show();
@@ -177,22 +107,20 @@ async function manageFloatingButtonForX() {
     floatingButtonController = null;
   }
 
-  floatingButtonXApiSignature = apiSignature;
-
-  const secondaryActions = getSecondaryApiActions({
-    apiProfilesJson: buttonSettings.apiProfilesJson,
-    apiOutputEnabled: buttonSettings.apiOutputEnabled,
-    integration: 'x',
-    onProfileAction: async (profileId) => {
-      await performXApiSend({ updateButton: true, profileId });
-    },
+  const buttonSettings = await new Promise((resolve) => {
+    chrome.storage.sync.get(
+      {
+        floatingButtonEnableDrag: true,
+        floatingButtonEnableDismiss: true,
+      },
+      resolve
+    );
   });
 
   floatingButtonController = await createFloatingButton({
     domain: window.location.hostname,
     enableDrag: buttonSettings.floatingButtonEnableDrag,
     enableDismiss: buttonSettings.floatingButtonEnableDismiss,
-    secondaryActions,
     onClick: async () => {
       await performXCopy(true);
     },
@@ -223,14 +151,5 @@ export function initXFeatures() {
     if (items.enableXIntegration === false) return;
     setupXMutationObserver();
     manageFloatingButtonForX();
-
-    if (!xStorageListenerAttached && chrome.storage?.onChanged) {
-      xStorageListenerAttached = true;
-      chrome.storage.onChanged.addListener((changes, areaName) => {
-        if (areaName !== 'sync') return;
-        if (!changes.apiProfilesJson && !changes.apiOutputEnabled) return;
-        manageFloatingButtonForX();
-      });
-    }
   });
 }

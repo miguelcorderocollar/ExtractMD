@@ -16,12 +16,10 @@ export default defineConfig({
   plugins: [
     {
       name: 'svg-loader',
-      enforce: 'pre',
       load(id) {
-        const pathOnly = id.split('?')[0];
-        if (pathOnly.endsWith('.svg')) {
-          // Trim whitespace and newlines from SVG content (match esbuild `text` loader)
-          const svgContent = readFileSync(pathOnly, 'utf-8').trim();
+        if (id.endsWith('.svg')) {
+          // Trim whitespace and newlines from SVG content
+          const svgContent = readFileSync(id, 'utf-8').trim();
           return `export default ${JSON.stringify(svgContent)}`;
         }
       },

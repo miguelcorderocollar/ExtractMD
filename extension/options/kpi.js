@@ -1,14 +1,5 @@
 // KPI display and time-saved calculation for ExtractMD options page
 
-import {
-  apiIcon,
-  articleIcon,
-  commentsIcon,
-  hackernewsIcon,
-  universalIcon,
-  xIcon,
-  youtubeIcon,
-} from '../shared/icons.js';
 import { showStatus } from './ui.js';
 
 // Time estimates in seconds for each action type
@@ -63,16 +54,7 @@ export function calculateTimeSaved(stats) {
  * Render KPI counters in the options page with card layout
  * @param {Object} stats - Usage stats object
  */
-function kpiCard(iconSvg, title, label, value) {
-  return `
-        <div class="kpi-card" title="${title}">
-            <span class="kpi-card-icon" aria-hidden="true">${iconSvg}</span>
-            <div class="kpi-card-label">${label}</div>
-            <div class="kpi-card-value">${value}</div>
-        </div>`;
-}
-
-export function renderKpiCounters(stats, apiCallCount = 0) {
+export function renderKpiCounters(stats) {
   const kpiCounters = document.getElementById('kpi-counters');
   if (!kpiCounters) return;
 
@@ -82,17 +64,33 @@ export function renderKpiCounters(stats, apiCallCount = 0) {
   const hnNews = stats.hn_news || 0;
   const xPosts = stats.x_posts || 0;
   const universal = stats.universal || 0;
-  const totalApiCalls = Number(apiCallCount || 0);
 
-  kpiCounters.innerHTML = [
-    kpiCard(youtubeIcon, 'YouTube transcript copies', 'YouTube', youtube),
-    kpiCard(articleIcon, 'Article exports', 'Articles', articles),
-    kpiCard(commentsIcon, 'HN comments exports', 'HN Comments', hnComments),
-    kpiCard(hackernewsIcon, 'HN news exports', 'HN News', hnNews),
-    kpiCard(xIcon, 'X post/article exports', 'X', xPosts),
-    kpiCard(universalIcon, 'Universal page exports', 'Universal', universal),
-    kpiCard(apiIcon, 'Successful API requests sent from ExtractMD', 'API Calls', totalApiCalls),
-  ].join('');
+  kpiCounters.innerHTML = `
+        <div class="kpi-card" title="YouTube transcript copies">
+            <div class="kpi-card-label">YouTube</div>
+            <div class="kpi-card-value">${youtube}</div>
+        </div>
+        <div class="kpi-card" title="Article exports">
+            <div class="kpi-card-label">Articles</div>
+            <div class="kpi-card-value">${articles}</div>
+        </div>
+        <div class="kpi-card" title="HN comments exports">
+            <div class="kpi-card-label">HN Comments</div>
+            <div class="kpi-card-value">${hnComments}</div>
+        </div>
+        <div class="kpi-card" title="HN news exports">
+            <div class="kpi-card-label">HN News</div>
+            <div class="kpi-card-value">${hnNews}</div>
+        </div>
+        <div class="kpi-card" title="X post/article exports">
+            <div class="kpi-card-label">X</div>
+            <div class="kpi-card-value">${xPosts}</div>
+        </div>
+        <div class="kpi-card" title="Universal page exports">
+            <div class="kpi-card-label">Universal</div>
+            <div class="kpi-card-value">${universal}</div>
+        </div>
+    `;
 
   const totalSeconds = calculateTimeSaved(stats);
   const timeSavedElement = document.getElementById('kpi-time-saved');
@@ -110,8 +108,8 @@ export function renderKpiCounters(stats, apiCallCount = 0) {
  * Load and display KPI counters from storage
  */
 export function loadKpiCounters() {
-  chrome.storage.sync.get({ usageStats: {}, apiCallCount: 0 }, function (items) {
-    renderKpiCounters(items.usageStats || {}, items.apiCallCount || 0);
+  chrome.storage.sync.get({ usageStats: {} }, function (items) {
+    renderKpiCounters(items.usageStats || {});
   });
 }
 
@@ -127,13 +125,6 @@ export function initializeKpi() {
   // Set up clear button
   if (clearKpiBtn) {
     clearKpiBtn.addEventListener('click', function () {
-      if (
-        !confirm(
-          'Clear all usage statistics and API call counts? This cannot be undone. Your saved settings are not affected.'
-        )
-      ) {
-        return;
-      }
       chrome.storage.sync.set(
         {
           usageStats: {
@@ -144,7 +135,6 @@ export function initializeKpi() {
             x_posts: 0,
             universal: 0,
           },
-          apiCallCount: 0,
         },
         function () {
           loadKpiCounters();

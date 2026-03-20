@@ -10,18 +10,10 @@ import {
 } from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
-import { runIntegrationApiSend } from './handlers/apiSendWorkflow.js';
-import {
-  computeEnabledApiProfileSignature,
-  getSecondaryApiActions,
-} from './handlers/apiSecondaryActions.js';
 import { encode } from 'gpt-tokenizer';
 
 let floatingButtonController = null;
 let isProcessing = false;
-let isApiProcessing = false;
-let floatingButtonYouTubeApiSignature = '';
-let youtubeStorageListenerAttached = false;
 
 async function expandDescription() {
   const expandButton = document.querySelector('tp-yt-paper-button#expand');
@@ -51,7 +43,7 @@ async function clickShowTranscript() {
   }
 }
 
-async function waitForTranscriptContainer() {
+async function waitForTranscriptAndCopy(settings = {}) {
   let transcriptContainer = null;
   let attempts = 0;
   const maxAttempts = 40;
@@ -72,107 +64,52 @@ async function waitForTranscriptContainer() {
     );
     throw new Error('Transcript failed to load within timeout period.');
   }
-  return transcriptContainer;
-}
-
-function collectYouTubeMetadata(settings = {}) {
-  let title = '';
-  let channelName = '';
-  let channelUrl = '';
-  const videoUrl = window.location.href;
-  const titleElem = document.querySelector('div#title h1 yt-formatted-string');
-  if (titleElem) title = titleElem.textContent.trim();
-
-  const channelElem = document.querySelector('ytd-channel-name#channel-name a');
-  if (channelElem) {
-    channelName = channelElem.textContent.trim();
-    channelUrl = channelElem.href.startsWith('http')
-      ? channelElem.href
-      : window.location.origin + channelElem.getAttribute('href');
-  }
-
-  const publishedDateMeta =
-    document.querySelector('meta[itemprop="datePublished"]')?.getAttribute('content') || '';
-
-  let metadataMarkdown = '';
-  if (settings.addTitleToTranscript && title) metadataMarkdown += `# ${title}\n`;
-  if (settings.addChannelToTranscript && channelName) {
-    metadataMarkdown += `**Channel:** [${channelName}](${channelUrl})\n`;
-  }
-  if (settings.addUrlToTranscript && videoUrl) metadataMarkdown += `**Video URL:** ${videoUrl}\n`;
-  if (metadataMarkdown) metadataMarkdown += '\n';
-
-  return {
-    title,
-    channelName,
-    channelUrl,
-    videoUrl,
-    publishedDate: publishedDateMeta,
-    metadataMarkdown,
-  };
-}
-
-export function buildYouTubeApiVariables({
-  title = '',
-  channelName = '',
-  channelUrl = '',
-  publishedDate = '',
-  videoUrl = '',
-  transcriptMarkdown = '',
-  extractedAt = '',
-}) {
-  return {
-    title,
-    author: channelName,
-    channel_name: channelName,
-    channel_url: channelUrl,
-    date: publishedDate,
-    link: videoUrl,
-    content: transcriptMarkdown,
-    extracted_at: extractedAt || new Date().toISOString(),
-  };
-}
-
-async function extractYouTubeTranscriptData(settings = {}) {
-  await waitForTranscriptContainer();
   const includeChapters = settings.includeChapters !== false;
   let transcriptText = extractTranscriptText(settings.includeTimestamps !== false, includeChapters);
-  const metadata = collectYouTubeMetadata(settings);
+  let metaMd = '';
+  if (
+    settings.addTitleToTranscript ||
+    settings.addChannelToTranscript ||
+    settings.addUrlToTranscript
+  ) {
+    let title = '';
+    let channelName = '';
+    let channelUrl = '';
+    let videoUrl = window.location.href;
+    const titleElem = document.querySelector('div#title h1 yt-formatted-string');
+    if (titleElem) title = titleElem.textContent.trim();
+    const channelElem = document.querySelector('ytd-channel-name#channel-name a');
+    if (channelElem) {
+      channelName = channelElem.textContent.trim();
+      channelUrl = channelElem.href.startsWith('http')
+        ? channelElem.href
+        : window.location.origin + channelElem.getAttribute('href');
+    }
+    if (settings.addTitleToTranscript && title) metaMd += `# ${title}\n`;
+    if (settings.addChannelToTranscript && channelName)
+      metaMd += `**Channel:** [${channelName}](${channelUrl})\n`;
+    if (settings.addUrlToTranscript && videoUrl) metaMd += `**Video URL:** ${videoUrl}\n`;
+    if (metaMd) metaMd += '\n';
+  }
 
   if (includeChapters) {
     const chapters = extractChapters();
     const chaptersMd = formatChaptersSection(chapters);
     if (chaptersMd) {
-      metadata.metadataMarkdown += chaptersMd + '\n\n';
+      metaMd += chaptersMd + '\n\n';
     }
   }
 
-  transcriptText = (metadata.metadataMarkdown || '') + transcriptText;
-  const extractedAt = new Date().toISOString();
-  const apiVariables = buildYouTubeApiVariables({
-    title: metadata.title,
-    channelName: metadata.channelName,
-    channelUrl: metadata.channelUrl,
-    publishedDate: metadata.publishedDate,
-    videoUrl: metadata.videoUrl,
-    transcriptMarkdown: transcriptText,
-    extractedAt,
-  });
-
-  return {
-    transcriptText,
-    title: metadata.title,
-    apiVariables,
-  };
-}
-
-async function waitForTranscriptAndCopy(settings = {}) {
-  const { transcriptText, title } = await extractYouTubeTranscriptData(settings);
+  transcriptText = metaMd + transcriptText;
   const userSettings = await getSettings();
   chrome.storage.sync.get(
     { downloadInsteadOfCopy: false, downloadIfTokensExceed: 0 },
     function (items) {
       if (items.downloadInsteadOfCopy) {
+        // Use video title for filename
+        let title = '';
+        const titleElem = document.querySelector('div#title h1 yt-formatted-string');
+        if (titleElem) title = titleElem.textContent.trim();
         downloadMarkdownFile(transcriptText, title, 'ExtractMD');
         showSuccessNotificationWithTokens('Transcript downloaded as .md!', transcriptText);
       } else {
@@ -181,6 +118,9 @@ async function waitForTranscriptAndCopy(settings = {}) {
         if (!isNaN(threshold) && threshold > 0) {
           const tokens = encode(transcriptText).length;
           if (tokens >= threshold * 1000) {
+            let title = '';
+            const titleElem = document.querySelector('div#title h1 yt-formatted-string');
+            if (titleElem) title = titleElem.textContent.trim();
             downloadMarkdownFile(transcriptText, title, 'ExtractMD');
             showSuccessNotificationWithTokens(
               'Transcript downloaded as .md (token threshold)!',
@@ -312,39 +252,6 @@ export async function copyYouTubeTranscript(settings = null) {
   }
 }
 
-async function performYouTubeApiSend({ updateButton = false, profileId = '' } = {}) {
-  await runIntegrationApiSend({
-    integration: 'youtube',
-    profileId,
-    updateButton,
-    defaultErrorMessage: 'Failed to send YouTube content via API.',
-    getIsProcessing: () => isApiProcessing,
-    setIsProcessing: (value) => {
-      isApiProcessing = value;
-    },
-    getFloatingButtonController: () => floatingButtonController,
-    prepareVariables: async () => {
-      const settings = await new Promise((resolve) => {
-        chrome.storage.sync.get(
-          {
-            includeTimestamps: true,
-            includeChapters: true,
-            addTitleToTranscript: true,
-            addChannelToTranscript: true,
-            addUrlToTranscript: true,
-          },
-          resolve
-        );
-      });
-
-      await expandDescription();
-      await clickShowTranscript();
-      const { apiVariables } = await extractYouTubeTranscriptData(settings);
-      return apiVariables;
-    },
-  });
-}
-
 window.copyYouTubeTranscript = copyYouTubeTranscript;
 
 export function initYouTubeFeatures() {
@@ -380,15 +287,6 @@ export function initYouTubeFeatures() {
 
     // Monitor for YouTube player state changes (theater mode, fullscreen buttons)
     // No longer needed as FloatingButton handles this internally
-
-    if (!youtubeStorageListenerAttached && chrome.storage?.onChanged) {
-      youtubeStorageListenerAttached = true;
-      chrome.storage.onChanged.addListener((changes, areaName) => {
-        if (areaName !== 'sync') return;
-        if (!changes.apiProfilesJson && !changes.apiOutputEnabled) return;
-        initializeFloatingButton();
-      });
-    }
   });
 }
 
@@ -401,55 +299,26 @@ async function initializeFloatingButton() {
     )
   )
     return;
+  if (document.getElementById('extractmd-floating-button')) {
+    console.debug('[ExtractMD] Floating button already exists (YouTube)');
+    return;
+  }
 
+  // Load floating button settings
   const buttonSettings = await new Promise((resolve) => {
     chrome.storage.sync.get(
       {
         floatingButtonEnableDrag: true,
         floatingButtonEnableDismiss: true,
-        apiOutputEnabled: false,
-        apiProfilesJson: '[]',
       },
       resolve
     );
-  });
-
-  const apiSignature = computeEnabledApiProfileSignature({
-    apiProfilesJson: buttonSettings.apiProfilesJson,
-    apiOutputEnabled: buttonSettings.apiOutputEnabled,
-    integration: 'youtube',
-  });
-
-  const existingDomButton = document.getElementById('extractmd-floating-button');
-  if (existingDomButton && floatingButtonController) {
-    if (apiSignature !== floatingButtonYouTubeApiSignature) {
-      floatingButtonController.remove();
-      floatingButtonController = null;
-    } else {
-      floatingButtonController.show();
-      return;
-    }
-  } else if (existingDomButton && !floatingButtonController) {
-    existingDomButton.remove();
-  }
-
-  if (document.getElementById('extractmd-floating-button')) return;
-
-  floatingButtonYouTubeApiSignature = apiSignature;
-  const secondaryActions = getSecondaryApiActions({
-    apiProfilesJson: buttonSettings.apiProfilesJson,
-    apiOutputEnabled: buttonSettings.apiOutputEnabled,
-    integration: 'youtube',
-    onProfileAction: async (profileId) => {
-      await performYouTubeApiSend({ updateButton: true, profileId });
-    },
   });
 
   floatingButtonController = await createFloatingButton({
     domain: window.location.hostname,
     enableDrag: buttonSettings.floatingButtonEnableDrag,
     enableDismiss: buttonSettings.floatingButtonEnableDismiss,
-    secondaryActions,
     onClick: async () => {
       if (isProcessing) return;
       isProcessing = true;

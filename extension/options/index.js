@@ -12,7 +12,6 @@ import { initializeDomainIgnore } from './domainIgnore.js';
 import { initializeSaveToast } from './ui.js';
 import { initializeStorageUsage } from './storageUsage.js';
 import { initializeTheme } from '../shared/theme-manager.js';
-import { initializeApiSettings } from './apiSettings.js';
 
 /**
  * Initialize replay welcome button functionality
@@ -44,6 +43,5 @@ document.addEventListener('DOMContentLoaded', async function () {
   initializeDomainIgnore();
   initializeStorageUsage();
   initializeSaveToast();
-  initializeApiSettings();
   initializeReplayWelcome();
 });

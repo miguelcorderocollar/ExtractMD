@@ -3,8 +3,6 @@
 
 import { DEFAULTS } from './defaults.js';
 
-const API_SECRETS_STORAGE_KEY = 'apiProfileSecrets';
-
 /**
  * Get settings from chrome.storage.sync, with defaults applied
  * @param {string[]|null} keys - Specific keys to fetch, or null for all defaults
@@ -73,23 +71,6 @@ export async function incrementKpi(type) {
 }
 
 /**
- * Increment total successful API call counter (settings KPI only)
- * @returns {Promise<void>}
- */
-export async function incrementApiCallCount() {
-  return new Promise((resolve) => {
-    chrome.storage.sync.get({ apiCallCount: 0, enableUsageKpi: true }, function (items) {
-      if (items.enableUsageKpi !== false) {
-        const nextCount = Number(items.apiCallCount || 0) + 1;
-        chrome.storage.sync.set({ apiCallCount: nextCount }, resolve);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
-
-/**
  * Get chrome.storage.sync usage statistics
  * @returns {Promise<{bytes: number, kb: number, percentage: number}>} Storage usage info
  */
@@ -103,42 +84,6 @@ export function getStorageUsage() {
       const percentage = Math.round((bytes / quotaBytes) * 100);
 
       resolve({ bytes, kb, percentage });
-    });
-  });
-}
-
-/**
- * Get API secret variables for a profile from chrome.storage.local
- * @param {string} profileId - API profile ID
- * @returns {Promise<Object>} Secret variable map
- */
-export function getApiProfileSecrets(profileId) {
-  const id = String(profileId || '');
-  if (!id) return Promise.resolve({});
-
-  return new Promise((resolve) => {
-    chrome.storage.local.get({ [API_SECRETS_STORAGE_KEY]: {} }, (result) => {
-      const allSecrets = result[API_SECRETS_STORAGE_KEY] || {};
-      resolve(allSecrets[id] || {});
-    });
-  });
-}
-
-/**
- * Save API secret variables for a profile in chrome.storage.local
- * @param {string} profileId - API profile ID
- * @param {Object} secrets - Secret variable map
- * @returns {Promise<void>}
- */
-export function saveApiProfileSecrets(profileId, secrets) {
-  const id = String(profileId || '');
-  if (!id) return Promise.resolve();
-
-  return new Promise((resolve) => {
-    chrome.storage.local.get({ [API_SECRETS_STORAGE_KEY]: {} }, (result) => {
-      const allSecrets = result[API_SECRETS_STORAGE_KEY] || {};
-      allSecrets[id] = secrets && typeof secrets === 'object' ? secrets : {};
-      chrome.storage.local.set({ [API_SECRETS_STORAGE_KEY]: allSecrets }, resolve);
     });
   });
 }

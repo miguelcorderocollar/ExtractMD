@@ -512,48 +512,13 @@ button.btn {
 
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-/* 4-card sections: keep 2×2 on desktop so the last row is not a single card */
-.feature-grid--cols-2 {
   grid-template-columns: repeat(2, 1fr);
-}
-
-/* 3-card rows: stay 3-wide until mobile (avoids 2+1 orphan at tablet widths) */
-.feature-grid--cols-3 {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-/* 5 cards: row1 = three equal; row2 = two equal, full width (6-col trick) */
-.feature-grid--layout-3-2 {
-  grid-template-columns: repeat(6, 1fr);
-}
-
-.feature-grid--layout-3-2 > .feature-card:nth-child(-n + 3) {
-  grid-column: span 2;
-}
-
-.feature-grid--layout-3-2 > .feature-card:nth-child(n + 4) {
-  grid-column: span 3;
-}
-
-@media (max-width: 960px) {
-  .feature-grid:not(.feature-grid--cols-2):not(.feature-grid--cols-3):not(
-      .feature-grid--layout-3-2
-    ) {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  gap: 24px;
 }
 
 @media (max-width: 640px) {
   .feature-grid {
     grid-template-columns: 1fr;
-  }
-
-  .feature-grid--layout-3-2 > .feature-card {
-    grid-column: auto;
   }
 }
 

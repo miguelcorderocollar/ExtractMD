@@ -26,9 +26,8 @@ export function showStatus(message, type) {
  * This is debounced - multiple calls will reset the timer and only show one toast
  * @param {string} [message='Saved'] - Short message to display
  * @param {string} [type='success'] - 'success' or 'error'
- * @param {string} [icon='status'] - 'status' or 'clipboard'
  */
-export function showSaveToast(message = 'Saved', type = 'success', icon = 'status') {
+export function showSaveToast(message = 'Saved', type = 'success') {
   // Clear any pending timeouts
   if (toastTimeout) clearTimeout(toastTimeout);
   if (toastHideTimeout) clearTimeout(toastHideTimeout);
@@ -41,16 +40,13 @@ export function showSaveToast(message = 'Saved', type = 'success', icon = 'statu
   }
 
   // Update content and show
-  const iconMarkup =
-    icon === 'clipboard'
-      ? '<rect x="9" y="3" width="6" height="4" rx="1"></rect><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>'
-      : type === 'success'
-        ? '<polyline points="20 6 9 17 4 12"></polyline>'
-        : '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>';
-
   toastElement.innerHTML = `
         <svg class="save-toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            ${iconMarkup}
+            ${
+              type === 'success'
+                ? '<polyline points="20 6 9 17 4 12"></polyline>'
+                : '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>'
+            }
         </svg>
         <span>${message}</span>
     `;

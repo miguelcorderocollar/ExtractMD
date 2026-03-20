@@ -1,8 +1,6 @@
 // Centralized defaults - single source of truth for all settings
 // Used by popup, content scripts, and storage module
 
-import { DEFAULT_API_PROFILE_ID, getDefaultApiProfilesJson } from './api/constants.js';
-
 export const DEFAULTS = {
   // YouTube
   includeTimestamps: true,
@@ -82,12 +80,6 @@ export const DEFAULTS = {
 
   // Welcome/Onboarding
   welcomeCompleted: false, // Whether user has completed welcome modal
-
-  // Generic API Output
-  apiOutputEnabled: false,
-  apiProfilesJson: getDefaultApiProfilesJson(),
-  apiActiveProfileId: DEFAULT_API_PROFILE_ID,
-  apiCallCount: 0,
 };
 
 // Schema for validation during import
@@ -149,8 +141,4 @@ export const SETTING_SCHEMA = {
   floatingButtonShowDetectionHint: 'boolean',
   accentColor: 'string',
   welcomeCompleted: 'boolean',
-  apiOutputEnabled: 'boolean',
-  apiProfilesJson: 'string',
-  apiActiveProfileId: 'string',
-  apiCallCount: 'number',
 };

@@ -10,18 +10,10 @@ import {
 } from './utils.js';
 import { incrementKpi } from '../shared/storage.js';
 import { createFloatingButton } from './components/FloatingButton.js';
-import { runIntegrationApiSend } from './handlers/apiSendWorkflow.js';
-import {
-  computeEnabledApiProfileSignature,
-  getSecondaryApiActions,
-} from './handlers/apiSecondaryActions.js';
 import { encode } from 'gpt-tokenizer';
 
 let isProcessing = false;
-let isApiProcessing = false;
 let floatingButtonController = null;
-let floatingButtonHnApiSignature = '';
-let hnStorageListenerAttached = false;
 
 // Shared copy logic
 export async function performHNCopy(updateButton = false) {
@@ -326,118 +318,6 @@ function extractHNNewsMarkdown(settings) {
   return md.trim();
 }
 
-function parseHnNumber(value) {
-  const parsed = Number.parseInt(String(value || '').replace(/[^0-9]/g, ''), 10);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function getHnCommentsPageApiVariables(markdown) {
-  const storyRow =
-    document.querySelector('table.fatitem tr.athing') || document.querySelector('tr.athing');
-  const title = storyRow?.querySelector('.titleline a')?.textContent?.trim() || document.title;
-  const author = storyRow?.querySelector('.subtext .hnuser')?.textContent?.trim() || '';
-  const date = storyRow?.querySelector('.subtext .age a')?.textContent?.trim() || '';
-  const site = storyRow?.querySelector('.titleline .sitestr')?.textContent?.trim() || '';
-  const points = parseHnNumber(storyRow?.querySelector('.subtext .score')?.textContent || '0');
-  const comments = document.querySelectorAll('tr.athing.comtr').length;
-
-  return {
-    title,
-    author,
-    date,
-    link: window.location.href,
-    content: markdown,
-    site,
-    points,
-    comments,
-    extracted_at: new Date().toISOString(),
-  };
-}
-
-function getHnNewsPageApiVariables(markdown) {
-  const rows = Array.from(document.querySelectorAll('tr.athing.submission, tr.athing')).filter(
-    (row) => row.querySelector('.titleline')
-  );
-  const totalPoints = rows.reduce((sum, row) => {
-    const pointsText = row.nextElementSibling?.querySelector('.subtext .score')?.textContent || '0';
-    return sum + parseHnNumber(pointsText);
-  }, 0);
-  const totalComments = rows.reduce((sum, row) => {
-    const commentLinkText =
-      Array.from(row.nextElementSibling?.querySelectorAll('.subtext a') || []).find((link) =>
-        link.textContent.includes('comment')
-      )?.textContent || '';
-    return sum + parseHnNumber(commentLinkText);
-  }, 0);
-
-  return {
-    title: document.title || 'Hacker News',
-    author: '',
-    date: '',
-    link: window.location.href,
-    content: markdown,
-    site: window.location.hostname,
-    points: totalPoints,
-    comments: totalComments,
-    extracted_at: new Date().toISOString(),
-  };
-}
-
-async function performHnApiSend({ updateButton = false, profileId = '' } = {}) {
-  await runIntegrationApiSend({
-    integration: 'hackernews',
-    profileId,
-    updateButton,
-    defaultErrorMessage: 'Failed to send Hacker News content via API.',
-    getIsProcessing: () => isApiProcessing,
-    setIsProcessing: (value) => {
-      isApiProcessing = value;
-    },
-    getFloatingButtonController: () => floatingButtonController,
-    prepareVariables: async () => {
-      let markdown = '';
-
-      if (isHNItemPage()) {
-        const settings = await new Promise((resolve) => {
-          chrome.storage.sync.get(
-            {
-              hnIncludeAuthor: true,
-              hnIncludeTime: true,
-              hnIncludeReplies: true,
-              hnIncludeUrl: true,
-              hnIncludeItemText: true,
-            },
-            resolve
-          );
-        });
-        markdown = extractHNCommentsMarkdown(settings);
-        return getHnCommentsPageApiVariables(markdown);
-      }
-
-      if (isHNNewsPage()) {
-        const settings = await new Promise((resolve) => {
-          chrome.storage.sync.get(
-            {
-              hnNewsIncludeTitle: true,
-              hnNewsIncludeUrl: true,
-              hnNewsIncludeSite: true,
-              hnNewsIncludePoints: true,
-              hnNewsIncludeAuthor: true,
-              hnNewsIncludeTime: true,
-              hnNewsIncludeComments: true,
-            },
-            resolve
-          );
-        });
-        markdown = extractHNNewsMarkdown(settings);
-        return getHnNewsPageApiVariables(markdown);
-      }
-
-      throw new Error('Not a supported HN page.');
-    },
-  });
-}
-
 export function initHackerNewsFeatures() {
   console.debug('[ExtractMD] initHackerNewsFeatures called');
   chrome.storage.sync.get(
@@ -445,48 +325,19 @@ export function initHackerNewsFeatures() {
       enableHackerNewsIntegration: true,
       floatingButtonEnableDrag: true,
       floatingButtonEnableDismiss: true,
-      apiOutputEnabled: false,
-      apiProfilesJson: '[]',
     },
     async function (items) {
       if (items.enableHackerNewsIntegration === false) return;
       if (!(isHNItemPage() || isHNNewsPage())) return;
-      const apiSignature = computeEnabledApiProfileSignature({
-        apiProfilesJson: items.apiProfilesJson,
-        apiOutputEnabled: items.apiOutputEnabled,
-        integration: 'hackernews',
-      });
-
-      const existingDomButton = document.getElementById('extractmd-floating-button');
-      if (existingDomButton && floatingButtonController) {
-        if (apiSignature !== floatingButtonHnApiSignature) {
-          floatingButtonController.remove();
-          floatingButtonController = null;
-        } else {
-          floatingButtonController.show();
-          return;
-        }
-      } else if (existingDomButton && !floatingButtonController) {
-        existingDomButton.remove();
+      if (document.getElementById('extractmd-floating-button')) {
+        console.debug('[ExtractMD] Floating button already exists (HN)');
+        return;
       }
-
-      if (document.getElementById('extractmd-floating-button')) return;
-
-      floatingButtonHnApiSignature = apiSignature;
-      const secondaryActions = getSecondaryApiActions({
-        apiProfilesJson: items.apiProfilesJson,
-        apiOutputEnabled: items.apiOutputEnabled,
-        integration: 'hackernews',
-        onProfileAction: async (profileId) => {
-          await performHnApiSend({ updateButton: true, profileId });
-        },
-      });
 
       floatingButtonController = await createFloatingButton({
         domain: window.location.hostname,
         enableDrag: items.floatingButtonEnableDrag,
         enableDismiss: items.floatingButtonEnableDismiss,
-        secondaryActions,
         onClick: async () => {
           await performHNCopy(true);
         },
@@ -495,19 +346,6 @@ export function initHackerNewsFeatures() {
       if (floatingButtonController) {
         floatingButtonController.appendTo(document.body);
         console.debug('[ExtractMD] Floating button created and added to DOM (HN)');
-      }
-
-      if (!hnStorageListenerAttached && chrome.storage?.onChanged) {
-        hnStorageListenerAttached = true;
-        chrome.storage.onChanged.addListener((changes, areaName) => {
-          if (areaName !== 'sync') return;
-          if (!changes.apiProfilesJson && !changes.apiOutputEnabled) return;
-          if (floatingButtonController) {
-            floatingButtonController.remove();
-            floatingButtonController = null;
-          }
-          initHackerNewsFeatures();
-        });
       }
     }
   );
