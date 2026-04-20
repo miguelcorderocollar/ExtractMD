@@ -783,7 +783,7 @@ async function manageFloatingButtonForLinkedInJobs() {
     enableDrag: buttonSettings.floatingButtonEnableDrag,
     enableDismiss: buttonSettings.floatingButtonEnableDismiss,
     showDetectionHint: true,
-    detectionHintText: 'LinkedIn Jobs',
+    detectionHintText: 'Job',
     secondaryActions,
     onClick: async () => {
       await performLinkedInJobsCopy(true);
