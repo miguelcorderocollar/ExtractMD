@@ -9,6 +9,7 @@ describe('shared/defaults', () => {
     // YouTube settings
     expect(DEFAULTS.includeTimestamps).toBe(true);
     expect(DEFAULTS.includeChapters).toBe(true);
+    expect(DEFAULTS.cleanUpLineBreaks).toBe(true);
     expect(DEFAULTS.addTitleToTranscript).toBe(true);
     expect(DEFAULTS.addChannelToTranscript).toBe(true);
     expect(DEFAULTS.addUrlToTranscript).toBe(true);

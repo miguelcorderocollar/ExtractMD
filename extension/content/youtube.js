@@ -14,6 +14,10 @@ import { encode } from 'gpt-tokenizer';
 
 let floatingButtonController = null;
 let isProcessing = false;
+const TRANSCRIPT_TEXT_SELECTOR =
+  '.segment-text, .yt-core-attributed-string, .ytAttributedStringHost';
+const TRANSCRIPT_TIMESTAMP_SELECTOR = '.segment-timestamp, .ytwTranscriptSegmentViewModelTimestamp';
+const LINE_BREAK_CLEANUP_REGEX = /^((?!#).*[^\n.!?:)])\n(?!\n|\s*(?:-|\[|\(|#))/gm;
 
 async function expandDescription() {
   const expandButton = document.querySelector('tp-yt-paper-button#expand');
@@ -65,7 +69,11 @@ async function waitForTranscriptAndCopy(settings = {}) {
     throw new Error('Transcript failed to load within timeout period.');
   }
   const includeChapters = settings.includeChapters !== false;
-  let transcriptText = extractTranscriptText(settings.includeTimestamps !== false, includeChapters);
+  let transcriptText = extractTranscriptText(
+    settings.includeTimestamps !== false,
+    includeChapters,
+    settings.cleanUpLineBreaks !== false
+  );
   let metaMd = '';
   if (
     settings.addTitleToTranscript ||
@@ -175,7 +183,15 @@ export function formatChaptersSection(chapters) {
   return `## Chapters\n${lines.join('\n')}`;
 }
 
-export function extractTranscriptText(includeTimestamps = true, includeChapters = true) {
+export function cleanUpTranscriptLineBreaks(transcript) {
+  return transcript.replace(LINE_BREAK_CLEANUP_REGEX, '$1 ');
+}
+
+export function extractTranscriptText(
+  includeTimestamps = true,
+  includeChapters = true,
+  cleanUpLineBreaks = true
+) {
   let transcript = '';
   const allElements = Array.from(
     document.querySelectorAll(
@@ -202,12 +218,8 @@ export function extractTranscriptText(includeTimestamps = true, includeChapters 
       tag === 'YTD-TRANSCRIPT-SEGMENT-RENDERER' ||
       tag === 'TRANSCRIPT-SEGMENT-VIEW-MODEL'
     ) {
-      const timestamp = element
-        .querySelector('.segment-timestamp, .ytwTranscriptSegmentViewModelTimestamp')
-        ?.textContent?.trim();
-      const text = element
-        .querySelector('.segment-text, .yt-core-attributed-string')
-        ?.textContent?.trim();
+      const timestamp = element.querySelector(TRANSCRIPT_TIMESTAMP_SELECTOR)?.textContent?.trim();
+      const text = element.querySelector(TRANSCRIPT_TEXT_SELECTOR)?.textContent?.trim();
       if (text) {
         if (includeTimestamps && timestamp) {
           transcript += `[${timestamp}] ${text}\n`;
@@ -217,7 +229,11 @@ export function extractTranscriptText(includeTimestamps = true, includeChapters 
       }
     }
   });
-  return transcript.trim();
+  transcript = transcript.trim();
+  if (!includeTimestamps && cleanUpLineBreaks) {
+    return cleanUpTranscriptLineBreaks(transcript);
+  }
+  return transcript;
 }
 
 // Global function for background script
@@ -230,6 +246,7 @@ export async function copyYouTubeTranscript(settings = null) {
           {
             includeTimestamps: true,
             includeChapters: true,
+            cleanUpLineBreaks: true,
             addTitleToTranscript: true,
             addChannelToTranscript: true,
             addUrlToTranscript: true,
