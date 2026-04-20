@@ -21,7 +21,7 @@ let floatingButtonController = null;
 /**
  * Create and configure a Turndown service instance
  */
-function createTurndownService(settings) {
+export function createTurndownService(settings) {
   const turndown = new TurndownService({
     headingStyle: 'atx',
     hr: '---',
@@ -51,6 +51,13 @@ function createTurndownService(settings) {
   // Remove images if setting is disabled
   if (!settings.universalIncludeImages) {
     turndown.remove(['img', 'picture', 'figure']);
+  } else {
+    turndown.addRule('removeEmbeddedDataImages', {
+      filter: (node) => {
+        return node.nodeName === 'IMG' && /^data:image\//i.test(node.getAttribute('src') || '');
+      },
+      replacement: () => '',
+    });
   }
 
   // Remove links if setting is disabled (keep text content)

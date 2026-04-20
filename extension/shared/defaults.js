@@ -5,6 +5,7 @@ export const DEFAULTS = {
   // YouTube
   includeTimestamps: true,
   includeChapters: true,
+  cleanUpLineBreaks: true,
   addTitleToTranscript: true,
   addChannelToTranscript: true,
   addUrlToTranscript: true,
@@ -86,6 +87,7 @@ export const DEFAULTS = {
 export const SETTING_SCHEMA = {
   includeTimestamps: 'boolean',
   includeChapters: 'boolean',
+  cleanUpLineBreaks: 'boolean',
   addTitleToTranscript: 'boolean',
   addChannelToTranscript: 'boolean',
   addUrlToTranscript: 'boolean',

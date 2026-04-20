@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-04-20
+
+### Added
+
+- **YouTube Transcript Cleanup**: Added `cleanUpLineBreaks` (enabled by default) to merge fragmented transcript lines when timestamps are disabled while preserving speaker, sound effect, and chapter boundaries.
+
+### Fixed
+
+- **YouTube Transcript Extraction**: Restored transcript text extraction for YouTube's latest transcript DOM where segment text is rendered with `ytAttributedStringHost`.
+- **Embedded Data Images**: Omitted inline `data:image` payloads from universal and article Markdown extraction to prevent base64 images from creating oversized outputs.
+
 ## [1.2.0] - 2026-03-15
 
 ### Added

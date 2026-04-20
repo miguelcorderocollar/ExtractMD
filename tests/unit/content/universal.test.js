@@ -31,6 +31,8 @@ vi.mock('gpt-tokenizer', () => ({
   encode: vi.fn((text) => ({ length: Math.ceil(text.length / 4) })),
 }));
 
+import { createTurndownService } from '../../../extension/content/universal.js';
+
 describe('Universal Module', () => {
   let dom;
   let document;
@@ -145,6 +147,28 @@ describe('Universal Module', () => {
       const img = document.querySelector('img');
       expect(img).toBeTruthy();
       expect(img.alt).toBe('Test image');
+    });
+
+    it('should omit embedded data images from markdown output', () => {
+      const turndown = createTurndownService({
+        universalIncludeImages: true,
+        universalIncludeLinks: true,
+        universalStripNav: true,
+      });
+
+      const markdown = turndown.turndown(`
+        <main>
+          <p>Intro text</p>
+          <img alt="Embedded chart" src="data:image/png;base64,${'A'.repeat(200)}">
+          <img alt="Linked chart" src="https://example.com/chart.png">
+        </main>
+      `);
+
+      expect(markdown).toContain('Intro text');
+      expect(markdown).toContain('![Linked chart](https://example.com/chart.png)');
+      expect(markdown).not.toContain('data:image');
+      expect(markdown).not.toContain('base64');
+      expect(markdown).not.toContain('Embedded chart');
     });
 
     it('should handle links', () => {

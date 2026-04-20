@@ -233,6 +233,9 @@ export function nodeToMarkdown(node, includeImages) {
     const alt = node.getAttribute('alt') || '';
     let src = node.getAttribute('src') || '';
     if (src) {
+      if (/^data:image\//i.test(src)) {
+        return '';
+      }
       if (!src.match(/^https?:\/\//)) {
         if (src.startsWith('/')) {
           src = window.location.origin + src;

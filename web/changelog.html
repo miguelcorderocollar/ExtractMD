@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Changelog - ExtractMD</title>
-    <meta name="description" content="ExtractMD release notes and version history." />
+    <meta
+      name="description"
+      content="ExtractMD release notes and version history."
+    />
     <meta name="author" content="ExtractMD" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
@@ -14,7 +17,10 @@
     <link rel="canonical" href="https://extractmd.miguelcorderocollar.com/changelog" />
 
     <meta property="og:title" content="Changelog - ExtractMD" />
-    <meta property="og:description" content="ExtractMD release notes and version history." />
+    <meta
+      property="og:description"
+      content="ExtractMD release notes and version history."
+    />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://extractmd.miguelcorderocollar.com/changelog" />
     <meta
@@ -26,7 +32,10 @@
 
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Changelog - ExtractMD" />
-    <meta name="twitter:description" content="ExtractMD release notes and version history." />
+    <meta
+      name="twitter:description"
+      content="ExtractMD release notes and version history."
+    />
 
     <link rel="icon" type="image/png" sizes="128x128" href="favicon.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="favicon.png" />
@@ -104,7 +113,7 @@
         <div class="changelog-content">
           <h1>Changelog</h1>
           <p class="changelog-meta">
-            Latest release: <strong>1.2.0</strong> (2026-03-15)<br />
+            Latest release: <strong>1.2.1</strong> (2026-04-20)<br />
             Source: <code>CHANGELOG.md</code><br />
             Also on GitHub:
             <a
@@ -114,205 +123,97 @@
               >Releases</a
             >
           </p>
-          <h2>[1.2.0] - 2026-03-15</h2>
-          <h3>Added</h3>
-          <ul>
-            <li>
-              <strong>X Integration (Posts + Articles)</strong>: Added extraction for X/Twitter
-              posts and long-form articles with metadata, quoted-post blocks, richer media handling,
-              metrics-context output, and dedicated settings/KPI tracking.
-            </li>
-            <li>
-              <strong>Floating Button UX (Glass + Mode Hint)</strong>: Added a default frosted-glass
-              button style, a pre-click mode hint badge (<code>Article</code> or <code>Page</code>),
-              and consistent translucent loading/success/error glass states; article-detected info
-              notifications are now off by default in favor of the hint.
-            </li>
-            <li>
-              <strong>YouTube Chapters Toggle</strong>: Added <code>includeChapters</code> (enabled
-              by default) to include or skip chapter headers and the
-              <code>## Chapters</code> section in transcript output.
-            </li>
-          </ul>
-          <h3>Fixed</h3>
-          <ul>
-            <li>
-              <strong>YouTube Transcript (New UI)</strong>: Restored transcript extraction for
-              YouTube&#39;s updated transcript panel DOM while preserving compatibility with the
-              legacy transcript layout.
-            </li>
-            <li>
-              <strong>YouTube Chapters Extraction</strong>: Added chapter extraction support for
-              YouTube&#39;s new transcript UI (<code>timeline-chapter-view-model</code>), rendering
-              chapters both inline as section headers and as a dedicated
-              <code>## Chapters</code> summary section with timestamps.
-            </li>
-            <li>
-              <strong>X Video Media Extraction</strong>: Improved X video output by extracting
-              direct video links when available and falling back to a permalink + poster-thumbnail
-              capture for blob-backed video players.
-            </li>
-          </ul>
-          <h3>Removed</h3>
-          <ul>
-            <li>
-              <strong>Last Extraction Status (Popup)</strong>: Removed the popup banner and related
-              <code>lastExtraction</code> local-storage writes/reads to reduce UI noise and simplify
-              popup state.
-            </li>
-          </ul>
-          <h2>[1.1.0] - 2026-01-04</h2>
-          <h3>Added</h3>
-          <ul>
-            <li>
-              <strong>Global Enable/Disable Toggle</strong>: Add extension-wide enable/disable
-              switch in popup and settings for quick control
-            </li>
-            <li>
-              <strong>Accent Color Customization</strong>: New setting to change accent color across
-              the entire extension UI
-            </li>
-            <li>
-              <strong>Welcome Modal</strong>: Welcome modal on first installation to introduce users
-              to the extension
-            </li>
-            <li>
-              <strong>Initial Notification Settings</strong>: Configurable options for initial
-              notifications on articles and universal extraction
-            </li>
-            <li>
-              <strong>Visual Disabled State</strong>: Red extension icon when the extension is
-              disabled for better visibility
-            </li>
-          </ul>
-          <h3>Fixed</h3>
-          <ul>
-            <li>
-              <strong>YouTube Fullscreen</strong>: Button no longer appears on YouTube fullscreen
-              videos
-            </li>
-            <li>
-              <strong>Icon Fixes</strong>: Corrected icons for about and info sections in the
-              settings
-            </li>
-            <li>
-              <strong>Settings Description Padding</strong>: Improved visual spacing for
-              &quot;options&quot; setting descriptions
-            </li>
-          </ul>
-          <h2>[1.0.0] - 2026-01-01</h2>
-          <h3>Added</h3>
-          <ul>
-            <li>
-              <strong>YouTube Integration</strong>: Extract video transcripts as Markdown with
-              customizable formatting (timestamps, title, channel, URL)
-            </li>
-            <li>
-              <strong>Hacker News Integration</strong>: Copy news lists or full comment threads as
-              Markdown
-            </li>
-            <li>
-              <strong>Article Extraction</strong>: Convert readable articles to Markdown with
-              optional image support
-            </li>
-            <li>
-              <strong>Universal Extractor</strong>: Fallback HTML-to-Markdown converter for any
-              webpage with configurable content selection
-            </li>
-            <li>
-              <strong>Floating Button Interface</strong>: Visual button with states (idle, loading,
-              success, error) that appears on supported pages
-            </li>
-            <li>
-              <strong>Keyboard Shortcuts</strong>:
-              <ul>
-                <li>
-                  <code>Ctrl+Shift+E</code> (or <code>Cmd+Shift+E</code> on Mac) to trigger
-                  extraction
-                </li>
-                <li>
-                  <code>Ctrl+Shift+H</code> (or <code>Cmd+Shift+H</code> on Mac) to toggle button
-                  visibility for current domain
-                </li>
-              </ul>
-            </li>
-            <li>
-              <strong>Smart Auto-Download</strong>: Automatically download content as
-              <code>.md</code> file when it exceeds configurable token threshold
-            </li>
-            <li>
-              <strong>Usage Tracking</strong>: KPI counters for each integration type displayed in
-              popup
-            </li>
-            <li>
-              <strong>Domain Ignore List</strong>: Per-domain toggle to disable extraction on
-              specific websites
-            </li>
-            <li>
-              <strong>Settings Import/Export</strong>: Backup and restore configuration as JSON
-            </li>
-            <li>
-              <strong>Last Extraction Status</strong>: Display recent extraction activity in popup
-            </li>
-            <li>
-              <strong>Jump to Domain</strong>: Automatically open a custom URL (e.g., ChatGPT) after
-              copying content
-            </li>
-            <li>
-              <strong>Close Tab After Extraction</strong>: Optional automatic tab closure after
-              extraction
-            </li>
-            <li>
-              <strong>Token Counting</strong>: Optional GPT token count display in notifications
-            </li>
-            <li>
-              <strong>Universal Extraction Settings</strong>:
-              <ul>
-                <li>
-                  Content mode selection (auto-detect, full page, main element, custom CSS selector)
-                </li>
-                <li>Custom CSS selector support for precise content extraction</li>
-                <li>Strip navigation elements (nav, header, footer, sidebar)</li>
-                <li>Include/exclude options for images, links, and page URL</li>
-                <li>Preserve code blocks with syntax highlighting hints</li>
-              </ul>
-            </li>
-            <li><strong>Theme Support</strong>: Light, dark, and system preference themes</li>
-            <li>
-              <strong>Comprehensive Settings Page</strong>: Full configuration management via
-              options page
-            </li>
-            <li>
-              <strong>Popup Quick Actions</strong>: Quick access to extraction, domain toggle, KPI
-              summary, and last extraction status
-            </li>
-            <li>
-              <strong>Notification System</strong>: Toast notifications with customizable themes and
-              animations
-            </li>
-            <li>
-              <strong>Modular Architecture</strong>: Shared components and utilities for
-              maintainability
-            </li>
-            <li>
-              <strong>Test Coverage</strong>: 203+ unit tests (Vitest) and E2E tests (Playwright)
-            </li>
-            <li>
-              <strong>Packaging Script</strong>: Automated Chrome Web Store package generation with
-              validation
-            </li>
-          </ul>
-          <h3>Changed</h3>
-          <ul>
-            <li>Initial release</li>
-          </ul>
-          <h3>Security</h3>
-          <ul>
-            <li>All processing happens locally in the browser</li>
-            <li>No data collection or external server communication</li>
-            <li>No analytics or tracking</li>
-            <li>Open source codebase for transparency</li>
-          </ul>
+          <h2>[1.2.1] - 2026-04-20</h2>
+<h3>Added</h3>
+<ul>
+<li><strong>YouTube Transcript Cleanup</strong>: Added <code>cleanUpLineBreaks</code> (enabled by default) to merge fragmented transcript lines when timestamps are disabled while preserving speaker, sound effect, and chapter boundaries.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li><strong>YouTube Transcript Extraction</strong>: Restored transcript text extraction for YouTube&#39;s latest transcript DOM where segment text is rendered with <code>ytAttributedStringHost</code>.</li>
+<li><strong>Embedded Data Images</strong>: Omitted inline <code>data:image</code> payloads from universal and article Markdown extraction to prevent base64 images from creating oversized outputs.</li>
+</ul>
+<h2>[1.2.0] - 2026-03-15</h2>
+<h3>Added</h3>
+<ul>
+<li><strong>X Integration (Posts + Articles)</strong>: Added extraction for X/Twitter posts and long-form articles with metadata, quoted-post blocks, richer media handling, metrics-context output, and dedicated settings/KPI tracking.</li>
+<li><strong>Floating Button UX (Glass + Mode Hint)</strong>: Added a default frosted-glass button style, a pre-click mode hint badge (<code>Article</code> or <code>Page</code>), and consistent translucent loading/success/error glass states; article-detected info notifications are now off by default in favor of the hint.</li>
+<li><strong>YouTube Chapters Toggle</strong>: Added <code>includeChapters</code> (enabled by default) to include or skip chapter headers and the <code>## Chapters</code> section in transcript output.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li><strong>YouTube Transcript (New UI)</strong>: Restored transcript extraction for YouTube&#39;s updated transcript panel DOM while preserving compatibility with the legacy transcript layout.</li>
+<li><strong>YouTube Chapters Extraction</strong>: Added chapter extraction support for YouTube&#39;s new transcript UI (<code>timeline-chapter-view-model</code>), rendering chapters both inline as section headers and as a dedicated <code>## Chapters</code> summary section with timestamps.</li>
+<li><strong>X Video Media Extraction</strong>: Improved X video output by extracting direct video links when available and falling back to a permalink + poster-thumbnail capture for blob-backed video players.</li>
+</ul>
+<h3>Removed</h3>
+<ul>
+<li><strong>Last Extraction Status (Popup)</strong>: Removed the popup banner and related <code>lastExtraction</code> local-storage writes/reads to reduce UI noise and simplify popup state.</li>
+</ul>
+<h2>[1.1.0] - 2026-01-04</h2>
+<h3>Added</h3>
+<ul>
+<li><strong>Global Enable/Disable Toggle</strong>: Add extension-wide enable/disable switch in popup and settings for quick control</li>
+<li><strong>Accent Color Customization</strong>: New setting to change accent color across the entire extension UI</li>
+<li><strong>Welcome Modal</strong>: Welcome modal on first installation to introduce users to the extension</li>
+<li><strong>Initial Notification Settings</strong>: Configurable options for initial notifications on articles and universal extraction</li>
+<li><strong>Visual Disabled State</strong>: Red extension icon when the extension is disabled for better visibility</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li><strong>YouTube Fullscreen</strong>: Button no longer appears on YouTube fullscreen videos</li>
+<li><strong>Icon Fixes</strong>: Corrected icons for about and info sections in the settings</li>
+<li><strong>Settings Description Padding</strong>: Improved visual spacing for &quot;options&quot; setting descriptions</li>
+</ul>
+<h2>[1.0.0] - 2026-01-01</h2>
+<h3>Added</h3>
+<ul>
+<li><strong>YouTube Integration</strong>: Extract video transcripts as Markdown with customizable formatting (timestamps, title, channel, URL)</li>
+<li><strong>Hacker News Integration</strong>: Copy news lists or full comment threads as Markdown</li>
+<li><strong>Article Extraction</strong>: Convert readable articles to Markdown with optional image support</li>
+<li><strong>Universal Extractor</strong>: Fallback HTML-to-Markdown converter for any webpage with configurable content selection</li>
+<li><strong>Floating Button Interface</strong>: Visual button with states (idle, loading, success, error) that appears on supported pages</li>
+<li><strong>Keyboard Shortcuts</strong>:<ul>
+<li><code>Ctrl+Shift+E</code> (or <code>Cmd+Shift+E</code> on Mac) to trigger extraction</li>
+<li><code>Ctrl+Shift+H</code> (or <code>Cmd+Shift+H</code> on Mac) to toggle button visibility for current domain</li>
+</ul>
+</li>
+<li><strong>Smart Auto-Download</strong>: Automatically download content as <code>.md</code> file when it exceeds configurable token threshold</li>
+<li><strong>Usage Tracking</strong>: KPI counters for each integration type displayed in popup</li>
+<li><strong>Domain Ignore List</strong>: Per-domain toggle to disable extraction on specific websites</li>
+<li><strong>Settings Import/Export</strong>: Backup and restore configuration as JSON</li>
+<li><strong>Last Extraction Status</strong>: Display recent extraction activity in popup</li>
+<li><strong>Jump to Domain</strong>: Automatically open a custom URL (e.g., ChatGPT) after copying content</li>
+<li><strong>Close Tab After Extraction</strong>: Optional automatic tab closure after extraction</li>
+<li><strong>Token Counting</strong>: Optional GPT token count display in notifications</li>
+<li><strong>Universal Extraction Settings</strong>:<ul>
+<li>Content mode selection (auto-detect, full page, main element, custom CSS selector)</li>
+<li>Custom CSS selector support for precise content extraction</li>
+<li>Strip navigation elements (nav, header, footer, sidebar)</li>
+<li>Include/exclude options for images, links, and page URL</li>
+<li>Preserve code blocks with syntax highlighting hints</li>
+</ul>
+</li>
+<li><strong>Theme Support</strong>: Light, dark, and system preference themes</li>
+<li><strong>Comprehensive Settings Page</strong>: Full configuration management via options page</li>
+<li><strong>Popup Quick Actions</strong>: Quick access to extraction, domain toggle, KPI summary, and last extraction status</li>
+<li><strong>Notification System</strong>: Toast notifications with customizable themes and animations</li>
+<li><strong>Modular Architecture</strong>: Shared components and utilities for maintainability</li>
+<li><strong>Test Coverage</strong>: 203+ unit tests (Vitest) and E2E tests (Playwright)</li>
+<li><strong>Packaging Script</strong>: Automated Chrome Web Store package generation with validation</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Initial release</li>
+</ul>
+<h3>Security</h3>
+<ul>
+<li>All processing happens locally in the browser</li>
+<li>No data collection or external server communication</li>
+<li>No analytics or tracking</li>
+<li>Open source codebase for transparency</li>
+</ul>
+
         </div>
       </div>
     </main>

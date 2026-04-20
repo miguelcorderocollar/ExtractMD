@@ -124,6 +124,155 @@ describe('YouTube content script logic', () => {
       expect(result).not.toContain('[0:00]');
     });
 
+    it('cleans up fragmented line breaks when timestamps are disabled', () => {
+      document.body.innerHTML = `
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:00</div>
+          <span class="yt-core-attributed-string">They buried themselves</span>
+        </transcript-segment-view-model>
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:05</div>
+          <span class="yt-core-attributed-string">deep within lorem ipsum,</span>
+        </transcript-segment-view-model>
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:10</div>
+          <span class="yt-core-attributed-string">wreaking synthetic havoc.</span>
+        </transcript-segment-view-model>
+      `;
+
+      const result = extractTranscriptText(false, true, true);
+
+      expect(result).toBe(
+        'They buried themselves deep within lorem ipsum, wreaking synthetic havoc.'
+      );
+    });
+
+    it('preserves line breaks when cleanup is disabled', () => {
+      document.body.innerHTML = `
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:00</div>
+          <span class="yt-core-attributed-string">They buried themselves</span>
+        </transcript-segment-view-model>
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:05</div>
+          <span class="yt-core-attributed-string">deep within lorem ipsum.</span>
+        </transcript-segment-view-model>
+      `;
+
+      const result = extractTranscriptText(false, true, false);
+
+      expect(result).toBe('They buried themselves\ndeep within lorem ipsum.');
+    });
+
+    it('does not clean up line breaks when timestamps are enabled', () => {
+      document.body.innerHTML = `
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:00</div>
+          <span class="yt-core-attributed-string">They buried themselves</span>
+        </transcript-segment-view-model>
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:05</div>
+          <span class="yt-core-attributed-string">deep within lorem ipsum.</span>
+        </transcript-segment-view-model>
+      `;
+
+      const result = extractTranscriptText(true, true, true);
+
+      expect(result).toBe('[0:00] They buried themselves\n[0:05] deep within lorem ipsum.');
+    });
+
+    it('preserves speaker, sound effect, and chapter boundaries during cleanup', () => {
+      document.body.innerHTML = `
+        <timeline-chapter-view-model class="ytwTimelineChapterViewModelHost">
+          <h3 class="ytwTimelineChapterViewModelTitle">Chapter 1: Lorem</h3>
+        </timeline-chapter-view-model>
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:00</div>
+          <span class="yt-core-attributed-string">Look at</span>
+        </transcript-segment-view-model>
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:05</div>
+          <span class="yt-core-attributed-string">how many samples appear.</span>
+        </transcript-segment-view-model>
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:10</div>
+          <span class="yt-core-attributed-string">- [Researcher] This line starts a speaker turn.</span>
+        </transcript-segment-view-model>
+        <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+          <div class="ytwTranscriptSegmentViewModelTimestamp">0:15</div>
+          <span class="yt-core-attributed-string">(soft synthetic music)</span>
+        </transcript-segment-view-model>
+      `;
+
+      const result = extractTranscriptText(false, true, true);
+
+      expect(result).toBe(`## Chapter 1: Lorem
+Look at how many samples appear.
+- [Researcher] This line starts a speaker turn.
+(soft synthetic music)`);
+    });
+
+    it('extracts transcript text from the latest YouTube DOM using ytAttributedStringHost', () => {
+      document.body.innerHTML = `
+        <macro-markers-panel-item-view-model class="ytwMacroMarkersPanelItemViewModelHost">
+          <timeline-item-view-model>
+            <div class="ytwTimelineItemViewModelContentItems">
+              <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+                <div aria-hidden="true" class="ytwTranscriptSegmentViewModelTimestamp">0:00</div>
+                <div class="ytwTranscriptSegmentViewModelTimestampA11yLabel">0 seconds</div>
+                <span class="ytAttributedStringHost ytAttributedStringLinkInheritColor" role="text">
+                  Lorem ipsum opening segment
+                </span>
+              </transcript-segment-view-model>
+            </div>
+          </timeline-item-view-model>
+        </macro-markers-panel-item-view-model>
+        <macro-markers-panel-item-view-model class="ytwMacroMarkersPanelItemViewModelHost">
+          <timeline-item-view-model>
+            <div class="ytwTimelineItemViewModelContentItems">
+              <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+                <div aria-hidden="true" class="ytwTranscriptSegmentViewModelTimestamp">0:11</div>
+                <div class="ytwTranscriptSegmentViewModelTimestampA11yLabel">11 seconds</div>
+                <span class="ytAttributedStringHost ytAttributedStringLinkInheritColor" role="text">
+                  Dolor sit amet follow up
+                </span>
+              </transcript-segment-view-model>
+            </div>
+          </timeline-item-view-model>
+        </macro-markers-panel-item-view-model>
+      `;
+
+      const result = extractTranscriptText(true);
+
+      expect(result).toContain('[0:00] Lorem ipsum opening segment');
+      expect(result).toContain('[0:11] Dolor sit amet follow up');
+      expect(result).not.toContain('11 seconds');
+    });
+
+    it('keeps chapter headings while extracting latest DOM transcript lines', () => {
+      document.body.innerHTML = `
+        <macro-markers-panel-item-view-model>
+          <timeline-chapter-view-model>
+            <div class="ytwTimelineChapterViewModelTimestamp">0:00</div>
+            <h3 class="ytwTimelineChapterViewModelTitle">Chapter 1: Lorem</h3>
+          </timeline-chapter-view-model>
+        </macro-markers-panel-item-view-model>
+        <macro-markers-panel-item-view-model>
+          <timeline-item-view-model>
+            <transcript-segment-view-model class="ytwTranscriptSegmentViewModelHost">
+              <div aria-hidden="true" class="ytwTranscriptSegmentViewModelTimestamp">0:05</div>
+              <span class="ytAttributedStringHost" role="text">Synthetic chapter body text</span>
+            </transcript-segment-view-model>
+          </timeline-item-view-model>
+        </macro-markers-panel-item-view-model>
+      `;
+
+      const result = extractTranscriptText(true);
+
+      expect(result).toContain('## Chapter 1: Lorem');
+      expect(result).toContain('[0:05] Synthetic chapter body text');
+    });
+
     it('handles segments without timestamps', () => {
       document.body.innerHTML = `
         <ytd-transcript-segment-renderer>
