@@ -17,6 +17,7 @@ Your goal is to transform ExtractMD from a collection of monolithic scripts into
 7. **Changelog Discipline (Extension-Only):** Document relevant extension updates in `CHANGELOG.md` (usually under `## [Unreleased]`) as part of feature work. Do not include contribution-process/docs changes (for example templates or `CONTRIBUTING.md`) and do not include website-only updates.
 8. **Unreleased Changelog Consolidation:** Keep `## [Unreleased]` concise by merging iterative updates for the same topic (for example, feature + follow-up fix) into one entry instead of duplicating details across sections.
 9. **Sanitized Test Content:** Always use fictional/synthetic names, handles, quotes, transcripts, and IDs in fixtures, temp samples, and test assertions. Never copy real-world personal or sensitive content into test assets.
+10. **Issue Template Compliance:** When creating GitHub issues, use the matching form template from `.github/ISSUE_TEMPLATE/` and complete every required field. Apply the template's default title prefix and labels.
 
 ## Project Vision (ExtractMD 2.0)
 
